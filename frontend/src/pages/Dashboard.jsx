@@ -1,13 +1,59 @@
-import React, { useState } from 'react';
-import { BarChart3, Target, Sprout, Settings, LogOut, Bell, User, TrendingUp, Droplets, Leaf } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import {
+  BarChart3,
+  Target,
+  Sprout,
+  Settings,
+  LogOut,
+  Bell,
+  User,
+  TrendingUp,
+  Droplets,
+  Leaf,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function Dashboard() {
-  const [selectedField, setSelectedField] = useState('Field-1');
+  const [selectedField, setSelectedField] = useState(null);
+  const [fields, setFields] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    fetchFields();
+  }, []);
+
+  const fetchFields = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://localhost:5000/api/fields", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setFields(response.data.fields);
+      if (response.data.fields.length > 0) {
+        setSelectedField(response.data.fields[0]);
+      }
+    } catch (error) {
+      console.error("Error fetching fields:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogout = () => {
-    navigate('/Login');
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
+  const handleFieldClick = (field) => {
+    // Navigate to the specific field details page
+    navigate(`/field/${field._id}`);
+  };
+
+  const handleFieldsNavigation = () => {
+    // Navigate to fields list page
+    navigate("/fields");
   };
 
   return (
@@ -22,31 +68,35 @@ function Dashboard() {
         </div>
 
         <nav className="flex-1 p-4">
-          <button className="w-full flex items-center gap-3 px-4 py-3 mb-2 bg-green-500 text-white rounded-lg">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="w-full flex items-center gap-3 px-4 py-3 mb-2 bg-green-500 text-white rounded-lg"
+          >
             <BarChart3 className="w-5 h-5" />
             <span>Dashboard</span>
           </button>
-          
+
           <button className="w-full flex items-center gap-3 px-4 py-3 mb-2 text-gray-400 hover:bg-gray-800 rounded-lg">
             <Target className="w-5 h-5" />
             <span>AI Recommendations</span>
           </button>
-          
-          <button className="w-full flex items-center gap-3 px-4 py-3 mb-2 text-gray-400 hover:bg-gray-800 rounded-lg">
+
+          <button
+            onClick={handleFieldsNavigation}
+            className="w-full flex items-center gap-3 px-4 py-3 mb-2 text-gray-400 hover:bg-gray-800 rounded-lg"
+          >
             <Sprout className="w-5 h-5" />
             <span>Fields</span>
           </button>
-          
+
           <button className="w-full flex items-center gap-3 px-4 py-3 mb-2 text-gray-400 hover:bg-gray-800 rounded-lg">
             <BarChart3 className="w-5 h-5" />
             <span>Analytics</span>
           </button>
-          
-          
         </nav>
 
         <div className="p-4 border-t border-gray-800">
-          <button 
+          <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-800 rounded-lg"
           >
@@ -62,9 +112,11 @@ function Dashboard() {
         <header className="h-16 bg-[#0a0a0a] border-b border-gray-800 flex items-center justify-between px-6">
           <div>
             <h1 className="text-2xl font-bold">Dashboard</h1>
-            <p className="text-sm text-gray-400">Real-time farm monitoring & AI optimization</p>
+            <p className="text-sm text-gray-400">
+              Real-time farm monitoring & AI optimization
+            </p>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <button className="relative p-2 hover:bg-gray-800 rounded-lg">
               <Bell className="w-5 h-5" />
@@ -88,37 +140,53 @@ function Dashboard() {
                 <Leaf className="w-8 h-8 text-green-500" />
                 <div>
                   <h2 className="text-2xl font-bold">AgriSync</h2>
-                  <p className="text-sm text-gray-400">Real-time farm monitoring & optimization</p>
+                  <p className="text-sm text-gray-400">
+                    Real-time farm monitoring & optimization
+                  </p>
                 </div>
               </div>
-              <button className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm">
+              <button
+                onClick={fetchFields}
+                className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm"
+              >
                 Refresh Data
               </button>
             </div>
 
             {/* Field Selector */}
             <div className="mb-6">
-              <label className="text-sm text-gray-400 mb-2 block">SELECT FIELD</label>
-              <div className="flex gap-2">
-                <button 
-                  onClick={() => setSelectedField('Field-1')}
-                  className={`px-6 py-2 rounded-lg ${selectedField === 'Field-1' ? 'bg-green-500 text-white' : 'bg-gray-800 text-gray-400'}`}
-                >
-                  Field-1
-                </button>
-                <button 
-                  onClick={() => setSelectedField('Field-2')}
-                  className={`px-6 py-2 rounded-lg ${selectedField === 'Field-2' ? 'bg-green-500 text-white' : 'bg-gray-800 text-gray-400'}`}
-                >
-                  Field-2
-                </button>
-                <button 
-                  onClick={() => setSelectedField('Field-3')}
-                  className={`px-6 py-2 rounded-lg ${selectedField === 'Field-3' ? 'bg-green-500 text-white' : 'bg-gray-800 text-gray-400'}`}
-                >
-                  Field-3
-                </button>
-              </div>
+              <label className="text-sm text-gray-400 mb-2 block">
+                SELECT FIELD
+              </label>
+              {loading ? (
+                <div className="text-gray-400">Loading fields...</div>
+              ) : fields.length > 0 ? (
+                <div className="flex gap-2 flex-wrap">
+                  {fields.map((field) => (
+                    <button
+                      key={field._id}
+                      onClick={() => handleFieldClick(field)}
+                      className={`px-6 py-2 rounded-lg transition ${
+                        selectedField?._id === field._id
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                      }`}
+                    >
+                      {field.fieldName}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-gray-400">
+                  No fields found.
+                  <button
+                    onClick={handleFieldsNavigation}
+                    className="ml-2 text-green-500 hover:text-green-400"
+                  >
+                    Create your first field
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Info Banner */}
@@ -127,17 +195,21 @@ function Dashboard() {
                 <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
               </div>
               <p className="text-sm text-gray-300">
-                South field irrigation efficiency improved to 94% after DRL optimization. Next recommendation in 6 hours.
+                {selectedField
+                  ? `${selectedField.fieldName} monitoring active. Click field name to view detailed analytics and recommendations.`
+                  : "South field irrigation efficiency improved to 94% after DRL optimization. Next recommendation in 6 hours."}
               </p>
             </div>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Soil Moisture Card */}
-              <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-6">
+              <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-6 hover:border-green-500 transition cursor-pointer">
                 <div className="flex items-center justify-between mb-4">
                   <Droplets className="w-8 h-8 text-green-500" />
-                  <span className="text-green-500 text-sm font-medium">+6%</span>
+                  <span className="text-green-500 text-sm font-medium">
+                    +6%
+                  </span>
                 </div>
                 <h3 className="text-gray-400 text-sm mb-2">Soil Moisture</h3>
                 <p className="text-4xl font-bold mb-1">68%</p>
@@ -145,10 +217,12 @@ function Dashboard() {
               </div>
 
               {/* Soil NPK Card */}
-              <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-6">
+              <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-6 hover:border-orange-500 transition cursor-pointer">
                 <div className="flex items-center justify-between mb-4">
                   <Leaf className="w-8 h-8 text-orange-500" />
-                  <span className="text-orange-500 text-sm font-medium">Balanced</span>
+                  <span className="text-orange-500 text-sm font-medium">
+                    Balanced
+                  </span>
                 </div>
                 <h3 className="text-gray-400 text-sm mb-2">Soil NPK</h3>
                 <p className="text-4xl font-bold mb-1">7.2</p>
@@ -156,21 +230,27 @@ function Dashboard() {
               </div>
 
               {/* Field Health Card */}
-              <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-6">
+              <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-6 hover:border-green-500 transition cursor-pointer">
                 <div className="flex items-center justify-between mb-4">
                   <TrendingUp className="w-8 h-8 text-green-500" />
-                  <span className="text-green-500 text-sm font-medium">+3%</span>
+                  <span className="text-green-500 text-sm font-medium">
+                    +3%
+                  </span>
                 </div>
                 <h3 className="text-gray-400 text-sm mb-2">Field Health</h3>
-                <p className="text-4xl font-bold mb-1">89%</p>
+                <p className="text-4xl font-bold mb-1">
+                  {selectedField?.overallHealth?.score || 89}%
+                </p>
                 <p className="text-xs text-gray-500">NDVI Score</p>
               </div>
 
               {/* Optimization Card */}
-              <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-6">
+              <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-6 hover:border-green-500 transition cursor-pointer">
                 <div className="flex items-center justify-between mb-4">
                   <Target className="w-8 h-8 text-green-500" />
-                  <span className="text-green-500 text-sm font-medium">DRL Active</span>
+                  <span className="text-green-500 text-sm font-medium">
+                    DRL Active
+                  </span>
                 </div>
                 <h3 className="text-gray-400 text-sm mb-2">Optimization</h3>
                 <p className="text-4xl font-bold mb-1">94%</p>
