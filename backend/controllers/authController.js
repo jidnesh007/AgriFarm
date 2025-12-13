@@ -61,11 +61,9 @@ const loginUser = async (req, res) => {
     if (user && (await bcrypt.compare(password, user.password))) {
       // Optional: Strict Role Checking
       if (role && user.role !== role) {
-        return res
-          .status(401)
-          .json({
-            message: `Access denied. You are not registered as a ${role}`,
-          });
+        return res.status(401).json({
+          message: `Access denied. You are not registered as a ${role}`,
+        });
       }
 
       res.json({
@@ -82,4 +80,12 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+const getUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select("-password");
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+module.exports = { registerUser, loginUser, getUser };
