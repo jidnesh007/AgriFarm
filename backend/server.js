@@ -4,6 +4,8 @@ const cors = require("cors");
 require("dotenv").config();
 
 const authRoutes = require("./routes/auth");
+const fieldRoutes = require("./routes/field");
+const weatherRoutes = require("./routes/weather"); // ADD THIS
 
 const app = express();
 
@@ -19,6 +21,8 @@ mongoose
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/fields", fieldRoutes);
+app.use("/api/weather", weatherRoutes); // ADD THIS
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
