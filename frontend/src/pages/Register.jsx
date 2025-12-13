@@ -1,38 +1,57 @@
-import React, { useState } from "react";
-import axios from "axios";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Sprout, UserPlus } from "lucide-react";
+import axios from "axios";
 
 const Register = () => {
   const navigate = useNavigate();
-  const [role, setRole] = useState("manager");
-  const [formData, setFormData] = useState({ phoneNumber: "", password: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    phoneNumber: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  const handleRegister = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccess(false);
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // API Call using Axios
-      const res = await axios.post("http://localhost:5000/api/auth/register", {
-        phoneNumber: formData.phoneNumber,
-        password: formData.password,
-        role: role,
-      });
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/register",
+        {
+          name: formData.name,
+          phoneNumber: formData.phoneNumber,
+          password: formData.password,
+        }
+      );
 
-      if (res.data) {
-        alert("Registration Successful! Please Login.");
-        navigate("/"); // Redirect to Login
-      }
+      setSuccess(true);
+
+      // Show success message briefly then redirect to login
+      setTimeout(() => {
+        navigate("/login", {
+          state: { message: "Registration successful! Please login." },
+        });
+      }, 1500);
     } catch (err) {
-      // Handle Axios Errors
       setError(err.response?.data?.message || "Registration failed");
     } finally {
       setLoading(false);
@@ -40,92 +59,131 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-green-50 px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden">
-        <div className="bg-green-600 p-6 text-center">
-          <h1 className="text-2xl font-bold text-white flex justify-center items-center gap-2">
-            <UserPlus size={28} /> Join SmartFarm AI
-          </h1>
-          <p className="text-green-100 text-sm mt-1">Create your account</p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-600 p-4">
+      <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md">
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
+          Create Account
+        </h2>
 
-        <div className="p-8">
-          {/* Role Toggle */}
-          <div className="flex bg-gray-100 p-1 rounded-xl mb-6">
-            <button
-              onClick={() => setRole("manager")}
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                role === "manager"
-                  ? "bg-white text-green-700 shadow"
-                  : "text-gray-500"
-              }`}
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            Registration successful! Redirecting to login...
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Manager
-            </button>
-            <button
-              onClick={() => setRole("farmer")}
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                role === "farmer"
-                  ? "bg-white text-green-700 shadow"
-                  : "text-gray-500"
-              }`}
-            >
-              Farmer
-            </button>
+              Full Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              disabled={success}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition disabled:bg-gray-100"
+              placeholder="Enter your full name"
+            />
           </div>
 
-          <form onSubmit={handleRegister} className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                name="phoneNumber"
-                required
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
-                placeholder="e.g. 9876543210"
-                onChange={handleChange}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Create Password
-              </label>
-              <input
-                type="password"
-                name="password"
-                required
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
-                placeholder="Min 6 characters"
-                onChange={handleChange}
-              />
-            </div>
-
-            {error && (
-              <div className="text-red-500 text-sm text-center">{error}</div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition-colors"
+          <div>
+            <label
+              htmlFor="phoneNumber"
+              className="block text-sm font-medium text-gray-700 mb-2"
             >
-              {loading ? "Creating Account..." : "Sign Up"}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center text-sm">
-            Already have an account?{" "}
-            <Link
-              to="/"
-              className="text-green-700 font-semibold hover:underline"
-            >
-              Login here
-            </Link>
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              id="phoneNumber"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              required
+              maxLength="10"
+              pattern="\d{10}"
+              disabled={success}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition disabled:bg-gray-100"
+              placeholder="Enter 10-digit phone number"
+            />
           </div>
-        </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              minLength="6"
+              disabled={success}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition disabled:bg-gray-100"
+              placeholder="Create a password (min 6 characters)"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="confirmPassword"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+              minLength="6"
+              disabled={success}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition disabled:bg-gray-100"
+              placeholder="Confirm your password"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading || success}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading
+              ? "Creating Account..."
+              : success
+              ? "Redirecting..."
+              : "Register"}
+          </button>
+        </form>
+
+        <p className="text-center text-gray-600 mt-6">
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            className="text-purple-600 hover:text-purple-700 font-semibold"
+          >
+            Login
+          </Link>
+        </p>
       </div>
     </div>
   );
