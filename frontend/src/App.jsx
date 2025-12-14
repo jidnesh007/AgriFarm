@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import FieldList from "./pages/FieldList";
 import FieldDetails from "./pages/FieldDetails";
 import Weather from "./pages/Weather";
+import AiRecommendation from "./components/AiRecommendation";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/fields" element={<FieldList />} />
         <Route path="/field/:id" element={<FieldDetails />} />
         <Route path="/weather" element={<Weather />} />
+        <Route path="/ai-recommendation" element={<AiRecommendation />} />
       </Routes>
     </BrowserRouter>
   );

@@ -4,15 +4,15 @@ const Field = require("../models/Field");
 const axios = require("axios");
 const authMiddleware = require("../middleware/auth");
 
-const OPENWEATHER_API_KEY = "";
+const OPENWEATHER_API_KEY = "b3b947aac91597e2a3495b9abd69d40e";
+const DRL_API_URL = "http://localhost:8000/recommend";
 
-// Get all fields for a user
+// Get all fields for user
 router.get("/", authMiddleware, async (req, res) => {
   try {
-    const fields = await Field.find({ userId: req.userId })
-      .sort({ createdAt: -1 })
-      .select("-zones.recommendations.explanation");
-
+    const fields = await Field.find({ userId: req.userId }).sort({
+      createdAt: -1,
+    });
     res.json({ fields });
   } catch (error) {
     console.error("Error fetching fields:", error);
@@ -20,7 +20,7 @@ router.get("/", authMiddleware, async (req, res) => {
   }
 });
 
-// Get single field with all details
+// Get single field
 router.get("/:id", authMiddleware, async (req, res) => {
   try {
     const field = await Field.findOne({
@@ -35,7 +35,7 @@ router.get("/:id", authMiddleware, async (req, res) => {
     res.json({ field });
   } catch (error) {
     console.error("Error fetching field:", error);
-    res.status(500).json({ message: "Error fetching field details" });
+    res.status(500).json({ message: "Error fetching field" });
   }
 });
 
@@ -45,73 +45,38 @@ router.post("/", authMiddleware, async (req, res) => {
     const { fieldName, cropType, fieldArea, location, numberOfZones } =
       req.body;
 
-    // Validation
-    if (!fieldName || !cropType || !fieldArea || !numberOfZones) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    if (numberOfZones < 1 || numberOfZones > 20) {
-      return res
-        .status(400)
-        .json({ message: "Number of zones must be between 1 and 20" });
-    }
-
-    // Generate zones automatically
+    // Create zones
     const zones = [];
-    const zoneLabels = "ABCDEFGHIJKLMNOPQRST";
-
-    for (let i = 0; i < numberOfZones; i++) {
+    for (let i = 1; i <= numberOfZones; i++) {
       zones.push({
-        zoneName: `Zone ${zoneLabels[i]}`,
-        soilMoisture: {
-          value: 0,
-          status: "Optimal",
-          lastUpdated: null,
-        },
-        soilNutrients: {
-          nitrogen: 0,
-          phosphorus: 0,
-          potassium: 0,
-          lastUpdated: null,
-        },
-        soilPH: {
-          value: 7.0,
-          lastUpdated: null,
-        },
-        cropHealth: {
-          score: 75,
-          status: "Healthy",
-          lastUpdated: null,
-        },
+        zoneName: `Zone ${i}`,
+        soilMoisture: { value: 50, status: "Optimal" },
+        soilNutrients: { nitrogen: 80, phosphorus: 50, potassium: 60 },
+        soilPH: { value: 6.8 },
+        cropHealth: { score: 75, status: "Healthy" },
       });
     }
 
-    const newField = new Field({
+    const field = new Field({
       userId: req.userId,
       fieldName,
       cropType,
-      fieldArea: {
-        value: fieldArea,
-        unit: "hectares",
-      },
+      fieldArea: { value: fieldArea, unit: "hectares" },
       location,
       numberOfZones,
       zones,
+      overallHealth: { status: "Healthy" },
     });
 
-    await newField.save();
-
-    res.status(201).json({
-      message: "Field created successfully",
-      field: newField,
-    });
+    await field.save();
+    res.status(201).json({ field });
   } catch (error) {
     console.error("Error creating field:", error);
     res.status(500).json({ message: "Error creating field" });
   }
 });
 
-// Update zone soil data
+// Update soil data for a zone
 router.put("/:fieldId/zone/:zoneId/soil", authMiddleware, async (req, res) => {
   try {
     const { fieldId, zoneId } = req.params;
@@ -129,61 +94,32 @@ router.put("/:fieldId/zone/:zoneId/soil", authMiddleware, async (req, res) => {
       return res.status(404).json({ message: "Zone not found" });
     }
 
-    const now = new Date();
+    // Update zone data
+    zone.soilMoisture.value = soilMoisture;
+    zone.soilMoisture.lastUpdated = new Date();
+    zone.soilMoisture.status =
+      soilMoisture < 40 ? "Dry" : soilMoisture > 70 ? "Wet" : "Optimal";
 
-    // Update soil moisture
-    if (soilMoisture !== undefined) {
-      zone.soilMoisture.value = soilMoisture;
-      zone.soilMoisture.status =
-        soilMoisture < 20 ? "Dry" : soilMoisture > 60 ? "Wet" : "Optimal";
-      zone.soilMoisture.lastUpdated = now;
-    }
+    zone.soilNutrients.nitrogen = nitrogen;
+    zone.soilNutrients.phosphorus = phosphorus;
+    zone.soilNutrients.potassium = potassium;
+    zone.soilNutrients.lastUpdated = new Date();
 
-    // Update nutrients
-    if (
-      nitrogen !== undefined ||
-      phosphorus !== undefined ||
-      potassium !== undefined
-    ) {
-      if (nitrogen !== undefined) zone.soilNutrients.nitrogen = nitrogen;
-      if (phosphorus !== undefined) zone.soilNutrients.phosphorus = phosphorus;
-      if (potassium !== undefined) zone.soilNutrients.potassium = potassium;
-      zone.soilNutrients.lastUpdated = now;
-    }
-
-    // Update pH
-    if (soilPH !== undefined) {
-      zone.soilPH.value = soilPH;
-      zone.soilPH.lastUpdated = now;
-    }
-
-    // Calculate crop health based on soil conditions
-    let healthScore = 100;
-    if (zone.soilMoisture.status === "Dry") healthScore -= 20;
-    if (zone.soilMoisture.status === "Wet") healthScore -= 10;
-    if (zone.soilPH.value < 5.5 || zone.soilPH.value > 8.5) healthScore -= 15;
-    if (zone.soilNutrients.nitrogen < 30) healthScore -= 10;
-
-    zone.cropHealth.score = Math.max(0, healthScore);
-    zone.cropHealth.status =
-      healthScore >= 75 ? "Healthy" : healthScore >= 50 ? "Stress" : "Critical";
-    zone.cropHealth.lastUpdated = now;
+    zone.soilPH.value = soilPH;
+    zone.soilPH.lastUpdated = new Date();
 
     await field.save();
 
-    res.json({
-      message: "Soil data updated successfully",
-      zone,
-    });
+    res.json({ message: "Soil data updated successfully", zone });
   } catch (error) {
     console.error("Error updating soil data:", error);
     res.status(500).json({ message: "Error updating soil data" });
   }
 });
 
-// Get weather and generate recommendations
+// Generate AI DRL Recommendation for a zone
 router.post(
-  "/:fieldId/zone/:zoneId/recommendations",
+  "/:fieldId/zone/:zoneId/ai-recommendation",
   authMiddleware,
   async (req, res) => {
     try {
@@ -201,11 +137,21 @@ router.post(
         return res.status(404).json({ message: "Zone not found" });
       }
 
+      // Check if we have soil data
+      if (!zone.soilMoisture.lastUpdated) {
+        return res.status(400).json({
+          message:
+            "Please update soil data first before getting AI recommendations",
+        });
+      }
+
       // Fetch weather data
-      let weatherData = null;
-      let weatherInfluence = "";
+      let temperature = 25;
+      let humidity = 60;
+      let rain_prob = 0.3;
 
       if (
+        field.location.coordinates &&
         field.location.coordinates.latitude &&
         field.location.coordinates.longitude
       ) {
@@ -214,165 +160,126 @@ router.post(
             `https://api.openweathermap.org/data/2.5/weather?lat=${field.location.coordinates.latitude}&lon=${field.location.coordinates.longitude}&appid=${OPENWEATHER_API_KEY}&units=metric`
           );
 
-          weatherData = weatherResponse.data;
+          const weatherData = weatherResponse.data;
+          temperature = weatherData.main.temp;
+          humidity = weatherData.main.humidity;
+          rain_prob = weatherData.clouds ? weatherData.clouds.all / 100 : 0.2;
 
-          // Update field weather summary
-          field.weatherSummary = {
-            temperature: weatherData.main.temp,
-            humidity: weatherData.main.humidity,
-            rainfall: weatherData.rain ? "Rain expected" : "No rain expected",
-            stressRisk:
-              weatherData.main.temp > 35
-                ? "Heat stress risk"
-                : weatherData.main.temp < 10
-                ? "Cold stress risk"
-                : "No stress risk",
-            lastUpdated: new Date(),
-          };
-
-          // Build weather influence text
+          // Check for rain in response
           if (weatherData.rain) {
-            weatherInfluence = "Rain is expected, reducing irrigation needs. ";
-          } else {
-            weatherInfluence =
-              "No rain expected, regular irrigation recommended. ";
-          }
-
-          if (weatherData.main.temp > 35) {
-            weatherInfluence +=
-              "High temperatures increase water requirements.";
-          } else if (weatherData.main.temp < 10) {
-            weatherInfluence += "Cold weather may slow crop growth.";
+            rain_prob = 0.8;
           }
         } catch (error) {
-          console.error("Weather API error:", error.message);
-          weatherInfluence = "Weather data unavailable";
+          console.log("Using default weather values");
         }
       }
 
-      // Generate recommendations based on soil data and weather
-      const soilMoisture = zone.soilMoisture.value;
-      const nitrogen = zone.soilNutrients.nitrogen;
-      const cropType = field.cropType;
+      // Prepare data for DRL model
+      const drlInput = {
+        moisture: zone.soilMoisture.value,
+        nitrogen: zone.soilNutrients.nitrogen,
+        phosphorus: zone.soilNutrients.phosphorus,
+        potassium: zone.soilNutrients.potassium,
+        ph: zone.soilPH.value,
+        growth: 0.5, // Default growth stage
+        temp: temperature,
+        humidity: humidity,
+        rain_prob: rain_prob,
+      };
 
-      // Irrigation recommendation
-      let irrigationAmount = 0;
-      let irrigationTiming = "";
-      let irrigationConfidence = 0;
-
-      if (soilMoisture < 20) {
-        irrigationAmount = 25;
-        irrigationTiming = "Urgent - Within 24 hours";
-        irrigationConfidence = 95;
-      } else if (soilMoisture < 40) {
-        irrigationAmount = 15;
-        irrigationTiming = "Within 2-3 days";
-        irrigationConfidence = 85;
-      } else if (soilMoisture < 60) {
-        irrigationAmount = 5;
-        irrigationTiming = "Monitor - not urgent";
-        irrigationConfidence = 70;
-      } else {
-        irrigationAmount = 0;
-        irrigationTiming = "Not needed";
-        irrigationConfidence = 90;
-      }
-
-      // Adjust for rain
-      if (weatherData?.rain) {
-        irrigationAmount = Math.max(0, irrigationAmount - 10);
-        irrigationConfidence -= 10;
-      }
-
-      // Fertilizer recommendation
-      let fertilizerAmount = 0;
-      let fertilizerType = "";
-      let fertilizerTiming = "";
-      let fertilizerConfidence = 0;
-
-      if (nitrogen < 30) {
-        fertilizerAmount = 50;
-        fertilizerType = "Nitrogen-rich (Urea)";
-        fertilizerTiming = "Within 1 week";
-        fertilizerConfidence = 90;
-      } else if (nitrogen < 50) {
-        fertilizerAmount = 30;
-        fertilizerType = "Balanced NPK";
-        fertilizerTiming = "Within 2 weeks";
-        fertilizerConfidence = 80;
-      } else {
-        fertilizerAmount = 0;
-        fertilizerType = "Not needed";
-        fertilizerTiming = "Monitor levels";
-        fertilizerConfidence = 85;
+      // Call Python DRL API
+      let aiRecommendation;
+      try {
+        const drlResponse = await axios.post(DRL_API_URL, drlInput, {
+          timeout: 10000,
+        });
+        aiRecommendation = drlResponse.data;
+      } catch (error) {
+        console.error("DRL API error:", error.message);
+        return res.status(503).json({
+          message:
+            "AI service unavailable. Please make sure the Python server is running on port 8000.",
+          error: error.message,
+        });
       }
 
       // Generate explanation
-      let explanation = `For ${cropType} in ${zone.zoneName}: `;
+      let explanation = "";
 
-      if (soilMoisture < 40) {
-        explanation += `Soil moisture is ${soilMoisture}%, which is below optimal levels. `;
+      if (zone.soilMoisture.value < 40) {
+        explanation += `Soil moisture is low at ${zone.soilMoisture.value}%. `;
+      } else if (zone.soilMoisture.value > 70) {
+        explanation += `Soil moisture is high at ${zone.soilMoisture.value}%. `;
       } else {
-        explanation += `Soil moisture is adequate at ${soilMoisture}%. `;
+        explanation += `Soil moisture is optimal at ${zone.soilMoisture.value}%. `;
       }
 
-      if (nitrogen < 40) {
-        explanation += `Nitrogen levels are low (${nitrogen} ppm), fertilization recommended. `;
+      if (zone.soilNutrients.nitrogen < 50) {
+        explanation += `Nitrogen levels are low (${zone.soilNutrients.nitrogen} ppm). `;
       }
 
-      explanation += weatherInfluence;
+      if (rain_prob > 0.6) {
+        explanation += `High rain probability (${(rain_prob * 100).toFixed(
+          0
+        )}%), irrigation reduced. `;
+      }
 
-      // Save recommendations
+      if (temperature > 35) {
+        explanation += `High temperature (${temperature}°C) increases water requirements. `;
+      }
+
+      explanation += `The AI model recommends ${aiRecommendation.irrigation_mm}mm of water and ${aiRecommendation.fertilizer_kg}kg/acre of fertilizer for optimal crop health.`;
+
+      // Store AI recommendation in zone
       zone.recommendations = {
         irrigation: {
-          amount: irrigationAmount,
+          amount: aiRecommendation.irrigation_mm,
           unit: "mm",
-          timing: irrigationTiming,
-          confidence: irrigationConfidence,
+          timing:
+            aiRecommendation.irrigation_mm > 0
+              ? "Within 24-48 hours"
+              : "Not needed",
+          confidence: 90,
         },
         fertilizer: {
-          amount: fertilizerAmount,
-          unit: "kg/ha",
-          type: fertilizerType,
-          timing: fertilizerTiming,
-          confidence: fertilizerConfidence,
+          amount: aiRecommendation.fertilizer_kg,
+          unit: "kg/acre",
+          type:
+            aiRecommendation.fertilizer_kg > 0 ? "NPK Balanced" : "Not needed",
+          timing:
+            aiRecommendation.fertilizer_kg > 0 ? "Within 1 week" : "Not needed",
+          confidence: 90,
         },
-        explanation,
-        weatherInfluence,
+        explanation: explanation.trim(),
+        weatherInfluence: `Temp: ${temperature.toFixed(
+          1
+        )}°C, Humidity: ${humidity}%, Rain: ${(rain_prob * 100).toFixed(0)}%`,
         lastGenerated: new Date(),
+        aiGenerated: true,
+        healthScore: aiRecommendation.health,
       };
 
       await field.save();
 
       res.json({
-        message: "Recommendations generated successfully",
-        recommendations: zone.recommendations,
-        weatherSummary: field.weatherSummary,
+        message: "AI recommendation generated successfully",
+        recommendation: {
+          irrigation_mm: aiRecommendation.irrigation_mm,
+          fertilizer_kg: aiRecommendation.fertilizer_kg,
+          health_score: aiRecommendation.health,
+          explanation: explanation.trim(),
+          weatherData: {
+            temperature,
+            humidity,
+            rain_probability: rain_prob,
+          },
+        },
       });
     } catch (error) {
-      console.error("Error generating recommendations:", error);
-      res.status(500).json({ message: "Error generating recommendations" });
+      console.error("Error generating AI recommendation:", error);
+      res.status(500).json({ message: "Error generating AI recommendation" });
     }
   }
 );
-
-// Delete field
-router.delete("/:id", authMiddleware, async (req, res) => {
-  try {
-    const field = await Field.findOneAndDelete({
-      _id: req.params.id,
-      userId: req.userId,
-    });
-
-    if (!field) {
-      return res.status(404).json({ message: "Field not found" });
-    }
-
-    res.json({ message: "Field deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting field:", error);
-    res.status(500).json({ message: "Error deleting field" });
-  }
-});
 
 module.exports = router;

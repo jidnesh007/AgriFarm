@@ -13,6 +13,8 @@ import {
   Edit2,
   CheckCircle,
   X,
+  Brain,
+  Loader,
 } from "lucide-react";
 
 const FieldDetails = () => {
@@ -60,19 +62,47 @@ const FieldDetails = () => {
     return colors[status] || "bg-gray-100 text-gray-700 border-gray-300";
   };
 
-  const generateRecommendations = async (zoneId) => {
+  const getHealthColor = (health) => {
+    if (health >= 75) return "text-green-600 bg-green-100 border-green-300";
+    if (health >= 50) return "text-yellow-600 bg-yellow-100 border-yellow-300";
+    return "text-red-600 bg-red-100 border-red-300";
+  };
+
+  const getHealthStatus = (health) => {
+    if (health >= 75) return "Excellent";
+    if (health >= 50) return "Moderate";
+    return "Poor";
+  };
+
+  const generateAIRecommendation = async (zoneId) => {
     setGeneratingRecs(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        `http://localhost:5000/api/fields/${id}/zone/${zoneId}/recommendations`,
+      const response = await axios.post(
+        `http://localhost:5000/api/fields/${id}/zone/${zoneId}/ai-recommendation`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
       await fetchFieldDetails();
+
+      // Show success message
+      const rec = response.data.recommendation;
+      alert(
+        `✅ AI Recommendation Generated!\n\n💧 Irrigation: ${
+          rec.irrigation_mm
+        }mm\n🌿 Fertilizer: ${
+          rec.fertilizer_kg
+        }kg/acre\n💚 Health Score: ${rec.health_score.toFixed(1)}%\n\n${
+          rec.explanation
+        }`
+      );
     } catch (error) {
-      console.error("Error generating recommendations:", error);
-      alert("Failed to generate recommendations");
+      console.error("Error generating AI recommendation:", error);
+      alert(
+        error.response?.data?.message ||
+          "Failed to generate AI recommendation. Make sure Python server (port 8000) is running."
+      );
     } finally {
       setGeneratingRecs(false);
     }
@@ -221,13 +251,32 @@ const FieldDetails = () => {
                 <h2 className="text-2xl font-bold text-gray-800">
                   {selectedZone.zoneName} Details
                 </h2>
-                <button
-                  onClick={() => setShowSoilModal(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                >
-                  <Edit2 size={18} />
-                  Update Soil Data
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => generateAIRecommendation(selectedZone._id)}
+                    disabled={generatingRecs}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {generatingRecs ? (
+                      <>
+                        <Loader size={18} className="animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Brain size={18} />
+                        AI Recommend
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setShowSoilModal(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                  >
+                    <Edit2 size={18} />
+                    Update Soil Data
+                  </button>
+                </div>
               </div>
 
               {/* Soil Conditions Grid */}
@@ -345,23 +394,105 @@ const FieldDetails = () => {
                 </div>
               </div>
 
-              {/* Recommendations Section */}
+              {/* AI Recommendations Section */}
               {selectedZone.recommendations &&
               selectedZone.recommendations.lastGenerated ? (
                 <div className="space-y-4">
-                  <h3 className="text-xl font-bold text-gray-800 mb-4">
-                    Recommended Actions
-                  </h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                      {selectedZone.recommendations.aiGenerated && (
+                        <div className="bg-purple-100 p-2 rounded-lg">
+                          <Brain size={20} className="text-purple-600" />
+                        </div>
+                      )}
+                      AI-Powered Recommendations
+                    </h3>
+                    {selectedZone.recommendations.aiGenerated && (
+                      <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold">
+                        DRL Model
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Health Score Card */}
+                  {selectedZone.recommendations.healthScore > 0 && (
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-200 rounded-lg p-6">
+                      <h4 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+                        <TrendingUp size={20} className="text-purple-600" />
+                        AI Health Assessment
+                      </h4>
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="text-gray-700 font-semibold">
+                          Overall Health Score
+                        </span>
+                        <div className="text-right">
+                          <span className="text-4xl font-bold text-purple-600">
+                            {selectedZone.recommendations.healthScore.toFixed(
+                              1
+                            )}
+                            %
+                          </span>
+                          <span
+                            className={`block mt-1 px-3 py-1 rounded-full text-xs font-semibold border ${getHealthColor(
+                              selectedZone.recommendations.healthScore
+                            )}`}
+                          >
+                            {getHealthStatus(
+                              selectedZone.recommendations.healthScore
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                        <div
+                          className="h-full transition-all duration-500 rounded-full"
+                          style={{
+                            width: `${selectedZone.recommendations.healthScore}%`,
+                            backgroundColor:
+                              selectedZone.recommendations.healthScore >= 75
+                                ? "#16a34a"
+                                : selectedZone.recommendations.healthScore >= 50
+                                ? "#eab308"
+                                : "#dc2626",
+                          }}
+                        ></div>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-3 text-center">
+                        {selectedZone.recommendations.healthScore >= 75
+                          ? "🌟 Excellent crop health! Continue current practices."
+                          : selectedZone.recommendations.healthScore >= 50
+                          ? "⚠️ Moderate health - Follow recommendations below."
+                          : "🚨 Poor health - Immediate action required!"}
+                      </p>
+                    </div>
+                  )}
 
                   {/* Explanation */}
-                  <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-                    <h4 className="font-semibold text-blue-900 mb-2">
-                      Why this recommendation?
-                    </h4>
-                    <p className="text-sm text-blue-800">
-                      {selectedZone.recommendations.explanation}
-                    </p>
-                  </div>
+                  {selectedZone.recommendations.explanation && (
+                    <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                      <h4 className="font-semibold text-blue-900 mb-2">
+                        Why this recommendation?
+                      </h4>
+                      <p className="text-sm text-blue-800">
+                        {selectedZone.recommendations.explanation}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Weather Influence */}
+                  {selectedZone.recommendations.weatherInfluence && (
+                    <div className="bg-gradient-to-r from-sky-50 to-blue-50 border border-sky-200 p-4 rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Cloud size={18} className="text-sky-600" />
+                        <h4 className="font-semibold text-gray-800">
+                          Weather Conditions Considered
+                        </h4>
+                      </div>
+                      <p className="text-sm text-gray-700">
+                        {selectedZone.recommendations.weatherInfluence}
+                      </p>
+                    </div>
+                  )}
 
                   {/* Action Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -378,7 +509,7 @@ const FieldDetails = () => {
 
                       {selectedZone.recommendations.irrigation.amount > 0 ? (
                         <>
-                          <p className="text-3xl font-bold text-blue-600 mb-2">
+                          <p className="text-4xl font-bold text-blue-600 mb-2">
                             {selectedZone.recommendations.irrigation.amount}{" "}
                             {selectedZone.recommendations.irrigation.unit}
                           </p>
@@ -404,19 +535,28 @@ const FieldDetails = () => {
                             </span>
                           </div>
                           <div className="flex gap-2">
-                            <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg flex items-center justify-center gap-2">
+                            <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg flex items-center justify-center gap-2 transition">
                               <CheckCircle size={18} />
                               Approve
                             </button>
-                            <button className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 py-2 rounded-lg">
+                            <button className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 py-2 rounded-lg transition">
                               Modify
                             </button>
                           </div>
                         </>
                       ) : (
-                        <p className="text-gray-600">
-                          No irrigation needed at this time
-                        </p>
+                        <div className="text-center py-4">
+                          <CheckCircle
+                            size={48}
+                            className="mx-auto text-green-500 mb-2"
+                          />
+                          <p className="text-gray-600 font-semibold">
+                            No irrigation needed
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Soil moisture is at optimal levels
+                          </p>
+                        </div>
                       )}
                     </div>
 
@@ -433,7 +573,7 @@ const FieldDetails = () => {
 
                       {selectedZone.recommendations.fertilizer.amount > 0 ? (
                         <>
-                          <p className="text-3xl font-bold text-green-600 mb-2">
+                          <p className="text-4xl font-bold text-green-600 mb-2">
                             {selectedZone.recommendations.fertilizer.amount}{" "}
                             {selectedZone.recommendations.fertilizer.unit}
                           </p>
@@ -463,19 +603,28 @@ const FieldDetails = () => {
                             </span>
                           </div>
                           <div className="flex gap-2">
-                            <button className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg flex items-center justify-center gap-2">
+                            <button className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg flex items-center justify-center gap-2 transition">
                               <CheckCircle size={18} />
                               Approve
                             </button>
-                            <button className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 py-2 rounded-lg">
+                            <button className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 py-2 rounded-lg transition">
                               Modify
                             </button>
                           </div>
                         </>
                       ) : (
-                        <p className="text-gray-600">
-                          No fertilizer needed at this time
-                        </p>
+                        <div className="text-center py-4">
+                          <CheckCircle
+                            size={48}
+                            className="mx-auto text-green-500 mb-2"
+                          />
+                          <p className="text-gray-600 font-semibold">
+                            No fertilizer needed
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Nutrient levels are adequate
+                          </p>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -489,24 +638,39 @@ const FieldDetails = () => {
                 </div>
               ) : (
                 <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                  <AlertCircle
-                    size={48}
-                    className="mx-auto text-gray-400 mb-4"
-                  />
+                  <Brain size={48} className="mx-auto text-gray-400 mb-4" />
                   <h4 className="text-lg font-semibold text-gray-700 mb-2">
-                    No recommendations yet
+                    No AI recommendations yet
                   </h4>
                   <p className="text-gray-600 mb-4">
-                    Update soil data and generate recommendations to get started
+                    {selectedZone.soilMoisture.lastUpdated
+                      ? "Click the button above to generate AI-powered recommendations"
+                      : "Update soil data first, then generate recommendations"}
                   </p>
                   <button
-                    onClick={() => generateRecommendations(selectedZone._id)}
+                    onClick={() => {
+                      if (selectedZone.soilMoisture.lastUpdated) {
+                        generateAIRecommendation(selectedZone._id);
+                      } else {
+                        setShowSoilModal(true);
+                      }
+                    }}
                     disabled={generatingRecs}
-                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg disabled:opacity-50"
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 mx-auto disabled:opacity-50"
                   >
-                    {generatingRecs
-                      ? "Generating..."
-                      : "Generate Recommendations"}
+                    {generatingRecs ? (
+                      <>
+                        <Loader size={20} className="animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Brain size={20} />
+                        {selectedZone.soilMoisture.lastUpdated
+                          ? "Generate AI Recommendations"
+                          : "Update Soil Data First"}
+                      </>
+                    )}
                   </button>
                 </div>
               )}
@@ -685,7 +849,7 @@ const SoilUpdateModal = ({ fieldId, zone, onClose, onSuccess }) => {
                 disabled={loading}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition disabled:opacity-50"
               >
-                {loading ? "Updating..." : "Update & Regenerate"}
+                {loading ? "Updating..." : "Update Data"}
               </button>
             </div>
           </form>

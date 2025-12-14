@@ -1,94 +1,107 @@
 const mongoose = require('mongoose');
 
+// Zone Schema
 const zoneSchema = new mongoose.Schema({
-  zoneName: {
-    type: String,
-    required: true
-  },
+  zoneName: { type: String, required: true },
+  
   soilMoisture: {
     value: { type: Number, default: 0 },
-    status: { type: String, enum: ['Dry', 'Optimal', 'Wet'], default: 'Optimal' },
-    lastUpdated: Date
+    status: { type: String, default: 'Unknown' },
+    lastUpdated: { type: Date }
   },
+  
   soilNutrients: {
     nitrogen: { type: Number, default: 0 },
     phosphorus: { type: Number, default: 0 },
     potassium: { type: Number, default: 0 },
-    lastUpdated: Date
+    lastUpdated: { type: Date }
   },
+  
   soilPH: {
     value: { type: Number, default: 7.0 },
-    lastUpdated: Date
+    lastUpdated: { type: Date }
   },
+  
   cropHealth: {
-    score: { type: Number, default: 75 },
-    status: { type: String, enum: ['Healthy', 'Stress', 'Critical'], default: 'Healthy' },
-    lastUpdated: Date
+    score: { type: Number, default: 0 },
+    status: { type: String, default: 'Unknown' },
+    lastUpdated: { type: Date }
   },
+  
+  // UPDATED RECOMMENDATIONS SCHEMA
   recommendations: {
     irrigation: {
-      amount: Number,
+      amount: { type: Number, default: 0 },
       unit: { type: String, default: 'mm' },
-      timing: String,
-      confidence: Number
+      timing: { type: String, default: 'Not needed' },
+      confidence: { type: Number, default: 0 }
     },
     fertilizer: {
-      amount: Number,
-      unit: { type: String, default: 'kg/ha' },
-      type: String,
-      timing: String,
-      confidence: Number
+      amount: { type: Number, default: 0 },
+      unit: { type: String, default: 'kg/acre' },
+      type: { type: String, default: 'Not needed' },
+      timing: { type: String, default: 'Not needed' },
+      confidence: { type: Number, default: 0 }
     },
-    explanation: String,
-    weatherInfluence: String,
-    lastGenerated: Date
+    explanation: { type: String, default: '' },
+    weatherInfluence: { type: String, default: '' },
+    lastGenerated: { type: Date },
+    aiGenerated: { type: Boolean, default: false },
+    healthScore: { type: Number, default: 0 }
   }
 });
 
+// Field Schema
 const fieldSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+  userId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User', 
+    required: true 
   },
-  fieldName: {
-    type: String,
-    required: true,
-    trim: true
+  
+  fieldName: { 
+    type: String, 
+    required: true 
   },
-  cropType: {
-    type: String,
-    required: true,
-    trim: true
+  
+  cropType: { 
+    type: String, 
+    required: true 
   },
+  
   fieldArea: {
     value: { type: Number, required: true },
     unit: { type: String, default: 'hectares' }
   },
+  
   location: {
-    village: String,
-    district: String,
+    village: { type: String },
+    district: { type: String },
     coordinates: {
-      latitude: Number,
-      longitude: Number
+      latitude: { type: Number },
+      longitude: { type: Number }
     }
   },
-  numberOfZones: {
-    type: Number,
-    required: true,
-    min: 1
+  
+  numberOfZones: { 
+    type: Number, 
+    required: true, 
+    default: 1 
   },
+  
   zones: [zoneSchema],
+  
   overallHealth: {
-    status: { type: String, enum: ['Good', 'Fair', 'Poor'], default: 'Good' },
-    score: { type: Number, default: 75 }
+    status: { type: String, default: 'Unknown' },
+    lastUpdated: { type: Date }
   },
+  
   weatherSummary: {
-    temperature: Number,
-    humidity: Number,
-    rainfall: String,
-    stressRisk: String,
-    lastUpdated: Date
+    temperature: { type: Number },
+    humidity: { type: Number },
+    rainfall: { type: String },
+    stressRisk: { type: String },
+    lastUpdated: { type: Date }
   }
 }, {
   timestamps: true

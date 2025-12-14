@@ -80,7 +80,9 @@ function Dashboard() {
               <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                 AgriSync
               </span>
-              <p className="text-xs text-gray-600 font-medium">Smart Farming Platform</p>
+              <p className="text-xs text-gray-600 font-medium">
+                Smart Farming Platform
+              </p>
             </div>
           </div>
         </div>
@@ -97,7 +99,10 @@ function Dashboard() {
             <Sparkles className="w-4 h-4 ml-auto relative z-10 opacity-70" />
           </button>
 
-          <button className="w-full flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group">
+          <button
+            onClick={() => navigate("/ai-recommendation")}
+            className="w-full flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group"
+          >
             <Target className="w-5 h-5 text-emerald-600 group-hover:scale-110 transition-transform" />
             <span className="font-medium">AI Recommendations</span>
           </button>
@@ -189,7 +194,7 @@ function Dashboard() {
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
               <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
-              
+
               <div className="relative flex items-start justify-between">
                 <div className="flex items-center gap-5">
                   <div className="w-20 h-20 bg-white/20 backdrop-blur-xl rounded-3xl flex items-center justify-center shadow-2xl border border-white/30 transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
@@ -200,7 +205,8 @@ function Dashboard() {
                       Welcome to AgriSync
                     </h2>
                     <p className="text-base text-white/90 font-medium drop-shadow">
-                      Empower your agriculture with real-time insights & AI optimization
+                      Empower your agriculture with real-time insights & AI
+                      optimization
                     </p>
                   </div>
                 </div>
@@ -209,7 +215,10 @@ function Dashboard() {
                   className="flex items-center gap-2 px-6 py-3 bg-white/20 hover:bg-white/30 backdrop-blur-xl border border-white/30 text-white rounded-full transition-all duration-300 shadow-xl hover:shadow-2xl font-semibold transform hover:-translate-y-1"
                 >
                   <span className="text-sm">Refresh Data</span>
-                  <ArrowUpRight size={18} className="group-hover:rotate-45 transition-transform" />
+                  <ArrowUpRight
+                    size={18}
+                    className="group-hover:rotate-45 transition-transform"
+                  />
                 </button>
               </div>
             </div>
@@ -247,7 +256,9 @@ function Dashboard() {
               ) : (
                 <div className="bg-gradient-to-br from-gray-50 to-emerald-50 rounded-2xl p-10 text-center border-2 border-dashed border-gray-300">
                   <Sprout className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-700 mb-5 font-semibold text-lg">No fields found</p>
+                  <p className="text-gray-700 mb-5 font-semibold text-lg">
+                    No fields found
+                  </p>
                   <button
                     onClick={handleFieldsNavigation}
                     className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-full transition-all duration-300 shadow-lg hover:shadow-xl font-semibold transform hover:-translate-y-1"
@@ -263,7 +274,7 @@ function Dashboard() {
               <div className="relative bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-3xl p-7 shadow-2xl overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-                
+
                 <div className="relative flex items-start gap-5">
                   <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center shadow-2xl flex-shrink-0 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
                     <MapPin className="w-7 h-7 text-white" />
@@ -275,12 +286,13 @@ function Dashboard() {
                     <p className="text-base text-white/95 font-medium drop-shadow mb-2">
                       {selectedField.location.village &&
                         `${selectedField.location.village}, `}
-                      {selectedField.location.district} • {selectedField.cropType}{" "}
-                      • {selectedField.fieldArea.value}{" "}
+                      {selectedField.location.district} •{" "}
+                      {selectedField.cropType} • {selectedField.fieldArea.value}{" "}
                       {selectedField.fieldArea.unit}
                     </p>
                     <p className="text-sm text-white/80 font-medium drop-shadow">
-                      Click field name above to view detailed analytics and AI recommendations
+                      Click field name above to view detailed analytics and AI
+                      recommendations
                     </p>
                   </div>
                 </div>
@@ -307,7 +319,9 @@ function Dashboard() {
                   <p className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">
                     68%
                   </p>
-                  <p className="text-xs text-gray-600 font-semibold">Status: Optimal Range</p>
+                  <p className="text-xs text-gray-600 font-semibold">
+                    Status: Optimal Range
+                  </p>
                 </div>
               </div>
 
@@ -329,7 +343,9 @@ function Dashboard() {
                   <p className="text-5xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent mb-2">
                     7.2
                   </p>
-                  <p className="text-xs text-gray-600 font-semibold">N:P:K Ratio</p>
+                  <p className="text-xs text-gray-600 font-semibold">
+                    N:P:K Ratio
+                  </p>
                 </div>
               </div>
 
@@ -351,7 +367,9 @@ function Dashboard() {
                   <p className="text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2">
                     {selectedField?.overallHealth?.score || 89}%
                   </p>
-                  <p className="text-xs text-gray-600 font-semibold">NDVI Score</p>
+                  <p className="text-xs text-gray-600 font-semibold">
+                    NDVI Score
+                  </p>
                 </div>
               </div>
 
@@ -373,7 +391,9 @@ function Dashboard() {
                   <p className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
                     94%
                   </p>
-                  <p className="text-xs text-gray-600 font-semibold">Efficiency Score</p>
+                  <p className="text-xs text-gray-600 font-semibold">
+                    Efficiency Score
+                  </p>
                 </div>
               </div>
             </div>
