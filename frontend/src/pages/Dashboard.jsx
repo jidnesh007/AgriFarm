@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   BarChart3,
+  Camera,
   Target,
   Sprout,
   Settings,
@@ -16,14 +17,48 @@ import {
   Sparkles,
   Activity,
   Zap,
+  Wind,
+  Sun,
+  CloudRain,
+  ThermometerSun,
+  AlertCircle,
+  CheckCircle,
+  Plus,
+  ArrowLeft,
+  Brain,
+  Loader,
+  Edit2,
+  X,
+  RefreshCw,
+  Thermometer,
+  AlertTriangle,
+  Clock,
+  Eye,
+  Gauge,
+  CloudDrizzle,
+  ChevronRight,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+// Import your separate component files
+import DashboardContent from "../components/DashboardContent";
+import FieldsContent from "../pages/FieldList";
+import AIRecommendationsContent from "../components/AiRecommendation";
+import WeatherContent from "../components/Weather";
+import DiseaseDetectionContent from "../components/DiseaseDetection";
+
 function Dashboard() {
+  const [currentView, setCurrentView] = useState("dashboard");
   const [selectedField, setSelectedField] = useState(null);
   const [fields, setFields] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [statistics, setStatistics] = useState({
+    totalFields: 0,
+    totalArea: 0,
+    avgHealth: 0,
+    activeFields: 0,
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,19 +67,51 @@ function Dashboard() {
 
   const fetchFields = async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem("token");
       const response = await axios.get("http://localhost:5000/api/fields", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setFields(response.data.fields);
-      if (response.data.fields.length > 0) {
-        setSelectedField(response.data.fields[0]);
+
+      const fieldsData = response.data.fields || [];
+      setFields(fieldsData);
+
+      if (fieldsData.length > 0) {
+        setSelectedField(fieldsData[0]);
+        calculateStatistics(fieldsData);
       }
     } catch (error) {
       console.error("Error fetching fields:", error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculateStatistics = (fieldsData) => {
+    const totalFields = fieldsData.length;
+    const totalArea = fieldsData.reduce(
+      (sum, field) => sum + (parseFloat(field.fieldArea?.value) || 0),
+      0
+    );
+    const avgHealth =
+      fieldsData.reduce(
+        (sum, field) => sum + (field.overallHealth?.score || 0),
+        0
+      ) / totalFields || 0;
+    const activeFields = fieldsData.filter(
+      (field) => field.isActive !== false
+    ).length;
+
+    setStatistics({
+      totalFields,
+      totalArea: totalArea.toFixed(2),
+      avgHealth: avgHealth.toFixed(1),
+      activeFields,
+    });
   };
 
   const handleLogout = () => {
@@ -53,11 +120,24 @@ function Dashboard() {
   };
 
   const handleFieldClick = (field) => {
+    setSelectedField(field);
     navigate(`/field/${field._id}`);
   };
 
-  const handleFieldsNavigation = () => {
-    navigate("/fields");
+  const getHealthColor = (score) => {
+    if (score >= 80) return "text-green-600";
+    if (score >= 60) return "text-yellow-600";
+    return "text-red-600";
+  };
+
+  const getHealthBgColor = (score) => {
+    if (score >= 80) return "from-green-50 to-emerald-50";
+    if (score >= 60) return "from-yellow-50 to-orange-50";
+    return "from-red-50 to-pink-50";
+  };
+
+  const switchView = (view) => {
+    setCurrentView(view);
   };
 
   return (
@@ -78,7 +158,7 @@ function Dashboard() {
             </div>
             <div>
               <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                AgriSync
+                Sigro
               </span>
               <p className="text-xs text-gray-600 font-medium">
                 Smart Farming Platform
@@ -90,42 +170,97 @@ function Dashboard() {
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           <button
-            onClick={() => navigate("/dashboard")}
-            className="w-full flex items-center gap-3 px-4 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden group"
+            onClick={() => switchView("dashboard")}
+            className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden group ${
+              currentView === "dashboard"
+                ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white"
+                : "text-gray-700 hover:bg-white/60 backdrop-blur-sm"
+            }`}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            {currentView === "dashboard" && (
+              <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            )}
             <BarChart3 className="w-5 h-5 relative z-10" />
             <span className="font-semibold relative z-10">Dashboard</span>
-            <Sparkles className="w-4 h-4 ml-auto relative z-10 opacity-70" />
+            {currentView === "dashboard" && (
+              <Sparkles className="w-4 h-4 ml-auto relative z-10 opacity-70" />
+            )}
           </button>
 
           <button
-            onClick={() => navigate("/ai-recommendation")}
-            className="w-full flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group"
+            onClick={() => switchView("ai-recommendations")}
+            className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group ${
+              currentView === "ai-recommendations"
+                ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg"
+                : "text-gray-700 hover:bg-white/60 backdrop-blur-sm"
+            }`}
           >
-            <Target className="w-5 h-5 text-emerald-600 group-hover:scale-110 transition-transform" />
+            <Target
+              className={`w-5 h-5 group-hover:scale-110 transition-transform ${
+                currentView === "ai-recommendations"
+                  ? "text-white"
+                  : "text-emerald-600"
+              }`}
+            />
             <span className="font-medium">AI Recommendations</span>
           </button>
 
           <button
-            onClick={handleFieldsNavigation}
-            className="w-full flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group"
+            onClick={() => switchView("fields")}
+            className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group ${
+              currentView === "fields"
+                ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg"
+                : "text-gray-700 hover:bg-white/60 backdrop-blur-sm"
+            }`}
           >
-            <Sprout className="w-5 h-5 text-teal-600 group-hover:scale-110 transition-transform" />
+            <Sprout
+              className={`w-5 h-5 group-hover:scale-110 transition-transform ${
+                currentView === "fields" ? "text-white" : "text-teal-600"
+              }`}
+            />
             <span className="font-medium">Fields</span>
           </button>
 
-          <button className="w-full flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group">
+          <button
+            onClick={() => navigate("/analytics")}
+            className="w-full flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group"
+          >
             <Activity className="w-5 h-5 text-emerald-600 group-hover:scale-110 transition-transform" />
             <span className="font-medium">Analytics</span>
           </button>
 
           <button
-            onClick={() => navigate("/weather")}
-            className="w-full flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group"
+            onClick={() => switchView("weather")}
+            className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group ${
+              currentView === "weather"
+                ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg"
+                : "text-gray-700 hover:bg-white/60 backdrop-blur-sm"
+            }`}
           >
-            <Cloud className="w-5 h-5 text-blue-600 group-hover:scale-110 transition-transform" />
+            <Cloud
+              className={`w-5 h-5 group-hover:scale-110 transition-transform ${
+                currentView === "weather" ? "text-white" : "text-blue-600"
+              }`}
+            />
             <span className="font-medium">Weather</span>
+          </button>
+
+          <button
+            onClick={() => switchView("disease-detection")}
+            className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group ${
+              currentView === "disease-detection"
+                ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg"
+                : "text-gray-700 hover:bg-white/60 backdrop-blur-sm"
+            }`}
+          >
+            <Camera
+              className={`w-5 h-5 group-hover:scale-110 transition-transform ${
+                currentView === "disease-detection"
+                  ? "text-white"
+                  : "text-red-600"
+              }`}
+            />
+            <span className="font-medium">Disease Detection</span>
           </button>
         </nav>
 
@@ -137,7 +272,9 @@ function Dashboard() {
                 <User className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-bold text-gray-900">Farmer</p>
+                <p className="text-sm font-bold text-gray-900">
+                  {localStorage.getItem("userName") || "Farmer"}
+                </p>
                 <p className="text-xs text-emerald-600 font-semibold flex items-center gap-1">
                   <Zap className="w-3 h-3" />
                   Premium Account
@@ -163,8 +300,17 @@ function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 bg-clip-text text-transparent mb-2">
-                Dashboard
+                {currentView === "dashboard"
+                  ? "Dashboard"
+                  : currentView === "fields"
+                  ? "My Fields"
+                  : currentView === "ai-recommendations"
+                  ? "AI Recommendations"
+                  : currentView === "disease-detection"
+                  ? "Disease Detection"
+                  : "Weather Intelligence"}
               </h1>
+
               <p className="text-sm text-gray-600 flex items-center gap-2 font-medium">
                 <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/50"></span>
                 Real-time farm monitoring & AI optimization
@@ -176,7 +322,10 @@ function Dashboard() {
                 <Bell className="w-5 h-5 text-gray-700 group-hover:scale-110 transition-transform" />
                 <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-lg shadow-red-500/50"></span>
               </button>
-              <button className="p-3 hover:bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:shadow-md group">
+              <button
+                onClick={() => navigate("/settings")}
+                className="p-3 hover:bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:shadow-md group"
+              >
                 <Settings className="w-5 h-5 text-gray-700 group-hover:rotate-90 transition-transform duration-300" />
               </button>
               <button className="px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
@@ -186,272 +335,43 @@ function Dashboard() {
           </div>
         </header>
 
-        {/* Dashboard Content */}
+        {/* Content Area - Renders based on currentView */}
         <main className="flex-1 overflow-y-auto p-8">
-          <div className="max-w-7xl mx-auto space-y-6">
-            {/* Welcome Section with Enhanced Gradients */}
-            <div className="relative bg-gradient-to-r from-emerald-500 via-teal-500 to-green-500 rounded-3xl p-8 shadow-2xl overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
+          {currentView === "dashboard" && (
+            <DashboardContent
+              fields={fields}
+              selectedField={selectedField}
+              statistics={statistics}
+              fetchFields={fetchFields}
+              handleFieldClick={handleFieldClick}
+              getHealthColor={getHealthColor}
+              getHealthBgColor={getHealthBgColor}
+              switchView={switchView}
+            />
+          )}
 
-              <div className="relative flex items-start justify-between">
-                <div className="flex items-center gap-5">
-                  <div className="w-20 h-20 bg-white/20 backdrop-blur-xl rounded-3xl flex items-center justify-center shadow-2xl border border-white/30 transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
-                    <Leaf className="w-10 h-10 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">
-                      Welcome to AgriSync
-                    </h2>
-                    <p className="text-base text-white/90 font-medium drop-shadow">
-                      Empower your agriculture with real-time insights & AI
-                      optimization
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={fetchFields}
-                  className="flex items-center gap-2 px-6 py-3 bg-white/20 hover:bg-white/30 backdrop-blur-xl border border-white/30 text-white rounded-full transition-all duration-300 shadow-xl hover:shadow-2xl font-semibold transform hover:-translate-y-1"
-                >
-                  <span className="text-sm">Refresh Data</span>
-                  <ArrowUpRight
-                    size={18}
-                    className="group-hover:rotate-45 transition-transform"
-                  />
-                </button>
-              </div>
-            </div>
+          {currentView === "fields" && (
+            <FieldsContent
+              fields={fields}
+              fetchFields={fetchFields}
+              handleFieldClick={handleFieldClick}
+              switchView={switchView}
+            />
+          )}
 
-            {/* Field Selector with Glassmorphism */}
-            <div className="backdrop-blur-xl bg-white/70 border border-white/20 rounded-3xl p-6 shadow-xl">
-              <div className="flex items-center gap-2 mb-5">
-                <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/50"></span>
-                <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">
-                  Select Field
-                </label>
-              </div>
+          {currentView === "ai-recommendations" && (
+            <AIRecommendationsContent
+              fields={fields}
+              fetchFields={fetchFields}
+              handleFieldClick={handleFieldClick}
+            />
+          )}
 
-              {loading ? (
-                <div className="flex items-center gap-4 text-gray-600 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-100">
-                  <div className="w-6 h-6 border-3 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
-                  <span className="font-medium">Loading fields...</span>
-                </div>
-              ) : fields.length > 0 ? (
-                <div className="flex gap-3 flex-wrap">
-                  {fields.map((field) => (
-                    <button
-                      key={field._id}
-                      onClick={() => handleFieldClick(field)}
-                      className={`px-7 py-3.5 rounded-2xl font-semibold transition-all duration-300 border-2 shadow-md hover:shadow-xl transform hover:-translate-y-1 ${
-                        selectedField?._id === field._id
-                          ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-emerald-600 shadow-emerald-200"
-                          : "bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white border-gray-200 hover:border-emerald-300"
-                      }`}
-                    >
-                      {field.fieldName}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="bg-gradient-to-br from-gray-50 to-emerald-50 rounded-2xl p-10 text-center border-2 border-dashed border-gray-300">
-                  <Sprout className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-700 mb-5 font-semibold text-lg">
-                    No fields found
-                  </p>
-                  <button
-                    onClick={handleFieldsNavigation}
-                    className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-full transition-all duration-300 shadow-lg hover:shadow-xl font-semibold transform hover:-translate-y-1"
-                  >
-                    Create your first field
-                  </button>
-                </div>
-              )}
-            </div>
+          {currentView === "weather" && (
+            <WeatherContent fields={fields} selectedField={selectedField} />
+          )}
 
-            {/* Info Banner with Enhanced Design */}
-            {selectedField && (
-              <div className="relative bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-3xl p-7 shadow-2xl overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-
-                <div className="relative flex items-start gap-5">
-                  <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center shadow-2xl flex-shrink-0 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
-                    <MapPin className="w-7 h-7 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-white font-bold mb-2 text-xl drop-shadow-lg">
-                      {selectedField.fieldName} Monitoring Active
-                    </h3>
-                    <p className="text-base text-white/95 font-medium drop-shadow mb-2">
-                      {selectedField.location.village &&
-                        `${selectedField.location.village}, `}
-                      {selectedField.location.district} •{" "}
-                      {selectedField.cropType} • {selectedField.fieldArea.value}{" "}
-                      {selectedField.fieldArea.unit}
-                    </p>
-                    <p className="text-sm text-white/80 font-medium drop-shadow">
-                      Click field name above to view detailed analytics and AI
-                      recommendations
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Stats Grid with Enhanced Glassmorphism */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Soil Moisture Card */}
-              <div className="group backdrop-blur-xl bg-white/70 border border-white/20 hover:border-blue-300 rounded-3xl p-7 cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-cyan-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative">
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="w-14 h-14 bg-gradient-to-br from-blue-400 via-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
-                      <Droplets className="w-7 h-7 text-white" />
-                    </div>
-                    <span className="px-4 py-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full border border-emerald-300 shadow-sm">
-                      +6%
-                    </span>
-                  </div>
-                  <h3 className="text-gray-600 text-sm mb-3 font-bold uppercase tracking-wide">
-                    Soil Moisture
-                  </h3>
-                  <p className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">
-                    68%
-                  </p>
-                  <p className="text-xs text-gray-600 font-semibold">
-                    Status: Optimal Range
-                  </p>
-                </div>
-              </div>
-
-              {/* Soil NPK Card */}
-              <div className="group backdrop-blur-xl bg-white/70 border border-white/20 hover:border-orange-300 rounded-3xl p-7 cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-amber-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative">
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="w-14 h-14 bg-gradient-to-br from-orange-400 via-orange-500 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
-                      <Leaf className="w-7 h-7 text-white" />
-                    </div>
-                    <span className="px-4 py-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full border border-emerald-300 shadow-sm">
-                      Balanced
-                    </span>
-                  </div>
-                  <h3 className="text-gray-600 text-sm mb-3 font-bold uppercase tracking-wide">
-                    Soil NPK
-                  </h3>
-                  <p className="text-5xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent mb-2">
-                    7.2
-                  </p>
-                  <p className="text-xs text-gray-600 font-semibold">
-                    N:P:K Ratio
-                  </p>
-                </div>
-              </div>
-
-              {/* Field Health Card */}
-              <div className="group backdrop-blur-xl bg-white/70 border border-white/20 hover:border-emerald-300 rounded-3xl p-7 cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-teal-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative">
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
-                      <TrendingUp className="w-7 h-7 text-white" />
-                    </div>
-                    <span className="px-4 py-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full border border-emerald-300 shadow-sm">
-                      +3%
-                    </span>
-                  </div>
-                  <h3 className="text-gray-600 text-sm mb-3 font-bold uppercase tracking-wide">
-                    Field Health
-                  </h3>
-                  <p className="text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2">
-                    {selectedField?.overallHealth?.score || 89}%
-                  </p>
-                  <p className="text-xs text-gray-600 font-semibold">
-                    NDVI Score
-                  </p>
-                </div>
-              </div>
-
-              {/* Optimization Card */}
-              <div className="group backdrop-blur-xl bg-white/70 border border-white/20 hover:border-purple-300 rounded-3xl p-7 cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-pink-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative">
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="w-14 h-14 bg-gradient-to-br from-purple-400 via-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
-                      <Target className="w-7 h-7 text-white" />
-                    </div>
-                    <span className="px-4 py-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full border border-emerald-300 shadow-sm">
-                      Active
-                    </span>
-                  </div>
-                  <h3 className="text-gray-600 text-sm mb-3 font-bold uppercase tracking-wide">
-                    AI Optimization
-                  </h3>
-                  <p className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-                    94%
-                  </p>
-                  <p className="text-xs text-gray-600 font-semibold">
-                    Efficiency Score
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Actions with Enhanced Design */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <button
-                onClick={() => navigate("/weather")}
-                className="backdrop-blur-xl bg-white/70 border border-white/20 hover:border-blue-400 rounded-3xl p-8 text-left transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 group relative overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-cyan-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center mb-5 group-hover:bg-gradient-to-br group-hover:from-blue-200 group-hover:to-cyan-200 transition-all duration-500 transform group-hover:scale-110 group-hover:rotate-6 shadow-md">
-                    <Cloud className="w-7 h-7 text-blue-600" />
-                  </div>
-                  <h3 className="text-gray-900 font-bold mb-2 text-xl">
-                    Weather Intelligence
-                  </h3>
-                  <p className="text-sm text-gray-600 font-medium leading-relaxed">
-                    View real-time weather & crop stress indicators
-                  </p>
-                </div>
-              </button>
-
-              <button
-                onClick={handleFieldsNavigation}
-                className="backdrop-blur-xl bg-white/70 border border-white/20 hover:border-emerald-400 rounded-3xl p-8 text-left transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 group relative overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-teal-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center mb-5 group-hover:bg-gradient-to-br group-hover:from-emerald-200 group-hover:to-teal-200 transition-all duration-500 transform group-hover:scale-110 group-hover:rotate-6 shadow-md">
-                    <Sprout className="w-7 h-7 text-emerald-600" />
-                  </div>
-                  <h3 className="text-gray-900 font-bold mb-2 text-xl">
-                    Manage Fields
-                  </h3>
-                  <p className="text-sm text-gray-600 font-medium leading-relaxed">
-                    Add new fields or update existing ones
-                  </p>
-                </div>
-              </button>
-
-              <button className="backdrop-blur-xl bg-white/70 border border-white/20 hover:border-purple-400 rounded-3xl p-8 text-left transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 group relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-pink-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center mb-5 group-hover:bg-gradient-to-br group-hover:from-purple-200 group-hover:to-pink-200 transition-all duration-500 transform group-hover:scale-110 group-hover:rotate-6 shadow-md">
-                    <Target className="w-7 h-7 text-purple-600" />
-                  </div>
-                  <h3 className="text-gray-900 font-bold mb-2 text-xl">
-                    AI Recommendations
-                  </h3>
-                  <p className="text-sm text-gray-600 font-medium leading-relaxed">
-                    Get intelligent irrigation & fertilizer advice
-                  </p>
-                </div>
-              </button>
-            </div>
-          </div>
+          {currentView === "disease-detection" && <DiseaseDetectionContent />}
         </main>
       </div>
     </div>
