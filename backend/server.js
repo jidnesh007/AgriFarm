@@ -6,6 +6,7 @@ require("dotenv").config();
 const authRoutes = require("./routes/auth");
 const fieldRoutes = require("./routes/field");
 const weatherRoutes = require("./routes/weather"); // ADD THIS
+const voiceAssistantRoutes = require("./routes/voiceAssistant");
 
 const app = express();
 
@@ -23,6 +24,7 @@ mongoose
 app.use("/api/auth", authRoutes);
 app.use("/api/fields", fieldRoutes);
 app.use("/api/weather", weatherRoutes); // ADD THIS
+app.use("/api/voice-assistant", voiceAssistantRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

@@ -8,35 +8,15 @@ import {
   LogOut,
   Bell,
   User,
-  TrendingUp,
-  Droplets,
-  Leaf,
-  Cloud,
-  MapPin,
-  ArrowUpRight,
-  Sparkles,
   Activity,
   Zap,
-  Wind,
+  Cloud,
+  Leaf,
   Sun,
-  CloudRain,
-  ThermometerSun,
-  AlertCircle,
-  CheckCircle,
-  Plus,
-  ArrowLeft,
-  Brain,
-  Loader,
-  Edit2,
-  X,
-  RefreshCw,
-  Thermometer,
-  AlertTriangle,
-  Clock,
-  Eye,
-  Gauge,
-  CloudDrizzle,
-  ChevronRight,
+  Wind,
+  Flower2,
+  CircleDashed,
+  Mic,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -47,12 +27,14 @@ import FieldsContent from "../pages/FieldList";
 import AIRecommendationsContent from "../components/AiRecommendation";
 import WeatherContent from "../components/Weather";
 import DiseaseDetectionContent from "../components/DiseaseDetection";
+import VoiceAssistant from "../components/VoiceAssistant";
 
 function Dashboard() {
   const [currentView, setCurrentView] = useState("dashboard");
   const [selectedField, setSelectedField] = useState(null);
   const [fields, setFields] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showVoiceAssistant, setShowVoiceAssistant] = useState(false);
   const [statistics, setStatistics] = useState({
     totalFields: 0,
     totalArea: 0,
@@ -69,16 +51,18 @@ function Dashboard() {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5000/api/fields", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const fieldsData = response.data.fields || [];
-      setFields(fieldsData);
-
-      if (fieldsData.length > 0) {
-        setSelectedField(fieldsData[0]);
-        calculateStatistics(fieldsData);
+      try {
+        const response = await axios.get("http://localhost:5000/api/fields", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const fieldsData = response.data.fields || [];
+        setFields(fieldsData);
+        if (fieldsData.length > 0) {
+          setSelectedField(fieldsData[0]);
+          calculateStatistics(fieldsData);
+        }
+      } catch (err) {
+        console.log("API not reachable, using empty state or handle error");
       }
     } catch (error) {
       console.error("Error fetching fields:", error);
@@ -125,13 +109,13 @@ function Dashboard() {
   };
 
   const getHealthColor = (score) => {
-    if (score >= 80) return "text-green-600";
+    if (score >= 80) return "text-emerald-700";
     if (score >= 60) return "text-yellow-600";
     return "text-red-600";
   };
 
   const getHealthBgColor = (score) => {
-    if (score >= 80) return "from-green-50 to-emerald-50";
+    if (score >= 80) return "from-emerald-100 to-green-50";
     if (score >= 60) return "from-yellow-50 to-orange-50";
     return "from-red-50 to-pink-50";
   };
@@ -141,202 +125,152 @@ function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 relative overflow-hidden">
-      {/* Animated Background Gradients */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-br from-emerald-200/30 to-transparent rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-gradient-to-tr from-teal-200/30 to-transparent rounded-full blur-3xl animate-pulse delay-1000"></div>
+    <div className="flex h-screen bg-[#F0FDF4] relative overflow-hidden font-sans">
+      {/* --- NATURE BACKGROUND PATTERN --- */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        {/* Dotted Grid Pattern */}
+        <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.07]"></div>
+
+        {/* Giant Sun Top Right */}
+        <Sun className="absolute -top-20 -right-20 text-yellow-400 opacity-10 w-96 h-96 animate-pulse-slow" />
+
+        {/* Leaves Bottom Left */}
+        <Leaf className="absolute bottom-10 -left-10 text-emerald-600 opacity-5 w-80 h-80 rotate-45" />
+        <Sprout className="absolute bottom-40 left-20 text-emerald-400 opacity-10 w-40 h-40 -rotate-12" />
+
+        {/* Floating Clouds */}
+        <Cloud className="absolute top-20 left-1/4 text-emerald-200 opacity-20 w-32 h-32" />
+        <Cloud className="absolute top-40 right-1/4 text-emerald-200 opacity-20 w-24 h-24" />
       </div>
 
-      {/* Sidebar with Glassmorphism */}
-      <aside className="w-72 backdrop-blur-xl bg-white/70 border-r border-white/20 shadow-2xl flex flex-col relative z-10">
+      {/* --- SIDEBAR --- */}
+      <aside className="w-72 bg-emerald-900 text-white shadow-2xl flex flex-col relative z-20 rounded-r-3xl my-4 ml-4 h-[calc(100vh-2rem)]">
+        {/* Decorative Circles on Sidebar */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden rounded-r-3xl pointer-events-none opacity-10">
+          <CircleDashed className="absolute -top-10 -left-10 w-40 h-40 text-white" />
+          <Flower2 className="absolute bottom-10 right-0 w-48 h-48 text-white translate-x-1/2" />
+        </div>
+
         {/* Logo Section */}
-        <div className="p-6 border-b border-white/30">
-          <div className="flex items-center gap-3 group cursor-pointer">
-            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 via-teal-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg transform transition-transform group-hover:scale-110 group-hover:rotate-3">
-              <Leaf className="w-7 h-7 text-white" />
+        <div className="p-8 relative z-10">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg">
+              <Leaf className="w-6 h-6 text-emerald-700 fill-emerald-700" />
             </div>
             <div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                Sigro
-              </span>
-              <p className="text-xs text-gray-600 font-medium">
-                Smart Farming Platform
+              <span className="text-2xl font-bold tracking-tight">Sigro</span>
+              <p className="text-[10px] text-emerald-300 uppercase tracking-widest">
+                Agriculture AI
               </p>
             </div>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-          <button
-            onClick={() => switchView("dashboard")}
-            className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden group ${
-              currentView === "dashboard"
-                ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white"
-                : "text-gray-700 hover:bg-white/60 backdrop-blur-sm"
-            }`}
-          >
-            {currentView === "dashboard" && (
-              <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            )}
-            <BarChart3 className="w-5 h-5 relative z-10" />
-            <span className="font-semibold relative z-10">Dashboard</span>
-            {currentView === "dashboard" && (
-              <Sparkles className="w-4 h-4 ml-auto relative z-10 opacity-70" />
-            )}
-          </button>
-
-          <button
-            onClick={() => switchView("ai-recommendations")}
-            className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group ${
-              currentView === "ai-recommendations"
-                ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg"
-                : "text-gray-700 hover:bg-white/60 backdrop-blur-sm"
-            }`}
-          >
-            <Target
-              className={`w-5 h-5 group-hover:scale-110 transition-transform ${
-                currentView === "ai-recommendations"
-                  ? "text-white"
-                  : "text-emerald-600"
+        <nav className="flex-1 px-4 space-y-2 overflow-y-auto relative z-10 py-4">
+          {[
+            { id: "dashboard", icon: BarChart3, label: "Dashboard" },
+            { id: "ai-recommendations", icon: Target, label: "AI Insights" },
+            { id: "fields", icon: Sprout, label: "My Fields" },
+            { id: "weather", icon: Cloud, label: "Weather" },
+            { id: "disease-detection", icon: Camera, label: "Disease Cam" },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => switchView(item.id)}
+              className={`w-full flex items-center gap-3 px-5 py-4 rounded-xl transition-all duration-300 group ${
+                currentView === item.id
+                  ? "bg-emerald-50 text-emerald-900 shadow-lg translate-x-2"
+                  : "text-emerald-100 hover:bg-emerald-800/50 hover:text-white"
               }`}
-            />
-            <span className="font-medium">AI Recommendations</span>
-          </button>
-
-          <button
-            onClick={() => switchView("fields")}
-            className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group ${
-              currentView === "fields"
-                ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg"
-                : "text-gray-700 hover:bg-white/60 backdrop-blur-sm"
-            }`}
-          >
-            <Sprout
-              className={`w-5 h-5 group-hover:scale-110 transition-transform ${
-                currentView === "fields" ? "text-white" : "text-teal-600"
-              }`}
-            />
-            <span className="font-medium">Fields</span>
-          </button>
+            >
+              <item.icon
+                className={`w-5 h-5 ${
+                  currentView === item.id ? "fill-current" : ""
+                }`}
+              />
+              <span className="font-semibold">{item.label}</span>
+              {currentView === item.id && (
+                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-600"></div>
+              )}
+            </button>
+          ))}
 
           <button
             onClick={() => navigate("/analytics")}
-            className="w-full flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group"
+            className="w-full flex items-center gap-3 px-5 py-4 rounded-xl text-emerald-100 hover:bg-emerald-800/50 hover:text-white transition-all duration-300"
           >
-            <Activity className="w-5 h-5 text-emerald-600 group-hover:scale-110 transition-transform" />
-            <span className="font-medium">Analytics</span>
-          </button>
-
-          <button
-            onClick={() => switchView("weather")}
-            className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group ${
-              currentView === "weather"
-                ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg"
-                : "text-gray-700 hover:bg-white/60 backdrop-blur-sm"
-            }`}
-          >
-            <Cloud
-              className={`w-5 h-5 group-hover:scale-110 transition-transform ${
-                currentView === "weather" ? "text-white" : "text-blue-600"
-              }`}
-            />
-            <span className="font-medium">Weather</span>
-          </button>
-
-          <button
-            onClick={() => switchView("disease-detection")}
-            className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group ${
-              currentView === "disease-detection"
-                ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg"
-                : "text-gray-700 hover:bg-white/60 backdrop-blur-sm"
-            }`}
-          >
-            <Camera
-              className={`w-5 h-5 group-hover:scale-110 transition-transform ${
-                currentView === "disease-detection"
-                  ? "text-white"
-                  : "text-red-600"
-              }`}
-            />
-            <span className="font-medium">Disease Detection</span>
+            <Activity className="w-5 h-5" />
+            <span className="font-semibold">Analytics</span>
           </button>
         </nav>
 
         {/* User Profile Section */}
-        <div className="p-4 border-t border-white/30 backdrop-blur-sm">
-          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-4 mb-3 border border-emerald-100 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-md">
-                <User className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-gray-900">
-                  {localStorage.getItem("userName") || "Farmer"}
-                </p>
-                <p className="text-xs text-emerald-600 font-semibold flex items-center gap-1">
-                  <Zap className="w-3 h-3" />
-                  Premium Account
-                </p>
-              </div>
+        <div className="p-6 mt-auto border-t border-emerald-800/50 relative z-10 bg-emerald-950/30 rounded-br-3xl">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-full bg-emerald-200 flex items-center justify-center border-2 border-white">
+              <User className="w-5 h-5 text-emerald-800" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-white">
+                {localStorage.getItem("userName") || "Farmer"}
+              </p>
+              <p className="text-xs text-emerald-300 flex items-center gap-1">
+                <Zap className="w-3 h-3 fill-current" /> Premium
+              </p>
             </div>
           </div>
 
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-gray-700 hover:bg-red-50 backdrop-blur-sm border border-gray-200 hover:border-red-300 rounded-2xl transition-all duration-300 font-medium hover:shadow-md"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-800 hover:bg-red-500/80 hover:text-white text-emerald-100 rounded-lg transition-all duration-300 text-sm font-medium"
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-4 h-4" />
             <span>Logout</span>
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden relative z-10">
-        {/* Top Header with Glassmorphism */}
-        <header className="backdrop-blur-xl bg-white/70 border-b border-white/20 shadow-lg px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 bg-clip-text text-transparent mb-2">
-                {currentView === "dashboard"
-                  ? "Dashboard"
-                  : currentView === "fields"
-                  ? "My Fields"
-                  : currentView === "ai-recommendations"
-                  ? "AI Recommendations"
-                  : currentView === "disease-detection"
-                  ? "Disease Detection"
-                  : "Weather Intelligence"}
-              </h1>
-
-              <p className="text-sm text-gray-600 flex items-center gap-2 font-medium">
-                <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/50"></span>
-                Real-time farm monitoring & AI optimization
+      {/* --- MAIN CONTENT AREA --- */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden relative z-10">
+        {/* Top Header */}
+        <header className="px-8 py-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-emerald-900">
+              {currentView === "dashboard"
+                ? "Farm Overview"
+                : currentView === "fields"
+                ? "Field Management"
+                : currentView === "ai-recommendations"
+                ? "Smart Advisory"
+                : currentView === "disease-detection"
+                ? "Plant Health Check"
+                : "Weather Station"}
+            </h1>
+            <div className="flex items-center gap-2 mt-1">
+              <div className="h-1 w-8 bg-emerald-500 rounded-full"></div>
+              <p className="text-sm text-emerald-600 font-medium">
+                Live Monitoring Active
               </p>
             </div>
+          </div>
 
-            <div className="flex items-center gap-3">
-              <button className="relative p-3 hover:bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:shadow-md group">
-                <Bell className="w-5 h-5 text-gray-700 group-hover:scale-110 transition-transform" />
-                <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-lg shadow-red-500/50"></span>
-              </button>
-              <button
-                onClick={() => navigate("/settings")}
-                className="p-3 hover:bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:shadow-md group"
-              >
-                <Settings className="w-5 h-5 text-gray-700 group-hover:rotate-90 transition-transform duration-300" />
-              </button>
-              <button className="px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                <User className="w-5 h-5 text-white" />
-              </button>
-            </div>
+          <div className="flex items-center gap-4">
+            <button className="p-3 bg-white/60 hover:bg-white backdrop-blur-md rounded-full shadow-sm text-emerald-900 transition-all relative">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+            </button>
+            <button
+              onClick={() => navigate("/settings")}
+              className="p-3 bg-white/60 hover:bg-white backdrop-blur-md rounded-full shadow-sm text-emerald-900 transition-all hover:rotate-90 duration-500"
+            >
+              <Settings className="w-5 h-5" />
+            </button>
           </div>
         </header>
 
-        {/* Content Area - Renders based on currentView */}
-        <main className="flex-1 overflow-y-auto p-8">
+        {/* Scrollable Content */}
+        <main className="flex-1 overflow-y-auto px-8 pb-8 scrollbar-hide">
           {currentView === "dashboard" && (
             <DashboardContent
               fields={fields}
@@ -374,6 +308,62 @@ function Dashboard() {
           {currentView === "disease-detection" && <DiseaseDetectionContent />}
         </main>
       </div>
+
+      {/* 🎤 FLOATING VOICE ASSISTANT BUTTON */}
+      {!showVoiceAssistant && (
+        <button
+          onClick={() => setShowVoiceAssistant(true)}
+          className="fixed bottom-8 right-8 w-16 h-16 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 rounded-full shadow-2xl flex items-center justify-center transition-all transform hover:scale-110 z-50 group"
+          title="Voice Assistant - Ask me anything!"
+        >
+          <Mic className="w-8 h-8 text-white animate-pulse" />
+
+          {/* Ripple Effect */}
+          <span className="absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75 animate-ping"></span>
+
+          {/* Tooltip */}
+          <div className="absolute bottom-20 right-0 bg-emerald-900 text-white px-4 py-2 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+            <p className="text-sm font-semibold">🎤 Voice Assistant</p>
+            <p className="text-xs text-emerald-300">Click to ask questions</p>
+            <div className="absolute -bottom-2 right-6 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-emerald-900"></div>
+          </div>
+        </button>
+      )}
+
+      {/* 🤖 VOICE ASSISTANT COMPONENT */}
+      {showVoiceAssistant && (
+        <VoiceAssistant
+          selectedField={selectedField}
+          fields={fields}
+          onClose={() => setShowVoiceAssistant(false)}
+        />
+      )}
+
+      {/* Custom CSS for smooth animations */}
+      <style jsx>{`
+        @keyframes pulse-slow {
+          0%,
+          100% {
+            opacity: 0.4;
+          }
+          50% {
+            opacity: 0.2;
+          }
+        }
+
+        .animate-pulse-slow {
+          animation: pulse-slow 4s ease-in-out infinite;
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 }

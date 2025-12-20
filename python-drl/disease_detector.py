@@ -11,10 +11,10 @@ import json
 from groq import Groq
 
 # Groq API Configuration
-GROQ_API_KEY = ""
+GROQ_API_KEY = "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"
 groq_client = Groq(api_key=GROQ_API_KEY)
 
-# Model paths
+
 MODEL_PATH = "./model/best.onnx"
 
 # Your exact class names
