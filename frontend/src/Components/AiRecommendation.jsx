@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import axios from "axios";
 import {
   Brain,
@@ -9,21 +10,47 @@ import {
   Loader,
   ChevronRight,
   RefreshCw,
-  TrendingUp,
   Cloud,
   Sprout,
-  CheckCircle,
+  Activity,
+  Zap,
+  CheckCircle2,
+  Beaker,
+  ThermometerSun,
+  CircleDashed,
+  Flower2,
+  X,
+  CheckCircle
 } from "lucide-react";
 
 const AiRecommendations = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [fields, setFields] = useState([]);
   const [loading, setLoading] = useState(true);
   const [generatingForZone, setGeneratingForZone] = useState(null);
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     fetchFields();
   }, []);
+
+  // Auto-hide notification after 5 seconds
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => {
+        setNotification(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
+
+  const showNotification = (type, messageKey, params = {}) => {
+    setNotification({
+      type,
+      message: t(messageKey, params)
+    });
+  };
 
   const fetchFields = async () => {
     try {
@@ -31,9 +58,10 @@ const AiRecommendations = () => {
       const response = await axios.get("http://localhost:5000/api/fields", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setFields(response.data.fields);
+      setFields(response.data.fields || []);
     } catch (error) {
       console.error("Error fetching fields:", error);
+      showNotification('error', 'aiRecommendations.notifications.fetchError');
     } finally {
       setLoading(false);
     }
@@ -41,6 +69,8 @@ const AiRecommendations = () => {
 
   const generateAIRecommendation = async (fieldId, zoneId) => {
     setGeneratingForZone(zoneId);
+    showNotification('info', 'aiRecommendations.notifications.generating');
+    
     try {
       const token = localStorage.getItem("token");
       await axios.post(
@@ -49,356 +79,275 @@ const AiRecommendations = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       await fetchFields();
+      showNotification('success', 'aiRecommendations.notifications.generateSuccess');
     } catch (error) {
       console.error("Error generating AI recommendation:", error);
-      alert(
-        error.response?.data?.message ||
-          "Failed to generate AI recommendation. Make sure Python server is running on port 8000."
-      );
+      showNotification('error', 'aiRecommendations.notifications.generateError');
     } finally {
       setGeneratingForZone(null);
     }
   };
 
   const getHealthColor = (health) => {
-    if (health >= 75) return "text-green-600 bg-green-100 border-green-300";
-    if (health >= 50) return "text-yellow-600 bg-yellow-100 border-yellow-300";
-    return "text-red-600 bg-red-100 border-red-300";
+    if (health >= 75) return "text-emerald-700 bg-emerald-100 border-emerald-200";
+    if (health >= 50) return "text-amber-700 bg-amber-100 border-amber-200";
+    return "text-rose-700 bg-rose-100 border-rose-200";
   };
 
-  const getHealthStatus = (health) => {
-    if (health >= 75) return "Healthy";
-    if (health >= 50) return "Moderate";
-    return "Poor";
+  const getNotificationStyles = (type) => {
+    switch(type) {
+      case 'success':
+        return 'bg-emerald-50 border-emerald-500 text-emerald-900';
+      case 'error':
+        return 'bg-red-50 border-red-500 text-red-900';
+      case 'warning':
+        return 'bg-amber-50 border-amber-500 text-amber-900';
+      case 'info':
+        return 'bg-blue-50 border-blue-500 text-blue-900';
+      default:
+        return 'bg-gray-50 border-gray-500 text-gray-900';
+    }
+  };
+
+  const getNotificationIcon = (type) => {
+    switch(type) {
+      case 'success':
+        return <CheckCircle className="w-5 h-5 text-emerald-600" />;
+      case 'error':
+        return <AlertCircle className="w-5 h-5 text-red-600" />;
+      case 'warning':
+        return <AlertCircle className="w-5 h-5 text-amber-600" />;
+      case 'info':
+        return <Brain className="w-5 h-5 text-blue-600" />;
+      default:
+        return <AlertCircle className="w-5 h-5" />;
+    }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading AI recommendations...</p>
+          <div className="relative w-16 h-16 mx-auto mb-4">
+            <div className="w-16 h-16 border-4 border-emerald-100 border-t-emerald-600 rounded-full animate-spin"></div>
+            <Brain className="w-6 h-6 text-emerald-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+          </div>
+          <p className="text-emerald-900 font-medium">{t('aiRecommendations.loading')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="bg-purple-100 p-3 rounded-lg">
-              <Brain className="w-8 h-8 text-purple-600" />
+    <div className="relative min-h-full space-y-6 animate-in fade-in duration-500">
+      
+      {/* Notification Toast */}
+      {notification && (
+        <div className="fixed top-20 right-6 z-50 animate-in slide-in-from-right duration-300">
+          <div className={`${getNotificationStyles(notification.type)} border-l-4 rounded-xl p-4 shadow-2xl backdrop-blur-sm max-w-md flex items-start gap-3`}>
+            {getNotificationIcon(notification.type)}
+            <div className="flex-1">
+              <p className="text-sm font-semibold">{notification.message}</p>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-800">
-                AI-Powered Recommendations
-              </h1>
-              <p className="text-gray-600">
-                Deep Reinforcement Learning for optimal irrigation and
-                fertilization
-              </p>
+            <button 
+              onClick={() => setNotification(null)}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* --- THEME MATCHED DECORATIVE BACKGROUND --- */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-[0.05]">
+        <CircleDashed className="absolute -top-10 -left-10 w-64 h-64 text-emerald-900 animate-spin-slow" />
+        <Flower2 className="absolute bottom-10 right-0 w-80 h-80 text-emerald-900 translate-x-1/4" />
+        <CircleDashed className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] text-emerald-900 opacity-30" />
+      </div>
+
+      <div className="relative z-10 space-y-6">
+        {/* Header Insight Card */}
+        <div className="bg-white/60 backdrop-blur-md rounded-3xl p-6 border border-emerald-100 shadow-sm relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-10">
+            <Brain size={120} className="text-emerald-900" />
+          </div>
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <div className="bg-emerald-600 p-3 rounded-2xl shadow-lg shadow-emerald-200">
+                <Zap className="w-6 h-6 text-white fill-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-emerald-900">{t('aiRecommendations.header.title')}</h2>
+                <p className="text-emerald-700/80 max-w-2xl text-sm leading-relaxed">
+                  {t('aiRecommendations.header.description')}
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Info Banner */}
-        <div className="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg shadow-md p-6 mb-6 text-white">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="w-6 h-6 flex-shrink-0 mt-1" />
-            <div>
-              <h3 className="font-bold text-lg mb-1">How it works</h3>
-              <p className="text-sm text-purple-100">
-                Our AI model analyzes soil moisture, NPK levels, pH, weather
-                conditions, and crop growth stage to provide intelligent
-                recommendations. The model is trained using Deep Reinforcement
-                Learning to optimize crop health while minimizing resource
-                waste.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Fields with Zones */}
         {fields.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <Sprout size={64} className="mx-auto text-gray-400 mb-4" />
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
-              No fields available
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Create a field first to get AI recommendations
-            </p>
+          <div className="bg-white/60 backdrop-blur-md rounded-3xl p-12 text-center border-2 border-dashed border-emerald-200">
+            <Sprout size={48} className="mx-auto text-emerald-300 mb-4" />
+            <h3 className="text-xl font-bold text-emerald-900 mb-2">{t('aiRecommendations.noFields.title')}</h3>
+            <p className="text-emerald-600 mb-6">{t('aiRecommendations.noFields.description')}</p>
             <button
               onClick={() => navigate("/fields")}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg inline-flex items-center gap-2"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-emerald-200"
             >
-              Go to Fields
-              <ChevronRight size={20} />
+              {t('aiRecommendations.noFields.button')}
             </button>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="grid gap-8">
             {fields.map((field) => (
-              <div
-                key={field._id}
-                className="bg-white rounded-lg shadow-md overflow-hidden"
-              >
-                {/* Field Header */}
-                <div className="bg-gradient-to-r from-green-500 to-green-600 p-4">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h2 className="text-2xl font-bold text-white">
-                        {field.fieldName}
-                      </h2>
-                      <p className="text-green-100">
-                        {field.cropType} • {field.fieldArea.value}{" "}
-                        {field.fieldArea.unit}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => navigate(`/field/${field._id}`)}
-                      className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                    >
-                      View Details
-                      <ChevronRight size={18} />
-                    </button>
-                  </div>
+              <div key={field._id} className="group">
+                {/* Field Label */}
+                <div className="flex items-center gap-3 mb-4 px-2">
+                  <div className="h-6 w-1.5 bg-emerald-500 rounded-full"></div>
+                  <h3 className="text-lg font-bold text-emerald-900 uppercase tracking-wider">
+                    {field.fieldName}
+                  </h3>
+                  <span className="text-xs font-medium px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg">
+                    {field.cropType}
+                  </span>
                 </div>
 
                 {/* Zones Grid */}
-                <div className="p-6">
-                  <h3 className="text-lg font-bold text-gray-800 mb-4">
-                    Zones & AI Recommendations
-                  </h3>
-
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {field.zones.map((zone) => (
-                      <div
-                        key={zone._id}
-                        className="border-2 border-gray-200 rounded-lg p-4 hover:border-purple-300 transition"
-                      >
-                        {/* Zone Header */}
-                        <div className="flex justify-between items-start mb-4">
-                          <div>
-                            <h4 className="text-lg font-bold text-gray-800">
-                              {zone.zoneName}
-                            </h4>
-                            <p className="text-sm text-gray-600">
-                              Moisture: {zone.soilMoisture.value}% • pH:{" "}
-                              {zone.soilPH.value}
-                            </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {field.zones.map((zone) => (
+                    <div
+                      key={zone._id}
+                      className="bg-white/80 backdrop-blur-sm border border-emerald-50 rounded-3xl p-5 shadow-sm hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300 relative overflow-hidden border-b-4 border-b-emerald-500"
+                    >
+                      {/* Zone Top Bar */}
+                      <div className="flex justify-between items-center mb-6">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+                            <Activity size={16} className="text-emerald-600" />
                           </div>
-                          {zone.recommendations?.healthScore > 0 && (
-                            <span
-                              className={`px-3 py-1 rounded-full text-xs font-semibold border ${getHealthColor(
-                                zone.recommendations.healthScore
-                              )}`}
-                            >
-                              {getHealthStatus(
-                                zone.recommendations.healthScore
-                              )}
-                            </span>
-                          )}
+                          <span className="font-bold text-emerald-950">{zone.zoneName}</span>
                         </div>
-
-                        {/* Soil Data Summary */}
-                        <div className="bg-gray-50 rounded-lg p-3 mb-4">
-                          <div className="grid grid-cols-3 gap-2 text-xs">
-                            <div>
-                              <span className="text-gray-600">N:</span>
-                              <span className="font-semibold ml-1">
-                                {zone.soilNutrients.nitrogen}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-gray-600">P:</span>
-                              <span className="font-semibold ml-1">
-                                {zone.soilNutrients.phosphorus}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-gray-600">K:</span>
-                              <span className="font-semibold ml-1">
-                                {zone.soilNutrients.potassium}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* AI Recommendations */}
-                        {zone.recommendations &&
-                        zone.recommendations.aiGenerated ? (
-                          <div className="space-y-3">
-                            {/* Irrigation Card */}
-                            <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-3">
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-2">
-                                  <Droplets
-                                    size={18}
-                                    className="text-blue-600"
-                                  />
-                                  <span className="font-semibold text-gray-800">
-                                    Irrigation
-                                  </span>
-                                </div>
-                                <span className="text-2xl font-bold text-blue-600">
-                                  {zone.recommendations.irrigation.amount} mm
-                                </span>
-                              </div>
-                              <p className="text-xs text-gray-600">
-                                {zone.recommendations.irrigation.timing}
-                              </p>
-                            </div>
-
-                            {/* Fertilizer Card */}
-                            <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-lg p-3">
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-2">
-                                  <Leaf size={18} className="text-green-600" />
-                                  <span className="font-semibold text-gray-800">
-                                    Fertilizer
-                                  </span>
-                                </div>
-                                <span className="text-2xl font-bold text-green-600">
-                                  {zone.recommendations.fertilizer.amount} kg
-                                </span>
-                              </div>
-                              <p className="text-xs text-gray-600">
-                                {zone.recommendations.fertilizer.type}
-                              </p>
-                            </div>
-
-                            {/* Health Score */}
-                            {zone.recommendations.healthScore > 0 && (
-                              <div className="bg-gray-50 rounded-lg p-3">
-                                <div className="flex items-center justify-between mb-2">
-                                  <span className="text-sm font-semibold text-gray-700">
-                                    Health Score
-                                  </span>
-                                  <span className="text-xl font-bold text-gray-800">
-                                    {zone.recommendations.healthScore.toFixed(
-                                      1
-                                    )}
-                                    %
-                                  </span>
-                                </div>
-                                <div className="w-full bg-gray-200 rounded-full h-2">
-                                  <div
-                                    className="h-2 rounded-full transition-all duration-500"
-                                    style={{
-                                      width: `${zone.recommendations.healthScore}%`,
-                                      backgroundColor:
-                                        zone.recommendations.healthScore >= 75
-                                          ? "#16a34a"
-                                          : zone.recommendations.healthScore >=
-                                            50
-                                          ? "#eab308"
-                                          : "#dc2626",
-                                    }}
-                                  ></div>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Weather Info */}
-                            {zone.recommendations.weatherInfluence && (
-                              <div className="flex items-center gap-2 text-xs text-gray-600">
-                                <Cloud size={14} />
-                                <span>
-                                  {zone.recommendations.weatherInfluence}
-                                </span>
-                              </div>
-                            )}
-
-                            {/* Explanation */}
-                            <div className="bg-purple-50 border-l-4 border-purple-500 p-3 rounded">
-                              <p className="text-xs text-gray-700">
-                                {zone.recommendations.explanation}
-                              </p>
-                            </div>
-
-                            {/* Timestamp & Regenerate */}
-                            <div className="flex justify-between items-center pt-2">
-                              <p className="text-xs text-gray-500">
-                                Generated:{" "}
-                                {new Date(
-                                  zone.recommendations.lastGenerated
-                                ).toLocaleString()}
-                              </p>
-                              <button
-                                onClick={() =>
-                                  generateAIRecommendation(field._id, zone._id)
-                                }
-                                disabled={generatingForZone === zone._id}
-                                className="text-xs bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded flex items-center gap-1 disabled:opacity-50"
-                              >
-                                {generatingForZone === zone._id ? (
-                                  <>
-                                    <Loader
-                                      size={12}
-                                      className="animate-spin"
-                                    />
-                                    Updating...
-                                  </>
-                                ) : (
-                                  <>
-                                    <RefreshCw size={12} />
-                                    Refresh
-                                  </>
-                                )}
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                            <Brain
-                              size={32}
-                              className="mx-auto text-gray-400 mb-2"
-                            />
-                            <p className="text-sm text-gray-600 mb-3">
-                              {zone.soilMoisture.lastUpdated
-                                ? "Generate AI recommendation"
-                                : "Update soil data first"}
-                            </p>
-                            <button
-                              onClick={() => {
-                                if (!zone.soilMoisture.lastUpdated) {
-                                  navigate(`/field/${field._id}`);
-                                } else {
-                                  generateAIRecommendation(field._id, zone._id);
-                                }
-                              }}
-                              disabled={generatingForZone === zone._id}
-                              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 mx-auto disabled:opacity-50"
-                            >
-                              {generatingForZone === zone._id ? (
-                                <>
-                                  <Loader size={16} className="animate-spin" />
-                                  Generating...
-                                </>
-                              ) : (
-                                <>
-                                  <Brain size={16} />
-                                  {zone.soilMoisture.lastUpdated
-                                    ? "Generate AI Rec"
-                                    : "Update Data"}
-                                </>
-                              )}
-                            </button>
+                        {zone.recommendations?.healthScore > 0 && (
+                          <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${getHealthColor(zone.recommendations.healthScore)}`}>
+                            <CheckCircle2 size={12} />
+                            {zone.recommendations.healthScore.toFixed(0)}% {t('aiRecommendations.zone.health')}
                           </div>
                         )}
                       </div>
-                    ))}
-                  </div>
+
+                      {/* Sensor Micro-Grid */}
+                      <div className="grid grid-cols-3 gap-3 mb-6">
+                        <div className="bg-slate-50/50 rounded-2xl p-3 text-center">
+                          <Droplets size={14} className="mx-auto text-blue-500 mb-1" />
+                          <p className="text-[10px] text-slate-500 uppercase font-bold">{t('aiRecommendations.zone.moisture')}</p>
+                          <p className="text-sm font-bold text-slate-800">{zone.soilMoisture?.value || 0}%</p>
+                        </div>
+                        <div className="bg-slate-50/50 rounded-2xl p-3 text-center">
+                          <Beaker size={14} className="mx-auto text-purple-500 mb-1" />
+                          <p className="text-[10px] text-slate-500 uppercase font-bold">{t('aiRecommendations.zone.ph')}</p>
+                          <p className="text-sm font-bold text-slate-800">{zone.soilPH?.value || 0}</p>
+                        </div>
+                        <div className="bg-slate-50/50 rounded-2xl p-3 text-center">
+                          <ThermometerSun size={14} className="mx-auto text-orange-500 mb-1" />
+                          <p className="text-[10px] text-slate-500 uppercase font-bold">{t('aiRecommendations.zone.nutrients')}</p>
+                          <p className="text-sm font-bold text-slate-800">NPK</p>
+                        </div>
+                      </div>
+
+                      {/* Recommendation Body */}
+                      {zone.recommendations && zone.recommendations.aiGenerated ? (
+                        <div className="space-y-4">
+                          <div className="flex gap-4">
+                            <div className="flex-1 bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-2xl p-4">
+                              <div className="flex items-center gap-2 mb-1">
+                                <Droplets size={16} className="text-blue-600" />
+                                <span className="text-xs font-bold text-blue-900 uppercase">{t('aiRecommendations.recommendation.watering')}</span>
+                              </div>
+                              <p className="text-xl font-black text-blue-700">{zone.recommendations.irrigation.amount}mm</p>
+                              <p className="text-[10px] text-blue-600/80 font-medium leading-tight mt-1">
+                                {zone.recommendations.irrigation.timing}
+                              </p>
+                            </div>
+                            <div className="flex-1 bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 rounded-2xl p-4">
+                              <div className="flex items-center gap-2 mb-1">
+                                <Leaf size={16} className="text-emerald-600" />
+                                <span className="text-xs font-bold text-emerald-900 uppercase">{t('aiRecommendations.recommendation.nutrition')}</span>
+                              </div>
+                              <p className="text-xl font-black text-emerald-700">{zone.recommendations.fertilizer.amount}kg</p>
+                              <p className="text-[10px] text-emerald-600/80 font-medium leading-tight mt-1">
+                                {zone.recommendations.fertilizer.type}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* AI Explanation Box */}
+                          <div className="bg-emerald-900 text-emerald-50 rounded-2xl p-4 text-xs leading-relaxed relative overflow-hidden">
+                            <Brain size={40} className="absolute -right-2 -bottom-2 text-white/10 rotate-12" />
+                            <p className="relative z-10 font-medium italic">
+                              "{zone.recommendations.explanation}"
+                            </p>
+                          </div>
+
+                          {/* Footer Actions */}
+                          <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                            <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium">
+                              <Cloud size={12} />
+                              {zone.recommendations.weatherInfluence || t('aiRecommendations.recommendation.stableWeather')}
+                            </div>
+                            <button
+                              onClick={() => generateAIRecommendation(field._id, zone._id)}
+                              disabled={generatingForZone === zone._id}
+                              className="flex items-center gap-2 text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-colors disabled:opacity-50"
+                            >
+                              {generatingForZone === zone._id ? (
+                                <Loader size={14} className="animate-spin" />
+                              ) : (
+                                <RefreshCw size={14} />
+                              )}
+                              {t('aiRecommendations.recommendation.syncAI')}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="py-8 text-center bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-200">
+                          <Brain size={32} className="mx-auto text-slate-300 mb-2" />
+                          <p className="text-xs text-slate-500 font-medium mb-4 px-6">
+                            {t('aiRecommendations.recommendation.pending')}
+                          </p>
+                          <button
+                            onClick={() => generateAIRecommendation(field._id, zone._id)}
+                            disabled={generatingForZone === zone._id}
+                            className="bg-emerald-900 text-white px-5 py-2 rounded-xl text-xs font-bold hover:bg-emerald-800 transition-all flex items-center gap-2 mx-auto"
+                          >
+                            {generatingForZone === zone._id ? (
+                              <Loader size={14} className="animate-spin" />
+                            ) : (
+                              <Brain size={14} />
+                            )}
+                            {t('aiRecommendations.recommendation.generateButton')}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      <style jsx>{`
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 40s linear infinite;
+        }
+      `}</style>
     </div>
   );
 };

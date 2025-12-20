@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import axios from "axios";
 import {
   ArrowLeft,
@@ -15,9 +16,22 @@ import {
   X,
   Brain,
   Loader,
+  CircleDashed,
+  Flower2,
+  MapPin,
+  Activity,
+  Beaker,
+  ThermometerSun,
+  Calendar,
+  Cpu,
+  Binary,
+  Globe,
+  Database,
+  BarChart,
 } from "lucide-react";
 
 const FieldDetails = () => {
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [field, setField] = useState(null);
@@ -52,26 +66,26 @@ const FieldDetails = () => {
 
   const getStatusColor = (status) => {
     const colors = {
-      Dry: "bg-red-100 text-red-700 border-red-300",
-      Optimal: "bg-green-100 text-green-700 border-green-300",
-      Wet: "bg-blue-100 text-blue-700 border-blue-300",
-      Healthy: "bg-green-100 text-green-700 border-green-300",
-      Stress: "bg-yellow-100 text-yellow-700 border-yellow-300",
-      Critical: "bg-red-100 text-red-700 border-red-300",
+      Dry: "bg-rose-100 text-rose-700 border-rose-200",
+      Optimal: "bg-emerald-100 text-emerald-700 border-emerald-200",
+      Wet: "bg-blue-100 text-blue-700 border-blue-200",
+      Healthy: "bg-emerald-100 text-emerald-700 border-emerald-200",
+      Stress: "bg-amber-100 text-amber-700 border-amber-200",
+      Critical: "bg-rose-100 text-rose-700 border-rose-200",
     };
-    return colors[status] || "bg-gray-100 text-gray-700 border-gray-300";
+    return colors[status] || "bg-slate-100 text-slate-700 border-slate-200";
   };
 
   const getHealthColor = (health) => {
-    if (health >= 75) return "text-green-600 bg-green-100 border-green-300";
-    if (health >= 50) return "text-yellow-600 bg-yellow-100 border-yellow-300";
-    return "text-red-600 bg-red-100 border-red-300";
+    if (health >= 75) return "text-emerald-700 bg-emerald-100 border-emerald-200";
+    if (health >= 50) return "text-amber-700 bg-amber-100 border-amber-200";
+    return "text-rose-700 bg-rose-100 border-rose-200";
   };
 
   const getHealthStatus = (health) => {
-    if (health >= 75) return "Excellent";
-    if (health >= 50) return "Moderate";
-    return "Poor";
+    if (health >= 75) return t('fieldDetails.excellent');
+    if (health >= 50) return t('fieldDetails.moderate');
+    return t('fieldDetails.poor');
   };
 
   const generateAIRecommendation = async (zoneId) => {
@@ -86,23 +100,15 @@ const FieldDetails = () => {
 
       await fetchFieldDetails();
 
-      // Show success message
       const rec = response.data.recommendation;
-      alert(
-        `✅ AI Recommendation Generated!\n\n💧 Irrigation: ${
-          rec.irrigation_mm
-        }mm\n🌿 Fertilizer: ${
-          rec.fertilizer_kg
-        }kg/acre\n💚 Health Score: ${rec.health_score.toFixed(1)}%\n\n${
-          rec.explanation
-        }`
-      );
+      
+      // Build translated alert message
+      const alertMessage = `✅ ${t('fieldDetails.aiRecGenerated')}\n\n💧 ${t('fieldDetails.irrigation')}: ${rec.irrigation_mm}mm\n🌿 ${t('fieldDetails.fertilizer')}: ${rec.fertilizer_kg}kg/acre\n💚 ${t('fieldDetails.healthScore')}: ${rec.health_score.toFixed(1)}%\n\n${rec.explanation}`;
+      
+      alert(alertMessage);
     } catch (error) {
       console.error("Error generating AI recommendation:", error);
-      alert(
-        error.response?.data?.message ||
-          "Failed to generate AI recommendation. Make sure Python server (port 8000) is running."
-      );
+      alert(error.response?.data?.message || t('fieldDetails.aiRecFailed'));
     } finally {
       setGeneratingRecs(false);
     }
@@ -110,10 +116,10 @@ const FieldDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading field details...</p>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="relative w-16 h-16">
+          <div className="w-16 h-16 border-4 border-emerald-100 border-t-emerald-600 rounded-full animate-spin"></div>
+          <Activity className="w-6 h-6 text-emerald-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
         </div>
       </div>
     );
@@ -121,15 +127,12 @@ const FieldDetails = () => {
 
   if (!field) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <AlertCircle size={48} className="mx-auto text-red-500 mb-4" />
-          <p className="text-gray-700">Field not found</p>
-          <button
-            onClick={() => navigate("/fields")}
-            className="mt-4 text-green-600 hover:text-green-700"
-          >
-            Back to fields
+          <AlertCircle size={48} className="mx-auto text-rose-500 mb-4" />
+          <p className="text-emerald-900 font-bold">{t('fieldDetails.fieldNotFound')}</p>
+          <button onClick={() => navigate("/fields")} className="mt-4 text-emerald-600 font-bold hover:underline">
+            {t('fieldDetails.backToFields')}
           </button>
         </div>
       </div>
@@ -137,549 +140,251 @@ const FieldDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
+    <div key={i18n.language} className="relative space-y-6 animate-in fade-in duration-500 pb-12">
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-[0.03]">
+        <CircleDashed className="absolute top-20 left-10 w-64 h-64 text-emerald-900 animate-spin-slow" />
+        <Flower2 className="absolute bottom-40 right-10 w-96 h-96 text-emerald-900" />
+      </div>
+
+      <div className="relative z-10 space-y-6">
         <button
-          onClick={() => navigate("/fields")}
-          className="flex items-center gap-2 text-gray-700 hover:text-gray-900 mb-4"
+          onClick={() => navigate("/Dashboard")}
+          className="flex items-center gap-2 text-emerald-800 font-bold hover:text-emerald-600 transition-colors mb-4 group"
         >
-          <ArrowLeft size={20} />
-          Back to Fields
+          <div className="p-2 bg-emerald-100 rounded-xl group-hover:-translate-x-1 transition-transform">
+            <ArrowLeft size={18} />
+          </div>
+          {t('fieldDetails.backToDashboard')}
         </button>
 
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex justify-between items-start">
+        <div className="bg-emerald-900 rounded-[32px] p-8 text-white shadow-2xl relative overflow-hidden">
+          <Flower2 className="absolute -right-10 -bottom-10 w-64 h-64 opacity-10 rotate-12" />
+          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">
+              <h1 className="text-4xl font-black tracking-tight mb-2">
                 {field.fieldName}
               </h1>
-              <p className="text-gray-600 mt-1">
-                {field.cropType} • {field.fieldArea.value}{" "}
-                {field.fieldArea.unit}
-              </p>
-              <p className="text-sm text-gray-500 mt-2">
-                {field.location.village && `${field.location.village}, `}
-                {field.location.district}
+              <div className="flex items-center gap-4 text-emerald-200 font-medium">
+                <span className="bg-white/10 px-3 py-1 rounded-lg backdrop-blur-md border border-white/10">
+                  {field.cropType}
+                </span>
+                <span>•</span>
+                <span>{field.fieldArea.value} {field.fieldArea.unit}</span>
+              </div>
+              <p className="text-sm text-emerald-300/80 mt-4 flex items-center gap-2">
+                <MapPin size={14} />
+                {field.location.village && `${field.location.village}, `}{field.location.district}
               </p>
             </div>
-            <div className="text-right">
-              <span
-                className={`inline-block px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(
-                  field.overallHealth.status
-                )}`}
-              >
-                {field.overallHealth.status} Health
-              </span>
-              <p className="text-xs text-gray-500 mt-2">
-                Last updated: {new Date(field.updatedAt).toLocaleString()}
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-3xl text-right min-w-[200px]">
+              <div className={`inline-block px-4 py-2 rounded-2xl text-xs font-black uppercase tracking-widest ${getStatusColor(field.overallHealth.status)}`}>
+                {field.overallHealth.status} {t('fieldDetails.status')}
+              </div>
+              <p className="text-[10px] text-emerald-300 mt-2 font-bold uppercase">
+                {t('fieldDetails.lastSync')}: {new Date(field.updatedAt).toLocaleDateString()}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Weather Summary */}
         {field.weatherSummary && field.weatherSummary.lastUpdated && (
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-md p-6 mb-6 text-white">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <Cloud size={24} />
-              Weather Impact Summary
+          <div className="bg-white/60 backdrop-blur-md rounded-[32px] p-6 border border-emerald-100 shadow-sm">
+            <h2 className="text-lg font-bold text-emerald-950 mb-4 flex items-center gap-2">
+              <Cloud size={20} className="text-emerald-600" />
+              {t('fieldDetails.envIntelligence')}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white bg-opacity-20 rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Thermometer size={20} />
-                  <span className="text-sm">Temperature</span>
+              {[
+                { icon: <Thermometer size={20} />, label: t('fieldDetails.temp'), val: `${field.weatherSummary.temperature}°C` },
+                { icon: <Droplets size={20} />, label: t('fieldDetails.humidity'), val: `${field.weatherSummary.humidity}%` },
+                { icon: <CloudRain size={20} />, label: t('fieldDetails.rain'), val: field.weatherSummary.rainfall },
+                { icon: <AlertCircle size={20} />, label: t('fieldDetails.stressRisk'), val: field.weatherSummary.stressRisk }
+              ].map((item, i) => (
+                <div key={i} className="bg-white rounded-2xl p-4 border border-emerald-50 shadow-sm flex flex-col items-center">
+                  <div className="text-emerald-600 mb-2">{item.icon}</div>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.label}</span>
+                  <p className="text-lg font-bold text-emerald-950">{item.val}</p>
                 </div>
-                <p className="text-2xl font-bold">
-                  {field.weatherSummary.temperature}°C
-                </p>
-              </div>
-              <div className="bg-white bg-opacity-20 rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Droplets size={20} />
-                  <span className="text-sm">Humidity</span>
-                </div>
-                <p className="text-2xl font-bold">
-                  {field.weatherSummary.humidity}%
-                </p>
-              </div>
-              <div className="bg-white bg-opacity-20 rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <CloudRain size={20} />
-                  <span className="text-sm">Rainfall</span>
-                </div>
-                <p className="text-sm font-semibold">
-                  {field.weatherSummary.rainfall}
-                </p>
-              </div>
-              <div className="bg-white bg-opacity-20 rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <AlertCircle size={20} />
-                  <span className="text-sm">Stress Risk</span>
-                </div>
-                <p className="text-sm font-semibold">
-                  {field.weatherSummary.stressRisk}
-                </p>
-              </div>
+              ))}
             </div>
           </div>
         )}
 
-        {/* Zone Tabs */}
-        <div className="bg-white rounded-lg shadow-md mb-6 overflow-hidden">
-          <div className="flex overflow-x-auto border-b border-gray-200">
-            {field.zones.map((zone) => (
-              <button
-                key={zone._id}
-                onClick={() => setSelectedZone(zone)}
-                className={`px-6 py-4 font-semibold whitespace-nowrap transition ${
-                  selectedZone?._id === zone._id
-                    ? "bg-green-600 text-white"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                {zone.zoneName}
-              </button>
-            ))}
-          </div>
+        <div className="bg-white/80 backdrop-blur-sm rounded-[32px] p-2 border border-emerald-100 shadow-xl flex gap-2 overflow-x-auto no-scrollbar">
+          {field.zones.map((zone) => (
+            <button
+              key={zone._id}
+              onClick={() => setSelectedZone(zone)}
+              className={`flex-1 min-w-[140px] py-4 rounded-2xl font-bold transition-all ${
+                selectedZone?._id === zone._id
+                  ? "bg-emerald-900 text-white shadow-lg"
+                  : "text-emerald-800 hover:bg-emerald-50"
+              }`}
+            >
+              {zone.zoneName}
+            </button>
+          ))}
+        </div>
 
-          {/* Zone Details */}
-          {selectedZone && (
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">
-                  {selectedZone.zoneName} Details
-                </h2>
-                <div className="flex gap-2">
+        {selectedZone && (
+          <div className="animate-in slide-in-from-bottom-4 duration-500">
+            <div className="bg-white rounded-[32px] p-8 shadow-lg border border-emerald-50 mb-6">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                <div>
+                  <h2 className="text-2xl font-black text-emerald-950">
+                    {selectedZone.zoneName} {t('fieldDetails.diagnostic')}
+                  </h2>
+                  <p className="text-sm text-slate-500 font-medium">{t('fieldDetails.realtimeSensor')}</p>
+                </div>
+                <div className="flex gap-3">
                   <button
                     onClick={() => generateAIRecommendation(selectedZone._id)}
                     disabled={generatingRecs}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-emerald-900 text-white px-5 py-3 rounded-2xl flex items-center gap-2 font-bold shadow-xl hover:bg-emerald-800 transition-all disabled:opacity-50"
                   >
-                    {generatingRecs ? (
-                      <>
-                        <Loader size={18} className="animate-spin" />
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <Brain size={18} />
-                        AI Recommend
-                      </>
-                    )}
+                    {generatingRecs ? <Loader size={18} className="animate-spin" /> : <Brain size={18} />}
+                    {t('fieldDetails.aiAdvisor')}
                   </button>
                   <button
                     onClick={() => setShowSoilModal(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                    className="bg-emerald-50 text-emerald-700 px-5 py-3 rounded-2xl flex items-center gap-2 font-bold border border-emerald-100 hover:bg-emerald-100 transition-all"
                   >
                     <Edit2 size={18} />
-                    Update Soil Data
+                    {t('fieldDetails.updateSensors')}
                   </button>
                 </div>
               </div>
 
-              {/* Soil Conditions Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Droplets size={20} className="text-blue-600" />
-                    <span className="text-sm font-medium text-gray-700">
-                      Soil Moisture
-                    </span>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div className="bg-slate-50 rounded-[24px] p-5 border border-slate-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Droplets size={18} className="text-blue-500" />
+                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{t('fieldDetails.moisture')}</span>
                   </div>
-                  <p className="text-3xl font-bold text-gray-800">
-                    {selectedZone.soilMoisture.value}%
-                  </p>
-                  <span
-                    className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
-                      selectedZone.soilMoisture.status
-                    )}`}
-                  >
+                  <p className="text-3xl font-black text-slate-900">{selectedZone.soilMoisture.value}%</p>
+                  <div className={`mt-3 inline-block px-3 py-1 rounded-lg text-[10px] font-black uppercase ${getStatusColor(selectedZone.soilMoisture.status)}`}>
                     {selectedZone.soilMoisture.status}
-                  </span>
-                  {selectedZone.soilMoisture.lastUpdated && (
-                    <p className="text-xs text-gray-500 mt-2">
-                      Updated:{" "}
-                      {new Date(
-                        selectedZone.soilMoisture.lastUpdated
-                      ).toLocaleDateString()}
-                    </p>
-                  )}
+                  </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Leaf size={20} className="text-green-600" />
-                    <span className="text-sm font-medium text-gray-700">
-                      NPK Levels
-                    </span>
+                <div className="bg-slate-50 rounded-[24px] p-5 border border-slate-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Leaf size={18} className="text-emerald-500" />
+                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{t('fieldDetails.nutrients')}</span>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-sm">
-                      <span className="font-semibold">N:</span>{" "}
-                      {selectedZone.soilNutrients.nitrogen} ppm
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-semibold">P:</span>{" "}
-                      {selectedZone.soilNutrients.phosphorus} ppm
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-semibold">K:</span>{" "}
-                      {selectedZone.soilNutrients.potassium} ppm
-                    </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[['N', selectedZone.soilNutrients.nitrogen], ['P', selectedZone.soilNutrients.phosphorus], ['K', selectedZone.soilNutrients.potassium]].map(([l, v]) => (
+                      <div key={l} className="text-center">
+                        <span className="text-[10px] font-bold text-slate-400 block">{l}</span>
+                        <span className="text-sm font-black text-emerald-700">{v}</span>
+                      </div>
+                    ))}
                   </div>
-                  {selectedZone.soilNutrients.lastUpdated && (
-                    <p className="text-xs text-gray-500 mt-2">
-                      Updated:{" "}
-                      {new Date(
-                        selectedZone.soilNutrients.lastUpdated
-                      ).toLocaleDateString()}
-                    </p>
-                  )}
                 </div>
 
-                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp size={20} className="text-purple-600" />
-                    <span className="text-sm font-medium text-gray-700">
-                      Soil pH
-                    </span>
+                <div className="bg-slate-50 rounded-[24px] p-5 border border-slate-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <TrendingUp size={18} className="text-purple-500" />
+                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{t('fieldDetails.soilPH')}</span>
                   </div>
-                  <p className="text-3xl font-bold text-gray-800">
-                    {selectedZone.soilPH.value}
+                  <p className="text-3xl font-black text-slate-900">{selectedZone.soilPH.value}</p>
+                  <p className="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-tighter">
+                    {selectedZone.soilPH.value < 6.5 ? t('fieldDetails.acidicEnv') : selectedZone.soilPH.value > 7.5 ? t('fieldDetails.alkalineEnv') : t('fieldDetails.neutralBalance')}
                   </p>
-                  <p className="text-xs text-gray-600 mt-2">
-                    {selectedZone.soilPH.value < 6.5
-                      ? "Acidic"
-                      : selectedZone.soilPH.value > 7.5
-                      ? "Alkaline"
-                      : "Neutral"}
-                  </p>
-                  {selectedZone.soilPH.lastUpdated && (
-                    <p className="text-xs text-gray-500 mt-2">
-                      Updated:{" "}
-                      {new Date(
-                        selectedZone.soilPH.lastUpdated
-                      ).toLocaleDateString()}
-                    </p>
-                  )}
                 </div>
 
-                <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg p-4 border border-yellow-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Leaf size={20} className="text-yellow-600" />
-                    <span className="text-sm font-medium text-gray-700">
-                      Crop Health
-                    </span>
+                <div className="bg-slate-50 rounded-[24px] p-5 border border-slate-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Activity size={18} className="text-orange-500" />
+                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{t('fieldDetails.vitality')}</span>
                   </div>
-                  <p className="text-3xl font-bold text-gray-800">
-                    {selectedZone.cropHealth.score}%
-                  </p>
-                  <span
-                    className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
-                      selectedZone.cropHealth.status
-                    )}`}
-                  >
+                  <p className="text-3xl font-black text-slate-900">{selectedZone.cropHealth.score}%</p>
+                  <div className={`mt-3 inline-block px-3 py-1 rounded-lg text-[10px] font-black uppercase ${getStatusColor(selectedZone.cropHealth.status)}`}>
                     {selectedZone.cropHealth.status}
-                  </span>
-                  {selectedZone.cropHealth.lastUpdated && (
-                    <p className="text-xs text-gray-500 mt-2">
-                      Updated:{" "}
-                      {new Date(
-                        selectedZone.cropHealth.lastUpdated
-                      ).toLocaleDateString()}
-                    </p>
-                  )}
+                  </div>
                 </div>
               </div>
 
-              {/* AI Recommendations Section */}
-              {selectedZone.recommendations &&
-              selectedZone.recommendations.lastGenerated ? (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                      {selectedZone.recommendations.aiGenerated && (
-                        <div className="bg-purple-100 p-2 rounded-lg">
-                          <Brain size={20} className="text-purple-600" />
-                        </div>
-                      )}
-                      AI-Powered Recommendations
+              {selectedZone.recommendations && selectedZone.recommendations.lastGenerated ? (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between border-t border-slate-100 pt-8">
+                    <h3 className="text-xl font-bold text-emerald-950 flex items-center gap-3">
+                      <Brain className="text-emerald-600" />
+                      {t('fieldDetails.aiDecisionIntel')}
                     </h3>
-                    {selectedZone.recommendations.aiGenerated && (
-                      <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold">
-                        DRL Model
+                    <span className="bg-emerald-900 text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest">{t('fieldDetails.drlEngineActive')}</span>
+                  </div>
+
+                  <div className="bg-emerald-50 border border-emerald-100 rounded-[24px] p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-sm font-bold text-emerald-900">{t('fieldDetails.computedHealthIndex')}</span>
+                      <span className={`px-4 py-1.5 rounded-xl text-xs font-black uppercase border ${getHealthColor(selectedZone.recommendations.healthScore)}`}>
+                        {getHealthStatus(selectedZone.recommendations.healthScore)}
                       </span>
-                    )}
+                    </div>
+                    <div className="flex items-end gap-4">
+                       <span className="text-5xl font-black text-emerald-900">{selectedZone.recommendations.healthScore.toFixed(1)}%</span>
+                       <div className="flex-1 pb-2">
+                          <div className="w-full bg-emerald-200/50 rounded-full h-3 overflow-hidden">
+                            <div className="h-full bg-emerald-600 rounded-full transition-all duration-1000" style={{ width: `${selectedZone.recommendations.healthScore}%` }}></div>
+                          </div>
+                       </div>
+                    </div>
                   </div>
 
-                  {/* Health Score Card */}
-                  {selectedZone.recommendations.healthScore > 0 && (
-                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-200 rounded-lg p-6">
-                      <h4 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
-                        <TrendingUp size={20} className="text-purple-600" />
-                        AI Health Assessment
-                      </h4>
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="text-gray-700 font-semibold">
-                          Overall Health Score
-                        </span>
-                        <div className="text-right">
-                          <span className="text-4xl font-bold text-purple-600">
-                            {selectedZone.recommendations.healthScore.toFixed(
-                              1
-                            )}
-                            %
-                          </span>
-                          <span
-                            className={`block mt-1 px-3 py-1 rounded-full text-xs font-semibold border ${getHealthColor(
-                              selectedZone.recommendations.healthScore
-                            )}`}
-                          >
-                            {getHealthStatus(
-                              selectedZone.recommendations.healthScore
-                            )}
-                          </span>
-                        </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-white border-2 border-emerald-100 rounded-3xl p-6 hover:shadow-xl transition-all">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="p-3 bg-blue-50 rounded-2xl text-blue-600"><Droplets size={24}/></div>
+                        <h4 className="font-black text-emerald-950 uppercase tracking-widest text-xs">{t('fieldDetails.irrigationStrategy')}</h4>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-                        <div
-                          className="h-full transition-all duration-500 rounded-full"
-                          style={{
-                            width: `${selectedZone.recommendations.healthScore}%`,
-                            backgroundColor:
-                              selectedZone.recommendations.healthScore >= 75
-                                ? "#16a34a"
-                                : selectedZone.recommendations.healthScore >= 50
-                                ? "#eab308"
-                                : "#dc2626",
-                          }}
-                        ></div>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-3 text-center">
-                        {selectedZone.recommendations.healthScore >= 75
-                          ? "🌟 Excellent crop health! Continue current practices."
-                          : selectedZone.recommendations.healthScore >= 50
-                          ? "⚠️ Moderate health - Follow recommendations below."
-                          : "🚨 Poor health - Immediate action required!"}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Explanation */}
-                  {selectedZone.recommendations.explanation && (
-                    <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-                      <h4 className="font-semibold text-blue-900 mb-2">
-                        Why this recommendation?
-                      </h4>
-                      <p className="text-sm text-blue-800">
-                        {selectedZone.recommendations.explanation}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Weather Influence */}
-                  {selectedZone.recommendations.weatherInfluence && (
-                    <div className="bg-gradient-to-r from-sky-50 to-blue-50 border border-sky-200 p-4 rounded-lg">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Cloud size={18} className="text-sky-600" />
-                        <h4 className="font-semibold text-gray-800">
-                          Weather Conditions Considered
-                        </h4>
-                      </div>
-                      <p className="text-sm text-gray-700">
-                        {selectedZone.recommendations.weatherInfluence}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Action Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Irrigation */}
-                    <div className="bg-white border-2 border-blue-200 rounded-lg p-6">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="bg-blue-100 p-2 rounded-lg">
-                          <Droplets size={24} className="text-blue-600" />
-                        </div>
-                        <h4 className="text-lg font-bold text-gray-800">
-                          Irrigation
-                        </h4>
-                      </div>
-
                       {selectedZone.recommendations.irrigation.amount > 0 ? (
-                        <>
-                          <p className="text-4xl font-bold text-blue-600 mb-2">
-                            {selectedZone.recommendations.irrigation.amount}{" "}
-                            {selectedZone.recommendations.irrigation.unit}
-                          </p>
-                          <p className="text-sm text-gray-700 mb-3">
-                            <span className="font-semibold">When:</span>{" "}
-                            {selectedZone.recommendations.irrigation.timing}
-                          </p>
-                          <div className="flex items-center gap-2 mb-4">
-                            <div className="flex-1 bg-gray-200 rounded-full h-2">
-                              <div
-                                className="bg-blue-600 h-2 rounded-full"
-                                style={{
-                                  width: `${selectedZone.recommendations.irrigation.confidence}%`,
-                                }}
-                              ></div>
-                            </div>
-                            <span className="text-xs font-semibold text-gray-600">
-                              {
-                                selectedZone.recommendations.irrigation
-                                  .confidence
-                              }
-                              % confidence
-                            </span>
-                          </div>
-                          <div className="flex gap-2">
-                            <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg flex items-center justify-center gap-2 transition">
-                              <CheckCircle size={18} />
-                              Approve
-                            </button>
-                            <button className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 py-2 rounded-lg transition">
-                              Modify
-                            </button>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="text-center py-4">
-                          <CheckCircle
-                            size={48}
-                            className="mx-auto text-green-500 mb-2"
-                          />
-                          <p className="text-gray-600 font-semibold">
-                            No irrigation needed
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Soil moisture is at optimal levels
-                          </p>
+                        <div className="space-y-4">
+                          <p className="text-4xl font-black text-blue-600">{selectedZone.recommendations.irrigation.amount} <span className="text-lg uppercase">{selectedZone.recommendations.irrigation.unit}</span></p>
+                          <p className="text-xs text-slate-500 font-bold uppercase tracking-tight">{t('fieldDetails.timeline')}: {selectedZone.recommendations.irrigation.timing}</p>
+                          <div className="flex items-center gap-2"><div className="flex-1 bg-slate-100 h-1.5 rounded-full"><div className="bg-blue-500 h-full rounded-full" style={{width: `${selectedZone.recommendations.irrigation.confidence}%`}}></div></div><span className="text-[10px] font-black text-slate-400">{selectedZone.recommendations.irrigation.confidence}% {t('fieldDetails.conf')}</span></div>
                         </div>
+                      ) : (
+                        <div className="text-center py-4 text-emerald-600 font-bold text-sm">{t('fieldDetails.statusOptimal')}</div>
                       )}
                     </div>
 
-                    {/* Fertilizer */}
-                    <div className="bg-white border-2 border-green-200 rounded-lg p-6">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="bg-green-100 p-2 rounded-lg">
-                          <Leaf size={24} className="text-green-600" />
-                        </div>
-                        <h4 className="text-lg font-bold text-gray-800">
-                          Fertilizer
-                        </h4>
+                    <div className="bg-white border-2 border-emerald-100 rounded-3xl p-6 hover:shadow-xl transition-all">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-600"><Leaf size={24}/></div>
+                        <h4 className="font-black text-emerald-950 uppercase tracking-widest text-xs">{t('fieldDetails.nutrientStrategy')}</h4>
                       </div>
-
                       {selectedZone.recommendations.fertilizer.amount > 0 ? (
-                        <>
-                          <p className="text-4xl font-bold text-green-600 mb-2">
-                            {selectedZone.recommendations.fertilizer.amount}{" "}
-                            {selectedZone.recommendations.fertilizer.unit}
-                          </p>
-                          <p className="text-sm text-gray-700 mb-1">
-                            <span className="font-semibold">Type:</span>{" "}
-                            {selectedZone.recommendations.fertilizer.type}
-                          </p>
-                          <p className="text-sm text-gray-700 mb-3">
-                            <span className="font-semibold">When:</span>{" "}
-                            {selectedZone.recommendations.fertilizer.timing}
-                          </p>
-                          <div className="flex items-center gap-2 mb-4">
-                            <div className="flex-1 bg-gray-200 rounded-full h-2">
-                              <div
-                                className="bg-green-600 h-2 rounded-full"
-                                style={{
-                                  width: `${selectedZone.recommendations.fertilizer.confidence}%`,
-                                }}
-                              ></div>
-                            </div>
-                            <span className="text-xs font-semibold text-gray-600">
-                              {
-                                selectedZone.recommendations.fertilizer
-                                  .confidence
-                              }
-                              % confidence
-                            </span>
-                          </div>
-                          <div className="flex gap-2">
-                            <button className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg flex items-center justify-center gap-2 transition">
-                              <CheckCircle size={18} />
-                              Approve
-                            </button>
-                            <button className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 py-2 rounded-lg transition">
-                              Modify
-                            </button>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="text-center py-4">
-                          <CheckCircle
-                            size={48}
-                            className="mx-auto text-green-500 mb-2"
-                          />
-                          <p className="text-gray-600 font-semibold">
-                            No fertilizer needed
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Nutrient levels are adequate
-                          </p>
+                        <div className="space-y-4">
+                          <p className="text-4xl font-black text-emerald-600">{selectedZone.recommendations.fertilizer.amount} <span className="text-lg uppercase">{selectedZone.recommendations.fertilizer.unit}</span></p>
+                          <p className="text-xs text-slate-500 font-bold uppercase tracking-tight">{t('fieldDetails.variant')}: {selectedZone.recommendations.fertilizer.type}</p>
+                          <div className="flex items-center gap-2"><div className="flex-1 bg-slate-100 h-1.5 rounded-full"><div className="bg-emerald-500 h-full rounded-full" style={{width: `${selectedZone.recommendations.fertilizer.confidence}%`}}></div></div><span className="text-[10px] font-black text-slate-400">{selectedZone.recommendations.fertilizer.confidence}% {t('fieldDetails.conf')}</span></div>
                         </div>
+                      ) : (
+                        <div className="text-center py-4 text-emerald-600 font-bold text-sm">{t('fieldDetails.soilBalanced')}</div>
                       )}
                     </div>
                   </div>
 
-                  <p className="text-xs text-gray-500 text-center">
-                    Recommendations generated:{" "}
-                    {new Date(
-                      selectedZone.recommendations.lastGenerated
-                    ).toLocaleString()}
-                  </p>
+                  <div className="bg-slate-900 rounded-[24px] p-6 text-slate-300 text-sm italic leading-relaxed relative overflow-hidden">
+                    <Brain size={48} className="absolute -right-4 -bottom-4 text-white/5 rotate-12" />
+                    <span className="text-emerald-400 font-black block not-italic mb-2 text-xs uppercase tracking-[0.2em]">{t('fieldDetails.engineRationale')}</span>
+                    "{selectedZone.recommendations.explanation}"
+                  </div>
                 </div>
               ) : (
-                <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                  <Brain size={48} className="mx-auto text-gray-400 mb-4" />
-                  <h4 className="text-lg font-semibold text-gray-700 mb-2">
-                    No AI recommendations yet
-                  </h4>
-                  <p className="text-gray-600 mb-4">
-                    {selectedZone.soilMoisture.lastUpdated
-                      ? "Click the button above to generate AI-powered recommendations"
-                      : "Update soil data first, then generate recommendations"}
-                  </p>
-                  <button
-                    onClick={() => {
-                      if (selectedZone.soilMoisture.lastUpdated) {
-                        generateAIRecommendation(selectedZone._id);
-                      } else {
-                        setShowSoilModal(true);
-                      }
-                    }}
-                    disabled={generatingRecs}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 mx-auto disabled:opacity-50"
-                  >
-                    {generatingRecs ? (
-                      <>
-                        <Loader size={20} className="animate-spin" />
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <Brain size={20} />
-                        {selectedZone.soilMoisture.lastUpdated
-                          ? "Generate AI Recommendations"
-                          : "Update Soil Data First"}
-                      </>
-                    )}
-                  </button>
+                <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-[32px] p-12 text-center">
+                  <Brain size={48} className="mx-auto text-slate-200 mb-4" />
+                  <h4 className="text-lg font-bold text-slate-800">{t('fieldDetails.pendingIntelSync')}</h4>
+                  <p className="text-slate-500 mb-6 text-sm">{t('fieldDetails.runAiEngine')}</p>
+                  <button onClick={() => generateAIRecommendation(selectedZone._id)} className="bg-emerald-900 text-white px-8 py-3 rounded-2xl font-bold shadow-xl">{t('fieldDetails.startScan')}</button>
                 </div>
               )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
-      {/* Soil Update Modal */}
       {showSoilModal && selectedZone && (
         <SoilUpdateModal
           fieldId={id}
@@ -691,12 +396,18 @@ const FieldDetails = () => {
           }}
         />
       )}
+
+      <style jsx>{`
+        @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .animate-spin-slow { animation: spin-slow 25s linear infinite; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+      `}</style>
     </div>
   );
 };
 
-// Soil Update Modal Component
 const SoilUpdateModal = ({ fieldId, zone, onClose, onSuccess }) => {
+  const { t, i18n } = useTranslation();
   const [formData, setFormData] = useState({
     soilMoisture: zone.soilMoisture.value || 0,
     nitrogen: zone.soilNutrients.nitrogen || 0,
@@ -709,151 +420,73 @@ const SoilUpdateModal = ({ fieldId, zone, onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
-
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:5000/api/fields/${fieldId}/zone/${zone._id}/soil`,
-        formData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.put(`http://localhost:5000/api/fields/${fieldId}/zone/${zone._id}/soil`, formData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       onSuccess();
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to update soil data");
+      setError(t('fieldDetails.updateFailed'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-md w-full">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">
-              Update Soil Data
-            </h2>
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <X size={24} />
-            </button>
+    <div key={i18n.language} className="fixed inset-0 bg-emerald-950/40 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in zoom-in duration-200">
+      <div className="bg-white rounded-[40px] max-w-md w-full shadow-2xl overflow-hidden border border-emerald-100">
+        <div className="bg-emerald-900 p-8 flex justify-between items-center text-white">
+          <h2 className="text-2xl font-black tracking-tight">{t('fieldDetails.sensorSync')}</h2>
+          <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors"><X /></button>
+        </div>
+        <form onSubmit={handleSubmit} className="p-8 space-y-6">
+          {error && <div className="bg-rose-50 text-rose-600 p-3 rounded-xl text-[10px] font-bold border border-rose-100">{error}</div>}
+          
+          <div className="grid grid-cols-2 gap-4">
+             <div className="space-y-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('fieldDetails.moisturePercent')}</label>
+                <input 
+                  type="number" 
+                  value={formData.soilMoisture} 
+                  onChange={(e) => setFormData({...formData, soilMoisture: e.target.value})} 
+                  className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-xl text-emerald-900 outline-none focus:border-emerald-500 focus:bg-white transition-all" 
+                />
+             </div>
+             <div className="space-y-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('fieldDetails.acidityPH')}</label>
+                <input 
+                  type="number" 
+                  step="0.1" 
+                  value={formData.soilPH} 
+                  onChange={(e) => setFormData({...formData, soilPH: e.target.value})} 
+                  className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-xl text-emerald-900 outline-none focus:border-emerald-500 focus:bg-white transition-all" 
+                />
+             </div>
           </div>
 
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-              {error}
-            </div>
-          )}
+          <div className="bg-emerald-50/50 p-6 rounded-[32px] space-y-4 border border-emerald-100/50">
+             <label className="text-[10px] font-black text-emerald-800 uppercase tracking-widest ml-1">{t('fieldDetails.nutrientLevelsPPM')}</label>
+             <div className="grid grid-cols-3 gap-3">
+                {['nitrogen', 'phosphorus', 'potassium'].map(k => (
+                  <div key={k} className="space-y-1">
+                    <span className="text-[8px] font-black text-emerald-600 uppercase block text-center tracking-tighter">{t(`fieldDetails.${k}`)}</span>
+                    <input 
+                      type="number" 
+                      value={formData[k]} 
+                      onChange={(e) => setFormData({...formData, [k]: e.target.value})} 
+                      className="w-full py-4 bg-white border-2 border-emerald-100 rounded-xl font-black text-xl text-center text-emerald-900 outline-none focus:border-emerald-500 transition-all shadow-sm" 
+                    />
+                  </div>
+                ))}
+             </div>
+          </div>
 
-          <p className="text-gray-600 mb-4">
-            Update readings for {zone.zoneName}
-          </p>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Soil Moisture (%)
-              </label>
-              <input
-                type="number"
-                step="0.1"
-                min="0"
-                max="100"
-                value={formData.soilMoisture}
-                onChange={(e) =>
-                  setFormData({ ...formData, soilMoisture: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nitrogen (ppm)
-              </label>
-              <input
-                type="number"
-                step="0.1"
-                min="0"
-                value={formData.nitrogen}
-                onChange={(e) =>
-                  setFormData({ ...formData, nitrogen: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Phosphorus (ppm)
-              </label>
-              <input
-                type="number"
-                step="0.1"
-                min="0"
-                value={formData.phosphorus}
-                onChange={(e) =>
-                  setFormData({ ...formData, phosphorus: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Potassium (ppm)
-              </label>
-              <input
-                type="number"
-                step="0.1"
-                min="0"
-                value={formData.potassium}
-                onChange={(e) =>
-                  setFormData({ ...formData, potassium: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Soil pH
-              </label>
-              <input
-                type="number"
-                step="0.1"
-                min="0"
-                max="14"
-                value={formData.soilPH}
-                onChange={(e) =>
-                  setFormData({ ...formData, soilPH: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              />
-            </div>
-
-            <div className="flex gap-4 pt-4">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition disabled:opacity-50"
-              >
-                {loading ? "Updating..." : "Update Data"}
-              </button>
-            </div>
-          </form>
-        </div>
+          <button type="submit" disabled={loading} className="w-full bg-emerald-900 text-white py-5 rounded-2xl font-black shadow-xl shadow-emerald-900/20 hover:bg-emerald-800 disabled:opacity-50 uppercase tracking-widest text-xs transform active:scale-95 transition-all">
+            {loading ? t('fieldDetails.syncing') : t('fieldDetails.updateLandVitals')}
+          </button>
+        </form>
       </div>
     </div>
   );

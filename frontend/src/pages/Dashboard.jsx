@@ -1,29 +1,53 @@
 import React, { useState, useEffect } from "react";
 import {
   BarChart3,
+  Camera,
   Target,
   Sprout,
   Settings,
   LogOut,
   Bell,
   User,
-  TrendingUp,
-  Droplets,
-  Leaf,
-  Cloud,
-  MapPin,
-  ArrowUpRight,
-  Sparkles,
   Activity,
   Zap,
+  Cloud,
+  Leaf,
+  Sun,
+  Wind,
+  Flower2,
+  CircleDashed,
+  LineChart,
+  Map,
+  Brain,
+  Menu,
+  ChevronLeft
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import axios from "axios";
 
+// Import your existing component files
+import DashboardContent from "../components/DashboardContent";
+import FieldsContent from "../pages/FieldList";
+import AIRecommendationsContent from "../components/AiRecommendation";
+import WeatherContent from "../components/Weather";
+import DiseaseDetectionContent from "../components/DiseaseDetection";
+import Analytics from "../components/Analytics";
+import LanguageSelector from "../components/LanguageSelector";
+
 function Dashboard() {
+  const { t } = useTranslation();
+  const [currentView, setCurrentView] = useState("dashboard");
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [selectedField, setSelectedField] = useState(null);
   const [fields, setFields] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [statistics, setStatistics] = useState({
+    totalFields: 0,
+    totalArea: 0,
+    avgHealth: 0,
+    activeFields: 0,
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,19 +56,51 @@ function Dashboard() {
 
   const fetchFields = async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem("token");
       const response = await axios.get("http://localhost:5000/api/fields", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setFields(response.data.fields);
-      if (response.data.fields.length > 0) {
-        setSelectedField(response.data.fields[0]);
+
+      const fieldsData = response.data.fields || [];
+      setFields(fieldsData);
+
+      if (fieldsData.length > 0) {
+        setSelectedField(fieldsData[0]);
+        calculateStatistics(fieldsData);
       }
     } catch (error) {
       console.error("Error fetching fields:", error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculateStatistics = (fieldsData) => {
+    const totalFields = fieldsData.length;
+    const totalArea = fieldsData.reduce(
+      (sum, field) => sum + (parseFloat(field.fieldArea?.value) || 0),
+      0
+    );
+    const avgHealth =
+      fieldsData.reduce(
+        (sum, field) => sum + (field.overallHealth?.score || 0),
+        0
+      ) / totalFields || 0;
+    const activeFields = fieldsData.filter(
+      (field) => field.isActive !== false
+    ).length;
+
+    setStatistics({
+      totalFields,
+      totalArea: totalArea.toFixed(2),
+      avgHealth: avgHealth.toFixed(1),
+      activeFields,
+    });
   };
 
   const handleLogout = () => {
@@ -53,409 +109,279 @@ function Dashboard() {
   };
 
   const handleFieldClick = (field) => {
+    setSelectedField(field);
     navigate(`/field/${field._id}`);
   };
 
-  const handleFieldsNavigation = () => {
-    navigate("/fields");
+  const getHealthColor = (score) => {
+    if (score >= 80) return "text-emerald-700";
+    if (score >= 60) return "text-yellow-600";
+    return "text-red-600";
+  };
+
+  const getHealthBgColor = (score) => {
+    if (score >= 80) return "from-emerald-100 to-green-50";
+    if (score >= 60) return "from-yellow-50 to-orange-50";
+    return "from-red-50 to-pink-50";
+  };
+
+  const switchView = (view) => {
+    setCurrentView(view);
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed);
+  };
+
+  const getHeaderTitle = () => {
+    const titleMap = {
+      "dashboard": t('header.farmOverview'),
+      "field-map": t('header.fieldManagement'),
+      "ai-assistant": t('header.smartAdvisory'),
+      "crop-health": t('header.plantHealthCheck'),
+      "analytics": t('header.analyticsDashboard'),
+      "weather": t('header.weatherStation'),
+      "notifications": t('header.allNotifications'),
+      "settings": t('nav.settings')
+    };
+    return titleMap[currentView] || t('header.farmOverview');
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 relative overflow-hidden">
-      {/* Animated Background Gradients */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-br from-emerald-200/30 to-transparent rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-gradient-to-tr from-teal-200/30 to-transparent rounded-full blur-3xl animate-pulse delay-1000"></div>
+    <div className="flex h-screen bg-[#F0FDF4] relative overflow-hidden font-sans">
+      {/* --- NATURE BACKGROUND PATTERN --- */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.07]"></div>
+        <Sun className="absolute -top-20 -right-20 text-yellow-400 opacity-10 w-96 h-96 animate-pulse-slow" />
+        <Leaf className="absolute bottom-10 -left-10 text-emerald-600 opacity-5 w-80 h-80 rotate-45" />
+        <Sprout className="absolute bottom-40 left-20 text-emerald-400 opacity-10 w-40 h-40 -rotate-12" />
+        <Cloud className="absolute top-20 left-1/4 text-emerald-200 opacity-20 w-32 h-32" />
+        <Cloud className="absolute top-40 right-1/4 text-emerald-200 opacity-20 w-24 h-24" />
       </div>
 
-      {/* Sidebar with Glassmorphism */}
-      <aside className="w-72 backdrop-blur-xl bg-white/70 border-r border-white/20 shadow-2xl flex flex-col relative z-10">
-        {/* Logo Section */}
-        <div className="p-6 border-b border-white/30">
-          <div className="flex items-center gap-3 group cursor-pointer">
-            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 via-teal-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg transform transition-transform group-hover:scale-110 group-hover:rotate-3">
-              <Leaf className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                AgriSync
-              </span>
-              <p className="text-xs text-gray-600 font-medium">
-                Smart Farming Platform
-              </p>
-            </div>
+      {/* --- SIDEBAR --- */}
+      <aside className={`${isSidebarCollapsed ? "w-20" : "w-72"} bg-emerald-900 text-white shadow-2xl flex flex-col relative z-20 rounded-r-3xl my-4 ml-4 h-[calc(100vh-2rem)] transition-all duration-300 ease-in-out`}>
+        {/* Decorative Circles on Sidebar */}
+        {!isSidebarCollapsed && (
+          <div className="absolute top-0 left-0 w-full h-full overflow-hidden rounded-r-3xl pointer-events-none opacity-10">
+            <CircleDashed className="absolute -top-10 -left-10 w-40 h-40 text-white" />
+            <Flower2 className="absolute bottom-10 right-0 w-48 h-48 text-white translate-x-1/2" />
           </div>
+        )}
+
+        {/* Logo & Toggle Section */}
+        <div className={`p-5 relative z-10 flex items-center ${isSidebarCollapsed ? "flex-col gap-4" : "justify-between"}`}>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white rounded-xl flex-shrink-0 flex items-center justify-center shadow-lg">
+              <Leaf className="w-6 h-6 text-emerald-700 fill-emerald-700" />
+            </div>
+            {!isSidebarCollapsed && (
+              <div className="animate-in fade-in slide-in-from-left-2 duration-300">
+                <span className="text-2xl font-bold tracking-tight block">Sigro</span>
+                <p className="text-[10px] text-emerald-300 uppercase tracking-widest">Agri AI</p>
+              </div>
+            )}
+          </div>
+          
+          <button 
+            onClick={toggleSidebar} 
+            className="p-2 hover:bg-emerald-800 rounded-lg transition-colors"
+            title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            {isSidebarCollapsed ? <Menu size={22} /> : <ChevronLeft size={22} />}
+          </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="w-full flex items-center gap-3 px-4 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden group"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <BarChart3 className="w-5 h-5 relative z-10" />
-            <span className="font-semibold relative z-10">Dashboard</span>
-            <Sparkles className="w-4 h-4 ml-auto relative z-10 opacity-70" />
-          </button>
+        <nav className="flex-1 px-3 space-y-2 overflow-y-auto relative z-10 py-4 scrollbar-thin scrollbar-thumb-emerald-700 scrollbar-track-transparent">
+          <NavItem
+            icon={<BarChart3 className="w-5 h-5" />}
+            label={t('nav.dashboard')}
+            active={currentView === "dashboard"}
+            onClick={() => switchView("dashboard")}
+            isCollapsed={isSidebarCollapsed}
+          />
+          <NavItem
+            icon={<Map className="w-5 h-5" />}
+            label={t('nav.myFields')}
+            active={currentView === "field-map"}
+            onClick={() => switchView("field-map")}
+            isCollapsed={isSidebarCollapsed}
+          />
+          <NavItem
+            icon={<Brain className="w-5 h-5" />}
+            label={t('nav.aiAssistant')}
+            active={currentView === "ai-assistant"}
+            onClick={() => switchView("ai-assistant")}
+            isCollapsed={isSidebarCollapsed}
+          />
+          <NavItem
+            icon={<Cloud className="w-5 h-5" />}
+            label={t('nav.weather')}
+            active={currentView === "weather"}
+            onClick={() => switchView("weather")}
+            isCollapsed={isSidebarCollapsed}
+          />
+          <NavItem
+            icon={<Camera className="w-5 h-5" />}
+            label={t('nav.cropHealth')}
+            active={currentView === "crop-health"}
+            onClick={() => switchView("crop-health")}
+            isCollapsed={isSidebarCollapsed}
+          />
+          <NavItem
+            icon={<LineChart className="w-5 h-5" />}
+            label={t('nav.analytics')}
+            active={currentView === "analytics"}
+            onClick={() => switchView("analytics")}
+            isCollapsed={isSidebarCollapsed}
+          />
 
-          <button
-            onClick={() => navigate("/ai-recommendation")}
-            className="w-full flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group"
-          >
-            <Target className="w-5 h-5 text-emerald-600 group-hover:scale-110 transition-transform" />
-            <span className="font-medium">AI Recommendations</span>
-          </button>
+          <div className="py-3 px-2">
+            <div className="h-px bg-emerald-800/50"></div>
+          </div>
 
-          <button
-            onClick={handleFieldsNavigation}
-            className="w-full flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group"
-          >
-            <Sprout className="w-5 h-5 text-teal-600 group-hover:scale-110 transition-transform" />
-            <span className="font-medium">Fields</span>
-          </button>
-
-          <button className="w-full flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group">
-            <Activity className="w-5 h-5 text-emerald-600 group-hover:scale-110 transition-transform" />
-            <span className="font-medium">Analytics</span>
-          </button>
-
-          <button
-            onClick={() => navigate("/weather")}
-            className="w-full flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group"
-          >
-            <Cloud className="w-5 h-5 text-blue-600 group-hover:scale-110 transition-transform" />
-            <span className="font-medium">Weather</span>
-          </button>
+          <NavItem
+            icon={<Bell className="w-5 h-5" />}
+            label={t('nav.notifications')}
+            active={currentView === "notifications"}
+            onClick={() => switchView("notifications")}
+            badge={isSidebarCollapsed ? null : 3}
+            isCollapsed={isSidebarCollapsed}
+          />
+          <NavItem
+            icon={<Settings className="w-5 h-5" />}
+            label={t('nav.settings')}
+            active={currentView === "settings"}
+            onClick={() => switchView("settings")}
+            isCollapsed={isSidebarCollapsed}
+          />
         </nav>
 
         {/* User Profile Section */}
-        <div className="p-4 border-t border-white/30 backdrop-blur-sm">
-          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-4 mb-3 border border-emerald-100 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-md">
-                <User className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-gray-900">Farmer</p>
-                <p className="text-xs text-emerald-600 font-semibold flex items-center gap-1">
-                  <Zap className="w-3 h-3" />
-                  Premium Account
+        <div className={`p-4 mt-auto border-t border-emerald-800/50 relative z-10 bg-emerald-950/30 rounded-br-3xl`}>
+          <div className={`flex items-center ${isSidebarCollapsed ? "justify-center" : "gap-3"} mb-4`}>
+            <div className="w-10 h-10 rounded-full bg-emerald-200 flex-shrink-0 flex items-center justify-center border-2 border-white">
+              <User className="w-5 h-5 text-emerald-800" />
+            </div>
+            {!isSidebarCollapsed && (
+              <div className="whitespace-nowrap animate-in fade-in duration-300">
+                <p className="text-sm font-bold text-white">
+                  {localStorage.getItem("userName") || "Farmer"}
+                </p>
+                <p className="text-xs text-emerald-300 flex items-center gap-1">
+                  <Zap className="w-3 h-3 fill-current" /> {t('user.premium')}
                 </p>
               </div>
-            </div>
+            )}
           </div>
 
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-gray-700 hover:bg-red-50 backdrop-blur-sm border border-gray-200 hover:border-red-300 rounded-2xl transition-all duration-300 font-medium hover:shadow-md"
+            className={`w-full flex items-center justify-center gap-2 ${isSidebarCollapsed ? "p-2.5" : "px-4 py-2.5"} bg-emerald-800 hover:bg-red-500/80 hover:text-white text-emerald-100 rounded-lg transition-all duration-300 text-sm font-medium`}
+            title={isSidebarCollapsed ? t('nav.logout') : ""}
           >
-            <LogOut className="w-5 h-5" />
-            <span>Logout</span>
+            <LogOut className="w-4 h-4" />
+            {!isSidebarCollapsed && <span>{t('nav.logout')}</span>}
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden relative z-10">
-        {/* Top Header with Glassmorphism */}
-        <header className="backdrop-blur-xl bg-white/70 border-b border-white/20 shadow-lg px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 bg-clip-text text-transparent mb-2">
-                Dashboard
-              </h1>
-              <p className="text-sm text-gray-600 flex items-center gap-2 font-medium">
-                <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/50"></span>
-                Real-time farm monitoring & AI optimization
-              </p>
+      {/* --- MAIN CONTENT AREA --- */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden relative z-10">
+        <header className="px-8 py-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-emerald-900">
+              {getHeaderTitle()}
+            </h1>
+            <div className="flex items-center gap-2 mt-1">
+              <div className="h-1 w-8 bg-emerald-500 rounded-full"></div>
+              <p className="text-sm text-emerald-600 font-medium tracking-wide">{t('header.liveMonitoring')}</p>
             </div>
+          </div>
 
-            <div className="flex items-center gap-3">
-              <button className="relative p-3 hover:bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:shadow-md group">
-                <Bell className="w-5 h-5 text-gray-700 group-hover:scale-110 transition-transform" />
-                <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-lg shadow-red-500/50"></span>
-              </button>
-              <button className="p-3 hover:bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:shadow-md group">
-                <Settings className="w-5 h-5 text-gray-700 group-hover:rotate-90 transition-transform duration-300" />
-              </button>
-              <button className="px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                <User className="w-5 h-5 text-white" />
-              </button>
-            </div>
+          <div className="flex items-center gap-4">
+            <LanguageSelector />
+            <button className="p-3 bg-white/60 hover:bg-white backdrop-blur-md rounded-full shadow-sm text-emerald-900 transition-all relative">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+            </button>
+            <button onClick={() => switchView("settings")} className="p-3 bg-white/60 hover:bg-white backdrop-blur-md rounded-full shadow-sm text-emerald-900 transition-all hover:rotate-90 duration-500">
+              <Settings className="w-5 h-5" />
+            </button>
           </div>
         </header>
 
-        {/* Dashboard Content */}
-        <main className="flex-1 overflow-y-auto p-8">
-          <div className="max-w-7xl mx-auto space-y-6">
-            {/* Welcome Section with Enhanced Gradients */}
-            <div className="relative bg-gradient-to-r from-emerald-500 via-teal-500 to-green-500 rounded-3xl p-8 shadow-2xl overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
-
-              <div className="relative flex items-start justify-between">
-                <div className="flex items-center gap-5">
-                  <div className="w-20 h-20 bg-white/20 backdrop-blur-xl rounded-3xl flex items-center justify-center shadow-2xl border border-white/30 transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
-                    <Leaf className="w-10 h-10 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">
-                      Welcome to AgriSync
-                    </h2>
-                    <p className="text-base text-white/90 font-medium drop-shadow">
-                      Empower your agriculture with real-time insights & AI
-                      optimization
-                    </p>
-                  </div>
+        <main className="flex-1 overflow-y-auto px-8 pb-8 scrollbar-thin scrollbar-thumb-emerald-400 scrollbar-track-transparent">
+          {loading ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <div className="relative w-20 h-20 mx-auto mb-6">
+                  <div className="w-20 h-20 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
+                  <Sprout className="w-8 h-8 text-emerald-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
                 </div>
-                <button
-                  onClick={fetchFields}
-                  className="flex items-center gap-2 px-6 py-3 bg-white/20 hover:bg-white/30 backdrop-blur-xl border border-white/30 text-white rounded-full transition-all duration-300 shadow-xl hover:shadow-2xl font-semibold transform hover:-translate-y-1"
-                >
-                  <span className="text-sm">Refresh Data</span>
-                  <ArrowUpRight
-                    size={18}
-                    className="group-hover:rotate-45 transition-transform"
-                  />
-                </button>
+                <p className="text-gray-700 font-semibold text-lg">{t('loading.farmData')}</p>
               </div>
             </div>
-
-            {/* Field Selector with Glassmorphism */}
-            <div className="backdrop-blur-xl bg-white/70 border border-white/20 rounded-3xl p-6 shadow-xl">
-              <div className="flex items-center gap-2 mb-5">
-                <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/50"></span>
-                <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">
-                  Select Field
-                </label>
-              </div>
-
-              {loading ? (
-                <div className="flex items-center gap-4 text-gray-600 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-100">
-                  <div className="w-6 h-6 border-3 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
-                  <span className="font-medium">Loading fields...</span>
-                </div>
-              ) : fields.length > 0 ? (
-                <div className="flex gap-3 flex-wrap">
-                  {fields.map((field) => (
-                    <button
-                      key={field._id}
-                      onClick={() => handleFieldClick(field)}
-                      className={`px-7 py-3.5 rounded-2xl font-semibold transition-all duration-300 border-2 shadow-md hover:shadow-xl transform hover:-translate-y-1 ${
-                        selectedField?._id === field._id
-                          ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-emerald-600 shadow-emerald-200"
-                          : "bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white border-gray-200 hover:border-emerald-300"
-                      }`}
-                    >
-                      {field.fieldName}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="bg-gradient-to-br from-gray-50 to-emerald-50 rounded-2xl p-10 text-center border-2 border-dashed border-gray-300">
-                  <Sprout className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-700 mb-5 font-semibold text-lg">
-                    No fields found
-                  </p>
-                  <button
-                    onClick={handleFieldsNavigation}
-                    className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-full transition-all duration-300 shadow-lg hover:shadow-xl font-semibold transform hover:-translate-y-1"
-                  >
-                    Create your first field
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Info Banner with Enhanced Design */}
-            {selectedField && (
-              <div className="relative bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-3xl p-7 shadow-2xl overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-
-                <div className="relative flex items-start gap-5">
-                  <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center shadow-2xl flex-shrink-0 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
-                    <MapPin className="w-7 h-7 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-white font-bold mb-2 text-xl drop-shadow-lg">
-                      {selectedField.fieldName} Monitoring Active
-                    </h3>
-                    <p className="text-base text-white/95 font-medium drop-shadow mb-2">
-                      {selectedField.location.village &&
-                        `${selectedField.location.village}, `}
-                      {selectedField.location.district} •{" "}
-                      {selectedField.cropType} • {selectedField.fieldArea.value}{" "}
-                      {selectedField.fieldArea.unit}
-                    </p>
-                    <p className="text-sm text-white/80 font-medium drop-shadow">
-                      Click field name above to view detailed analytics and AI
-                      recommendations
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Stats Grid with Enhanced Glassmorphism */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Soil Moisture Card */}
-              <div className="group backdrop-blur-xl bg-white/70 border border-white/20 hover:border-blue-300 rounded-3xl p-7 cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-cyan-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative">
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="w-14 h-14 bg-gradient-to-br from-blue-400 via-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
-                      <Droplets className="w-7 h-7 text-white" />
-                    </div>
-                    <span className="px-4 py-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full border border-emerald-300 shadow-sm">
-                      +6%
-                    </span>
-                  </div>
-                  <h3 className="text-gray-600 text-sm mb-3 font-bold uppercase tracking-wide">
-                    Soil Moisture
-                  </h3>
-                  <p className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">
-                    68%
-                  </p>
-                  <p className="text-xs text-gray-600 font-semibold">
-                    Status: Optimal Range
-                  </p>
-                </div>
-              </div>
-
-              {/* Soil NPK Card */}
-              <div className="group backdrop-blur-xl bg-white/70 border border-white/20 hover:border-orange-300 rounded-3xl p-7 cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-amber-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative">
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="w-14 h-14 bg-gradient-to-br from-orange-400 via-orange-500 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
-                      <Leaf className="w-7 h-7 text-white" />
-                    </div>
-                    <span className="px-4 py-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full border border-emerald-300 shadow-sm">
-                      Balanced
-                    </span>
-                  </div>
-                  <h3 className="text-gray-600 text-sm mb-3 font-bold uppercase tracking-wide">
-                    Soil NPK
-                  </h3>
-                  <p className="text-5xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent mb-2">
-                    7.2
-                  </p>
-                  <p className="text-xs text-gray-600 font-semibold">
-                    N:P:K Ratio
-                  </p>
-                </div>
-              </div>
-
-              {/* Field Health Card */}
-              <div className="group backdrop-blur-xl bg-white/70 border border-white/20 hover:border-emerald-300 rounded-3xl p-7 cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-teal-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative">
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
-                      <TrendingUp className="w-7 h-7 text-white" />
-                    </div>
-                    <span className="px-4 py-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full border border-emerald-300 shadow-sm">
-                      +3%
-                    </span>
-                  </div>
-                  <h3 className="text-gray-600 text-sm mb-3 font-bold uppercase tracking-wide">
-                    Field Health
-                  </h3>
-                  <p className="text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2">
-                    {selectedField?.overallHealth?.score || 89}%
-                  </p>
-                  <p className="text-xs text-gray-600 font-semibold">
-                    NDVI Score
-                  </p>
-                </div>
-              </div>
-
-              {/* Optimization Card */}
-              <div className="group backdrop-blur-xl bg-white/70 border border-white/20 hover:border-purple-300 rounded-3xl p-7 cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-pink-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative">
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="w-14 h-14 bg-gradient-to-br from-purple-400 via-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
-                      <Target className="w-7 h-7 text-white" />
-                    </div>
-                    <span className="px-4 py-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full border border-emerald-300 shadow-sm">
-                      Active
-                    </span>
-                  </div>
-                  <h3 className="text-gray-600 text-sm mb-3 font-bold uppercase tracking-wide">
-                    AI Optimization
-                  </h3>
-                  <p className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-                    94%
-                  </p>
-                  <p className="text-xs text-gray-600 font-semibold">
-                    Efficiency Score
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Actions with Enhanced Design */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <button
-                onClick={() => navigate("/weather")}
-                className="backdrop-blur-xl bg-white/70 border border-white/20 hover:border-blue-400 rounded-3xl p-8 text-left transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 group relative overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-cyan-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center mb-5 group-hover:bg-gradient-to-br group-hover:from-blue-200 group-hover:to-cyan-200 transition-all duration-500 transform group-hover:scale-110 group-hover:rotate-6 shadow-md">
-                    <Cloud className="w-7 h-7 text-blue-600" />
-                  </div>
-                  <h3 className="text-gray-900 font-bold mb-2 text-xl">
-                    Weather Intelligence
-                  </h3>
-                  <p className="text-sm text-gray-600 font-medium leading-relaxed">
-                    View real-time weather & crop stress indicators
-                  </p>
-                </div>
-              </button>
-
-              <button
-                onClick={handleFieldsNavigation}
-                className="backdrop-blur-xl bg-white/70 border border-white/20 hover:border-emerald-400 rounded-3xl p-8 text-left transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 group relative overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-teal-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center mb-5 group-hover:bg-gradient-to-br group-hover:from-emerald-200 group-hover:to-teal-200 transition-all duration-500 transform group-hover:scale-110 group-hover:rotate-6 shadow-md">
-                    <Sprout className="w-7 h-7 text-emerald-600" />
-                  </div>
-                  <h3 className="text-gray-900 font-bold mb-2 text-xl">
-                    Manage Fields
-                  </h3>
-                  <p className="text-sm text-gray-600 font-medium leading-relaxed">
-                    Add new fields or update existing ones
-                  </p>
-                </div>
-              </button>
-
-              <button className="backdrop-blur-xl bg-white/70 border border-white/20 hover:border-purple-400 rounded-3xl p-8 text-left transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 group relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-pink-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center mb-5 group-hover:bg-gradient-to-br group-hover:from-purple-200 group-hover:to-pink-200 transition-all duration-500 transform group-hover:scale-110 group-hover:rotate-6 shadow-md">
-                    <Target className="w-7 h-7 text-purple-600" />
-                  </div>
-                  <h3 className="text-gray-900 font-bold mb-2 text-xl">
-                    AI Recommendations
-                  </h3>
-                  <p className="text-sm text-gray-600 font-medium leading-relaxed">
-                    Get intelligent irrigation & fertilizer advice
-                  </p>
-                </div>
-              </button>
-            </div>
-          </div>
+          ) : (
+            <>
+              {currentView === "dashboard" && <DashboardContent fields={fields} selectedField={selectedField} statistics={statistics} fetchFields={fetchFields} handleFieldClick={handleFieldClick} getHealthColor={getHealthColor} getHealthBgColor={getHealthBgColor} switchView={switchView} />}
+              {currentView === "field-map" && <FieldsContent fields={fields} fetchFields={fetchFields} handleFieldClick={handleFieldClick} switchView={switchView} />}
+              {currentView === "crop-health" && <DiseaseDetectionContent fields={fields} fetchFields={fetchFields} handleFieldClick={handleFieldClick} />}
+              {currentView === "weather" && <WeatherContent fields={fields} selectedField={selectedField} />}
+              {currentView === "ai-assistant" && <AIRecommendationsContent />}
+              {currentView === "analytics" && <Analytics />}
+              {currentView === "notifications" && <PlaceholderView title={t('header.allNotifications')} />}
+              {currentView === "settings" && <PlaceholderView title={t('nav.settings')} />}
+            </>
+          )}
         </main>
       </div>
+
+      <style jsx>{`
+        @keyframes pulse-slow { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.1); } }
+        .animate-pulse-slow { animation: pulse-slow 5s ease-in-out infinite; }
+        .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+        .scrollbar-thumb-emerald-700::-webkit-scrollbar-thumb { background-color: rgb(4 120 87); border-radius: 3px; }
+        .scrollbar-track-transparent::-webkit-scrollbar-track { background: transparent; }
+      `}</style>
     </div>
   );
 }
+
+const NavItem = ({ icon, label, active, onClick, badge, isCollapsed }) => (
+  <button
+    onClick={onClick}
+    title={isCollapsed ? label : ""}
+    className={`w-full flex items-center ${isCollapsed ? "justify-center" : "justify-between"} gap-3 px-4 py-4 rounded-xl transition-all duration-300 group relative ${
+      active ? "bg-emerald-50 text-emerald-900 shadow-lg" : "text-emerald-100 hover:bg-emerald-800/50 hover:text-white"
+    }`}
+  >
+    <div className="flex items-center gap-3">
+      <div className={`${active ? "fill-current" : ""}`}>{icon}</div>
+      {!isCollapsed && <span className="font-semibold whitespace-nowrap animate-in fade-in duration-300">{label}</span>}
+    </div>
+    
+    {!isCollapsed && active && <div className="w-1.5 h-1.5 rounded-full bg-emerald-600"></div>}
+    {!isCollapsed && badge && <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg">{badge}</span>}
+    {isCollapsed && active && <div className="absolute left-0 w-1 h-6 bg-white rounded-r-full shadow-[0_0_8px_white]"></div>}
+  </button>
+);
+
+const PlaceholderView = ({ title }) => {
+  const { t } = useTranslation();
+  
+  return (
+    <div className="flex items-center justify-center h-full">
+      <div className="text-center">
+        <div className="w-24 h-24 bg-emerald-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
+          <Brain className="w-12 h-12 text-white" />
+        </div>
+        <h2 className="text-3xl font-bold text-emerald-900 mb-2">{title}</h2>
+        <p className="text-gray-500 mb-6">{t('placeholder.comingSoon')}</p>
+      </div>
+    </div>
+  );
+};
 
 export default Dashboard;

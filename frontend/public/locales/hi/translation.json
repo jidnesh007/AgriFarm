@@ -1,0 +1,383 @@
+{
+  "nav": {
+    "dashboard": "डैशबोर्ड",
+    "myFields": "मेरे खेत",
+    "aiAssistant": "एआई सहायक",
+    "weather": "मौसम",
+    "cropHealth": "फसल स्वास्थ्य",
+    "analytics": "विश्लेषण",
+    "notifications": "सूचनाएं",
+    "settings": "सेटिंग",
+    "logout": "लॉगआउट"
+  },
+  "header": {
+    "farmOverview": "फार्म अवलोकन",
+    "fieldManagement": "क्षेत्र प्रबंधन",
+    "smartAdvisory": "स्मार्ट सलाह",
+    "plantHealthCheck": "पौधे की स्वास्थ्य जांच",
+    "analyticsDashboard": "विश्लेषण डैशबोर्ड",
+    "weatherStation": "मौसम स्टेशन",
+    "allNotifications": "सभी सूचनाएं",
+    "liveMonitoring": "लाइव मॉनिटरिंग सक्रिय"
+  },
+  "user": {
+    "premium": "प्रीमियम",
+    "farmer": "किसान"
+  },
+  "loading": {
+    "farmData": "फार्म डेटा लोड हो रहा है..."
+  },
+  "placeholder": {
+    "comingSoon": "फीचर जल्द आ रहा है"
+  },
+  "kpi": {
+    "soilMoisture": "मिट्टी की नमी",
+    "temperature": "तापमान",
+    "cropHealth": "फसल स्वास्थ्य",
+    "systemPressure": "सिस्टम दबाव",
+    "energyUsage": "ऊर्जा उपयोग",
+    "yieldForecast": "उपज पूर्वानुमान",
+    "vsYesterday": "कल की तुलना में",
+    "good": "अच्छा"
+  },
+  "soil": {
+    "title": "मिट्टी स्वास्थ्य मॉनिटर",
+    "moistureLevel": "नमी स्तर",
+    "optimal": "इष्टतम",
+    "phLevel": "पीएच स्तर",
+    "acidic": "अम्लीय",
+    "neutral": "तटस्थ",
+    "alkaline": "क्षारीय",
+    "npkNutrients": "एनपीके पोषक तत्व",
+    "nitrogen": "नाइट्रोजन",
+    "phosphorus": "फास्फोरस",
+    "potassium": "पोटेशियम"
+  },
+  "recommendations": {
+    "title": "एआई सिफारिशें",
+    "drlOptimized": "डीआरएल अनुकूलित",
+    "increaseIrrigation": "सिंचाई बढ़ाएं",
+    "applyNitrogen": "नाइट्रोजन बूस्ट लगाएं",
+    "zoneA": "क्षेत्र ए",
+    "zoneB": "क्षेत्र बी",
+    "zoneC": "क्षेत्र सी",
+    "zoneD": "क्षेत्र डी",
+    "earlyMorning": "सुबह जल्दी (सुबह 5:00 बजे)",
+    "afterIrrigation": "अगली सिंचाई के बाद",
+    "scheduled": "निर्धारित",
+    "lowMoisture": "मिट्टी की नमी 32% (इष्टतम 40% से कम)",
+    "noRain": "अगले 5 दिनों के लिए बारिश का पूर्वानुमान नहीं",
+    "growthStage": "वर्तमान विकास चरण को अधिक पानी की आवश्यकता है",
+    "yieldImprovement": "+8% अनुमानित उपज सुधार",
+    "leafChlorosis": "ड्रोन इमेजरी में पत्ती क्लोरोसिस का पता चला",
+    "lowNitrogen": "मिट्टी में नाइट्रोजन 18 पीपीएम (इष्टतम: 25-30 पीपीएम)",
+    "vegetativePhase": "वर्तमान वनस्पति विकास चरण",
+    "preventLoss": "12% उपज हानि रोकें",
+    "amount": "मात्रा",
+    "schedule": "अनुसूची",
+    "whyThis": "यह सिफारिश क्यों?",
+    "confidence": "विश्वास"
+  },
+  "crops": {
+    "wheat": "गेहूं",
+    "corn": "मक्का",
+    "soybeans": "सोयाबीन",
+    "tomatoes": "टमाटर",
+    "rice": "चावल",
+    "cotton": "कपास"
+  },
+  "status": {
+    "excellent": "उत्कृष्ट",
+    "good": "अच्छा",
+    "moderate": "मध्यम",
+    "poor": "खराब"
+  },
+  "alerts": {
+    "nitrogenDeficiency": "नाइट्रोजन की कमी का पता चला"
+  },
+  "weather": {
+    "title": "मौसम पूर्वानुमान",
+    "partlyCloudy": "हल्की हवा के साथ आंशिक रूप से बादल",
+    "heatAdvisory": "गर्मी की सलाह: गुरुवार को उच्च तापमान की उम्मीद। सुबह जल्दी सिंचाई पर विचार करें।",
+    "mon": "सोम",
+    "tue": "मंगल",
+    "wed": "बुध",
+    "thu": "गुरु",
+    "fri": "शुक्र",
+    "sat": "शनि",
+    "sun": "रवि",
+    "loading": "मौसम डेटा लोड हो रहा है...",
+    "navigation": {
+      "backToDashboard": "डैशबोर्ड पर वापस",
+      "manualSync": "मैन्युअल सिंक",
+      "updating": "अपडेट हो रहा है..."
+    },
+    "noLocation": {
+      "title": "स्थान गायब है",
+      "description": "मौसम इंटेलिजेंस को सक्रिय करने के लिए कृपया अपने खेत में गांव, जिला या जीपीएस निर्देशांक जोड़ें।",
+      "button": "खेत कॉन्फ़िगर करें"
+    },
+    "header": {
+      "title": "मौसम इंटेलिजेंस",
+      "subtitle": "सटीक खेती के लिए रियल-टाइम वायुमंडलीय विश्लेषण"
+    },
+    "current": {
+      "feelsLike": "{{temp}}°C जैसा महसूस होता है",
+      "humidity": "आर्द्रता",
+      "windSpeed": "हवा की गति",
+      "cloudCover": "बादल कवर"
+    },
+    "additional": {
+      "title": "वायुमंडल-सेंसर",
+      "precipitation": "वर्षा स्थिति",
+      "rainfall": "{{amount}} मिमी मापा गया",
+      "pressure": "दबाव",
+      "visibility": "दृश्यता"
+    },
+    "forecast": {
+      "title": "सटीक सूक्ष्म पूर्वानुमान",
+      "tempRange": "तापमान रेंज",
+      "maxRainRisk": "अधिकतम बारिश जोखिम",
+      "totalRainfall": "कुल वर्षा"
+    },
+    "aiInfluence": {
+      "title": "एआई निर्णय प्रभाव"
+    },
+    "stressMatrix": {
+      "title": "फसल तनाव मैट्रिक्स",
+      "heatStress": "गर्मी तनाव",
+      "coldStress": "ठंड तनाव",
+      "diseaseRisk": "रोग रोगजनन"
+    },
+    "aiSummary": {
+      "title": "डीआरएल इंटेलिजेंस सारांश"
+    },
+    "footer": {
+      "updated": "अपडेट किया गया {{time}} • चक्र: 10मि"
+    },
+    "syncing": {
+      "title": "डेटा सिंक हो रहा है",
+      "description": "वायुमंडलीय इंटेलिजेंस के लिए उपग्रह सेंसर से कनेक्ट हो रहा है..."
+    },
+    "notifications": {
+      "fetchFieldsError": "फ़ील्ड डेटा प्राप्त करने में विफल",
+      "fetchingWeather": "मौसम डेटा प्राप्त हो रहा है...",
+      "weatherUpdated": "मौसम डेटा सफलतापूर्वक अपडेट किया गया",
+      "fetchWeatherError": "मौसम डेटा प्राप्त करने में विफल। कृपया फ़ील्ड स्थान की जानकारी जांचें।"
+    }
+  },
+  "cropHealth": {
+    "title": "फसल स्वास्थ्य स्थिति",
+    "droneScan": "ड्रोन स्कैन: 2 घंटे पहले",
+    "averageNDVI": "औसत एनडीवीआई सूचकांक",
+    "bare": "0.0 नंगा",
+    "sparse": "0.3 विरल",
+    "moderate": "0.6 मध्यम",
+    "dense": "1.0 घना",
+    "goodOverall": "अच्छा समग्र स्वास्थ्य",
+    "basedOnImagery": "उपग्रह और ड्रोन इमेजरी के आधार पर"
+  },
+  "resources": {
+    "title": "संसाधन उपयोग विश्लेषण",
+    "overview": "अवलोकन",
+    "water": "पानी",
+    "fertilizer": "उर्वरक",
+    "waterSaved": "पानी बचाया",
+    "fertilizerSaved": "उर्वरक बचाया",
+    "energySaved": "ऊर्जा बचाई",
+    "vsLastMonth": "पिछले महीने की तुलना में",
+    "weeklyComparison": "साप्ताहिक उपयोग तुलना",
+    "waterL": "पानी (लीटर)",
+    "fertilizerKg": "उर्वरक (किलो)"
+  },
+  "notifications": {
+    "title": "अलर्ट और सूचनाएं",
+    "markAllRead": "सभी को पढ़ा हुआ चिह्नित करें",
+    "nitrogenDeficiency": "क्षेत्र सी में नाइट्रोजन की कमी का पता चला",
+    "irrigationComplete": "सिंचाई चक्र पूर्ण - क्षेत्र बी",
+    "weatherAlert": "मौसम चेतावनी: कल बारिश की उम्मीद",
+    "lowMoisture": "क्षेत्र ए में कम मिट्टी की नमी",
+    "tenMinAgo": "10 मिनट पहले",
+    "oneHourAgo": "1 घंटे पहले",
+    "twoHoursAgo": "2 घंटे पहले",
+    "threeHoursAgo": "3 घंटे पहले"
+  },
+  "aiRecommendations": {
+    "loading": "क्षेत्र डेटा का विश्लेषण हो रहा है...",
+    "header": {
+      "title": "आरएल-संचालित सटीकता",
+      "description": "हमारे डीप रीइन्फोर्समेंट लर्निंग मॉडल हजारों परिदृश्यों का अनुकरण करते हैं ताकि आपकी मिट्टी की प्रोफ़ाइल के लिए सबसे संसाधन-कुशल सिंचाई और पोषक तत्व रणनीतियां प्रदान की जा सकें।"
+    },
+    "noFields": {
+      "title": "कोई सक्रिय खेत नहीं",
+      "description": "एआई-संचालित जानकारी प्राप्त करने के लिए अपने खेत के प्लॉट पंजीकृत करें।",
+      "button": "खेत कॉन्फ़िगर करें"
+    },
+    "zone": {
+      "health": "स्वास्थ्य",
+      "moisture": "नमी",
+      "ph": "पीएच स्तर",
+      "nutrients": "पोषक तत्व"
+    },
+    "recommendation": {
+      "watering": "पानी देना",
+      "nutrition": "पोषण",
+      "stableWeather": "स्थिर मौसम",
+      "syncAI": "एआई सिंक करें",
+      "pending": "इस क्षेत्र के लिए रियल-टाइम विश्लेषण लंबित है।",
+      "generateButton": "सलाह उत्पन्न करें"
+    },
+    "notifications": {
+      "generating": "एआई सिफारिशें उत्पन्न हो रही हैं...",
+      "generateSuccess": "एआई सिफारिशें सफलतापूर्वक उत्पन्न हुईं!",
+      "generateError": "सिफारिशें उत्पन्न करने में विफल। कृपया सुनिश्चित करें कि पायथन सर्वर चल रहा है।",
+      "fetchError": "फ़ील्ड डेटा लोड करने में विफल। कृपया पुनः प्रयास करें।"
+    }
+  },
+  "diseaseDetection": {
+    "header": {
+      "title": "एआई फसल चिकित्सक",
+      "subtitle": "तत्काल पौधा रोगविज्ञान के लिए डीप लर्निंग दृष्टि"
+    },
+    "upload": {
+      "title": "दृश्य इनपुट",
+      "dropzone": "यहां पत्ती की छवि छोड़ें",
+      "formats": "JPEG या PNG • उच्च रिज़ॉल्यूशन पसंदीदा"
+    },
+    "buttons": {
+      "clearAnalysis": "विश्लेषण साफ़ करें",
+      "runDiagnostic": "निदान चलाएं",
+      "processing": "न्यूरल प्रोसेसिंग...",
+      "share": "साझा करें",
+      "download": "डाउनलोड करें"
+    },
+    "results": {
+      "awaiting": "नमूने की प्रतीक्षा में...",
+      "awaitingDesc": "तत्काल एआई रोगविज्ञान के लिए एक पत्ती की तस्वीर अपलोड करें",
+      "scanResults": "स्कैन परिणाम",
+      "crop": "फसल",
+      "confidence": "विश्वास",
+      "growthStage": "विकास चरण",
+      "severity": "गंभीरता"
+    },
+    "treatment": {
+      "title": "एआई रिकवरी प्रोटोकॉल",
+      "disclaimer": "नोट: यह निदान डीप लर्निंग मॉडल द्वारा उत्पन्न किया गया है। सत्यापन के लिए, उच्च मात्रा में रासायनिक अनुप्रयोग से पहले एक पंजीकृत कृषि विज्ञानी से सिंक करें।"
+    },
+    "errors": {
+      "invalidFile": "कृपया एक मान्य छवि फ़ाइल चुनें",
+      "fileTooLarge": "फ़ाइल का आकार 10MB से कम होना चाहिए",
+      "noImage": "कृपया पहले एक छवि चुनें",
+      "detectionFailed": "पहचान विफल। कृपया सुनिश्चित करें कि पायथन सर्वर पोर्ट 8000 पर चल रहा है।"
+    },
+    "notifications": {
+      "fileSelected": "छवि चुनी गई: {{fileName}}",
+      "analyzing": "एआई के साथ पौधे की छवि का विश्लेषण हो रहा है...",
+      "analysisComplete": "विश्लेषण सफलतापूर्वक पूर्ण हुआ!",
+      "downloadSuccess": "उपचार योजना डाउनलोड की गई",
+      "shareSuccess": "उपचार योजना साझा की गई",
+      "copiedToClipboard": "क्लिपबोर्ड पर कॉपी किया गया!",
+      "cleared": "विश्लेषण साफ़ किया गया"
+    },
+    "download": {
+      "title": "फसल रोग उपचार योजना",
+      "generated": "उत्पन्न",
+      "crop": "फसल",
+      "disease": "रोग",
+      "plan": "योजना",
+      "filename": "उपचार"
+    },
+    "share": {
+      "title": "फसल रोग योजना",
+      "crop": "फसल",
+      "disease": "रोग",
+      "shareTitle": "फसल उपचार"
+    }
+  },
+  "loadingEstates": "आपकी भूमि लोड हो रही है...",
+  "landManagement": "भूमि प्रबंधन",
+  "monitorPlots": "अपने कृषि भूखंडों की निगरानी और व्यवस्थित करें",
+  "registerNewField": "नया खेत पंजीकृत करें",
+  "startJourney": "अपनी यात्रा शुरू करें",
+  "noFieldsYet": "आपने अभी तक कोई खेत नहीं जोड़ा है। AI निगरानी शुरू करने के लिए अपनी भूमि को जोड़ें।",
+  "addFirstField": "पहला खेत जोड़ें",
+  "regionalPlot": "क्षेत्रीय भूखंड",
+  "subZones": "उप-क्षेत्र",
+  "synced": "सिंक किया गया",
+  "registerLand": "भूमि पंजीकरण",
+  "fieldDesignation": "खेत का नाम",
+  "fieldPlaceholder": "जैसे पश्चिम बगीचा",
+  "cropVariety": "फसल का प्रकार",
+  "selectType": "प्रकार चुनें",
+  "totalArea": "कुल क्षेत्रफल (हेक्टेयर)",
+  "analysisZones": "विश्लेषण क्षेत्र",
+  "village": "गाँव",
+  "district": "जिला",
+  "cancel": "रद्द करें",
+  "registering": "पंजीकृत हो रहा है...",
+  "confirmEstate": "खेत पुष्टि करें",
+  "internalError": "आंतरिक त्रुटि हुई",
+  "fieldDetails": {
+    "excellent": "उत्कृष्ट",
+    "good": "अच्छा",
+    "moderate": "मध्यम",
+    "poor": "खराब",
+    "aiRecGenerated": "AI सिफारिश जनरेट हुई!",
+    "irrigation": "सिंचाई",
+    "fertilizer": "उर्वरक",
+    "healthScore": "स्वास्थ्य स्कोर",
+    "aiRecFailed": "AI सिफारिश जनरेट करने में विफल। सुनिश्चित करें कि Python सर्वर चल रहा है।",
+    "fieldNotFound": "खेत नहीं मिला",
+    "backToFields": "खेतों पर वापस जाएं",
+    "backToDashboard": "डैशबोर्ड पर वापस जाएं",
+    "status": "स्थिति",
+    "lastSync": "अंतिम सिंक",
+    "envIntelligence": "पर्यावरणीय बुद्धिमत्ता",
+    "temp": "तापमान",
+    "humidity": "नमी",
+    "rain": "वर्षा",
+    "stressRisk": "तनाव जोखिम",
+    "diagnostic": "निदान",
+    "realtimeSensor": "रियल-टाइम सेंसर विश्लेषण",
+    "aiAdvisor": "AI सलाहकार",
+    "updateSensors": "सेंसर अपडेट करें",
+    "moisture": "नमी",
+    "nutrients": "पोषक तत्व",
+    "soilPH": "मिट्टी pH",
+    "acidicEnv": "अम्लीय वातावरण",
+    "alkalineEnv": "क्षारीय वातावरण",
+    "neutralBalance": "तटस्थ संतुलन",
+    "vitality": "जीवन शक्ति",
+    "aiDecisionIntel": "AI निर्णय बुद्धिमत्ता",
+    "drlEngineActive": "DRL इंजन सक्रिय",
+    "computedHealthIndex": "गणना किया गया स्वास्थ्य सूचकांक",
+    "irrigationStrategy": "सिंचाई रणनीति",
+    "timeline": "समयरेखा",
+    "conf": "विश्वास",
+    "statusOptimal": "स्थिति इष्टतम - कोई कार्रवाई आवश्यक नहीं",
+    "nutrientStrategy": "पोषक तत्व रणनीति",
+    "variant": "प्रकार",
+    "soilBalanced": "मिट्टी संतुलित - कोई कार्रवाई आवश्यक नहीं",
+    "engineRationale": "इंजन तर्क",
+    "pendingIntelSync": "बुद्धिमत्ता सिंक लंबित",
+    "runAiEngine": "विशिष्ट भूमि प्रबंधन सलाह उत्पन्न करने के लिए AI इंजन चलाएं।",
+    "startScan": "स्कैन शुरू करें",
+    "sensorSync": "सेंसर सिंक",
+    "moisturePercent": "नमी (%)",
+    "acidityPH": "अम्लता (pH)",
+    "nutrientLevelsPPM": "पोषक तत्व स्तर (PPM)",
+    "nitrogen": "नाइट्रोजन",
+    "phosphorus": "फास्फोरस",
+    "potassium": "पोटेशियम",
+    "syncing": "सिंक हो रहा है...",
+    "updateLandVitals": "भूमि संकेतक अपडेट करें",
+    "updateFailed": "संकेतक अपडेट करने में विफल।"
+  },
+  "analytics": {
+    "title": "विश्लेषण डैशबोर्ड",
+    "performanceMetrics": "प्रदर्शन मैट्रिक्स",
+    "trends": "रुझान",
+    "insights": "अंतर्दृष्टि",
+    "exportData": "डेटा निर्यात करें"
+  }
+}
