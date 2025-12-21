@@ -9,9 +9,10 @@ import AiRecommendation from "./components/AiRecommendation";
 import HeroSection from "./pages/Hero";
 import AboutSection from "./components/About";
 import SigroLanding from "./components/SigroLanding";
-import ContactSection from "./Components/Contact";
+import ContactSection from "./components/Contact";
 import Footer from "./components/Footer";
 import DiseaseDetection from "./components/DiseaseDetection";
+import Analytics from "./components/Analytics";
 
 // Landing Page Component - combines all sections
 const LandingPage = () => {
@@ -33,11 +34,12 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/fields" element={<FieldList />} />
+           <Route path="/fields" element={<FieldList />} />
         <Route path="/field/:id" element={<FieldDetails />} />
         <Route path="/weather" element={<Weather />} />
         <Route path="/ai-recommendation" element={<AiRecommendation />} />
         <Route path="/disease-detection" element={<DiseaseDetection />} />
+         <Route path="/analytics" element={< Analytics/>} />
       </Routes>
     </BrowserRouter>
   );

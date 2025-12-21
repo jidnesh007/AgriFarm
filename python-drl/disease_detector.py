@@ -1,7 +1,3 @@
-"""
-Crop Disease Detection Module with Comprehensive Treatment Plans
-Powered by Groq LLM
-"""
 
 import cv2
 import numpy as np

@@ -1,0 +1,38 @@
+{
+  "analysis": {
+    "complete": "Analysis completed successfully"
+  },
+  "risk": {
+    "high": "High Risk",
+    "medium": "Medium Risk",
+    "low": "Low Risk"
+  },
+  "recommendations": {
+    "fertilizer": "Apply {{amount}} kg of {{type}} fertilizer to improve crop yield",
+    "irrigation": "Irrigate for {{duration}} minutes in {{zone}} zone",
+    "pestControl": "Apply {{pesticide}} to control {{pest}} infestation"
+  },
+  "alerts": {
+    "pest": {
+      "title": "Pest Alert",
+      "message": "{{pestName}} detected in sector {{sector}}",
+      "voice": "Urgent alert. {{pestName}} pest detected in sector {{sector}}. Take immediate action."
+    },
+    "water": {
+      "title": "Irrigation Alert",
+      "message": "Low soil moisture in {{zone}}",
+      "voice": "Attention farmer. Low water detected in {{zone}}. Please irrigate soon."
+    }
+  },
+  "crops": {
+    "wheat": "Wheat",
+    "rice": "Rice",
+    "cotton": "Cotton"
+  },
+  "voice": {
+    "analysisComplete": "Your {{cropType}} analysis is ready. Please check the dashboard for details."
+  },
+  "errors": {
+    "analysisError": "Unable to complete analysis. Please try again."
+  }
+}

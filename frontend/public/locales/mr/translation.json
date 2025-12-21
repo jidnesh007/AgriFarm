@@ -1,0 +1,383 @@
+{
+  "nav": {
+    "dashboard": "डॅशबोर्ड",
+    "myFields": "माझी शेती",
+    "aiAssistant": "एआय सहाय्यक",
+    "weather": "हवामान",
+    "cropHealth": "पिकांचे आरोग्य",
+    "analytics": "विश्लेषण",
+    "notifications": "सूचना",
+    "settings": "सेटिंग्ज",
+    "logout": "लॉगआउट"
+  },
+  "header": {
+    "farmOverview": "शेतीचा आढावा",
+    "fieldManagement": "शेत व्यवस्थापन",
+    "smartAdvisory": "स्मार्ट सल्ला",
+    "plantHealthCheck": "वनस्पती आरोग्य तपासणी",
+    "analyticsDashboard": "विश्लेषण डॅशबोर्ड",
+    "weatherStation": "हवामान केंद्र",
+    "allNotifications": "सर्व सूचना",
+    "liveMonitoring": "थेट निरीक्षण सुरू आहे"
+  },
+  "user": {
+    "premium": "प्रीमियम",
+    "farmer": "शेतकरी"
+  },
+  "loading": {
+    "farmData": "शेतीचा डेटा लोड होत आहे..."
+  },
+  "placeholder": {
+    "comingSoon": "लवकरच येत आहे"
+  },
+  "kpi": {
+    "soilMoisture": "मातीतील आर्द्रता",
+    "temperature": "तापमान",
+    "cropHealth": "पिकांचे आरोग्य",
+    "systemPressure": "सिस्टम प्रेशर",
+    "energyUsage": "ऊर्जा वापर",
+    "yieldForecast": "उत्पन्न अंदाज",
+    "vsYesterday": "कालच्या तुलनेत",
+    "good": "चांगले"
+  },
+  "soil": {
+    "title": "माती आरोग्य निरीक्षक",
+    "moistureLevel": "आर्द्रतेची पातळी",
+    "optimal": "इष्टतम",
+    "phLevel": "pH पातळी",
+    "acidic": "आम्लीय",
+    "neutral": "तटस्थ",
+    "alkaline": "क्षारीय",
+    "npkNutrients": "NPK पोषक तत्वे",
+    "nitrogen": "नायट्रोजन",
+    "phosphorus": "फॉस्फरस",
+    "potassium": "पोटॅशियम"
+  },
+  "recommendations": {
+    "title": "एआय शिफारसी",
+    "drlOptimized": "DRL ऑप्टिमाइझ्ड",
+    "increaseIrrigation": "सिंचन वाढवा",
+    "applyNitrogen": "नायट्रोजन बूस्ट द्या",
+    "zoneA": "झोन A",
+    "zoneB": "झोन B",
+    "zoneC": "झोन C",
+    "zoneD": "झोन D",
+    "earlyMorning": "पहाटे (५:०० वाजता)",
+    "afterIrrigation": "पुढील सिंचनानंतर",
+    "scheduled": "नियोजित",
+    "lowMoisture": "मातीतील आर्द्रता ३२% (इष्टतम ४०% पेक्षा कमी)",
+    "noRain": "पुढील ५ दिवस पावसाचा अंदाज नाही",
+    "growthStage": "सध्याच्या वाढीच्या टप्प्यास जास्त पाण्याची गरज आहे",
+    "yieldImprovement": "+८% संभाव्य उत्पन्न वाढ",
+    "leafChlorosis": "ड्रोन प्रतिमांमध्ये पर्ण पिवळेपणा (क्लोरॉसिस) आढळला",
+    "lowNitrogen": "मातीत नायट्रोजन १८ ppm (इष्टतम: २५-३० ppm)",
+    "vegetativePhase": "सध्याचा वनस्पतिजन्य वाढीचा टप्पा",
+    "preventLoss": "१२% उत्पन्न तोटा टाळा",
+    "amount": "प्रमाण",
+    "schedule": "वेळापत्रक",
+    "whyThis": "ही शिफारस का?",
+    "confidence": "विश्वास पातळी"
+  },
+  "crops": {
+    "wheat": "गहू",
+    "corn": "मका",
+    "soybeans": "सोयाबीन",
+    "tomatoes": "टोमॅटो",
+    "rice": "तांदूळ",
+    "cotton": "कापूस"
+  },
+  "status": {
+    "excellent": "उत्कृष्ट",
+    "good": "चांगले",
+    "moderate": "मध्यम",
+    "poor": "खराब"
+  },
+  "alerts": {
+    "nitrogenDeficiency": "नायट्रोजनची कमतरता आढळली"
+  },
+  "weather": {
+    "title": "हवामान अंदाज",
+    "partlyCloudy": "आंशिक ढगाळ, हलका वारा",
+    "heatAdvisory": "उष्णतेचा इशारा: गुरुवारी जास्त तापमान अपेक्षित. सिंचन सकाळी लवकर करण्याचा विचार करा.",
+    "mon": "सोम",
+    "tue": "मंगळ",
+    "wed": "बुध",
+    "thu": "गुरु",
+    "fri": "शुक्र",
+    "sat": "शनि",
+    "sun": "रवि",
+    "loading": "हवामान डेटा लोड होत आहे...",
+    "navigation": {
+      "backToDashboard": "डॅशबोर्डवर परत या",
+      "manualSync": "मॅन्युअल सिंक",
+      "updating": "अपडेट होत आहे..."
+    },
+    "noLocation": {
+      "title": "स्थान उपलब्ध नाही",
+      "description": "हवामान विश्लेषण सुरू करण्यासाठी आपल्या शेताची वाडी, तालुका किंवा GPS निर्देशांक जोडा.",
+      "button": "शेत कॉन्फिगर करा"
+    },
+    "header": {
+      "title": "हवामान इंटेलिजन्स",
+      "subtitle": "प्रिसिजन शेतीसाठी रिअल‑टाइम वायुमंडलीय विश्लेषण"
+    },
+    "current": {
+      "feelsLike": "{{temp}}°C जाणवते",
+      "humidity": "आर्द्रता",
+      "windSpeed": "वाऱ्याचा वेग",
+      "cloudCover": "ढगांचे आच्छादन"
+    },
+    "additional": {
+      "title": "अॅटमॉस-सेंसर",
+      "precipitation": "पर्जन्य स्थिती",
+      "rainfall": "{{amount}} मिमी नोंदवले",
+      "pressure": "दाब",
+      "visibility": "दृश्यमानता"
+    },
+    "forecast": {
+      "title": "अतिशय सूक्ष्म हवामान अंदाज",
+      "tempRange": "तापमान श्रेणी",
+      "maxRainRisk": "कमाल पावसाचा धोका",
+      "totalRainfall": "एकूण पर्जन्य"
+    },
+    "aiInfluence": {
+      "title": "एआय निर्णय प्रभाव"
+    },
+    "stressMatrix": {
+      "title": "पिक ताण मॅट्रिक्स",
+      "heatStress": "उष्णता ताण",
+      "coldStress": "थंडी ताण",
+      "diseaseRisk": "रोग धोका"
+    },
+    "aiSummary": {
+      "title": "DRL इंटेलिजन्स सारांश"
+    },
+    "footer": {
+      "updated": "अपडेट: {{time}} • सायकल: १० मिनिटे"
+    },
+    "syncing": {
+      "title": "डेटा सिंक होत आहे",
+      "description": "वायुमंडलीय माहितीकरता उपग्रह सेन्सरशी जोडले जात आहे..."
+    },
+    "notifications": {
+      "fetchFieldsError": "शेतांचा डेटा घेण्यात अयशस्वी",
+      "fetchingWeather": "हवामान डेटा आणत आहोत...",
+      "weatherUpdated": "हवामान डेटा यशस्वीरित्या अपडेट झाला",
+      "fetchWeatherError": "हवामान डेटा मिळाला नाही. कृपया शेताचे स्थान तपासा."
+    }
+  },
+  "cropHealth": {
+    "title": "पिक आरोग्य स्थिती",
+    "droneScan": "ड्रोन स्कॅन: २ तासांपूर्वी",
+    "averageNDVI": "सरासरी NDVI निर्देशांक",
+    "bare": "०.० ओसाड",
+    "sparse": "०.३ विरळ",
+    "moderate": "०.६ मध्यम",
+    "dense": "१.० दाट",
+    "goodOverall": "एकूण आरोग्य चांगले",
+    "basedOnImagery": "उपग्रह आणि ड्रोन प्रतिमांवर आधारित"
+  },
+  "resources": {
+    "title": "संसाधन वापर विश्लेषण",
+    "overview": "आढावा",
+    "water": "पाणी",
+    "fertilizer": "खत",
+    "waterSaved": "वाचवलेले पाणी",
+    "fertilizerSaved": "वाचवलेले खत",
+    "energySaved": "वाचवलेली ऊर्जा",
+    "vsLastMonth": "मागील महिन्याच्या तुलनेत",
+    "weeklyComparison": "साप्ताहिक वापर तुलना",
+    "waterL": "पाणी (लिटर)",
+    "fertilizerKg": "खत (किलो)"
+  },
+  "notifications": {
+    "title": "अलर्ट व सूचना",
+    "markAllRead": "सर्व वाचले म्हणून खूण करा",
+    "nitrogenDeficiency": "झोन C मध्ये नायट्रोजन कमतरता आढळली",
+    "irrigationComplete": "सिंचन फेरी पूर्ण - झोन B",
+    "weatherAlert": "हवामान इशारा: उद्या पावसाचा अंदाज",
+    "lowMoisture": "झोन A मध्ये मातीतील कमी आर्द्रता",
+    "tenMinAgo": "१० मिनिटांपूर्वी",
+    "oneHourAgo": "१ तासापूर्वी",
+    "twoHoursAgo": "२ तासांपूर्वी",
+    "threeHoursAgo": "३ तासांपूर्वी"
+  },
+  "aiRecommendations": {
+    "loading": "शेताचा डेटा विश्लेषित होत आहे...",
+    "header": {
+      "title": "RL‑आधारित अचूकता",
+      "description": "आमचे डीप रीइन्फोर्समेंट लर्निंग मॉडेल हजारो परिस्थितींचे अनुकरण करून तुमच्या मातीच्या प्रोफाइलसाठी सर्वाधिक परिणामकारक सिंचन व पोषण धोरणे सुचवतात."
+    },
+    "noFields": {
+      "title": "कोणतीही सक्रिय शेते नाहीत",
+      "description": "एआय आधारित माहिती मिळवण्यासाठी तुमची शेती नोंदवा.",
+      "button": "शेत कॉन्फिगर करा"
+    },
+    "zone": {
+      "health": "आरोग्य",
+      "moisture": "आर्द्रता",
+      "ph": "pH पातळी",
+      "nutrients": "पोषक तत्वे"
+    },
+    "recommendation": {
+      "watering": "पाणी व्यवस्थापन",
+      "nutrition": "पोषण",
+      "stableWeather": "स्थिर हवामान",
+      "syncAI": "एआय सिंक करा",
+      "pending": "या झोनसाठी रिअल‑टाइम विश्लेषण प्रलंबित आहे.",
+      "generateButton": "सल्ला तयार करा"
+    },
+    "notifications": {
+      "generating": "एआय शिफारसी तयार होत आहेत...",
+      "generateSuccess": "एआय शिफारसी यशस्वीरित्या तयार झाल्या!",
+      "generateError": "शिफारसी तयार करण्यात अयशस्वी. कृपया Python सर्व्हर चालू आहे याची खात्री करा.",
+      "fetchError": "शेत डेटा लोड करण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा."
+    }
+  },
+  "diseaseDetection": {
+    "header": {
+      "title": "एआय पिक डॉक्टर",
+      "subtitle": "त्वरित वनस्पती रोगनिदानासाठी डीप लर्निंग व्हिजन"
+    },
+    "upload": {
+      "title": "दृश्य इनपुट",
+      "dropzone": "इथे पानाचा फोटो ड्रॉप करा",
+      "formats": "JPEG किंवा PNG • उच्च रिझोल्यूशन योग्य"
+    },
+    "buttons": {
+      "clearAnalysis": "विश्लेषण साफ करा",
+      "runDiagnostic": "निदान चालवा",
+      "processing": "न्यूरल प्रोसेसिंग...",
+      "share": "शेअर करा",
+      "download": "डाउनलोड करा"
+    },
+    "results": {
+      "awaiting": "नमुना प्रतीक्षेत...",
+      "awaitingDesc": "त्वरित एआय निदानासाठी पानाचा फोटो अपलोड करा",
+      "scanResults": "स्कॅन निकाल",
+      "crop": "पिक",
+      "confidence": "विश्वास पातळी",
+      "growthStage": "वाढीचा टप्पा",
+      "severity": "गंभीरता"
+    },
+    "treatment": {
+      "title": "एआय पुनर्वसन प्रोटोकॉल",
+      "disclaimer": "टीप: हे निदान डीप लर्निंग मॉडेलने तयार केले आहे. मोठ्या प्रमाणात रासायनिक वापरापूर्वी नोंदणीकृत कृषी तज्ञांचा सल्ला घ्या."
+    },
+    "errors": {
+      "invalidFile": "कृपया वैध प्रतिमा फाइल निवडा",
+      "fileTooLarge": "फाइलचा आकार १०MB पेक्षा कमी असावा",
+      "noImage": "कृपया आधी प्रतिमा निवडा",
+      "detectionFailed": "डिटेक्शन अयशस्वी. कृपया Python सर्व्हर ८००० पोर्टवर चालू आहे याची खात्री करा."
+    },
+    "notifications": {
+      "fileSelected": "प्रतिमा निवडली: {{fileName}}",
+      "analyzing": "एआयद्वारे प्रतिमेचे विश्लेषण सुरू...",
+      "analysisComplete": "विश्लेषण यशस्वीरित्या पूर्ण झाले!",
+      "downloadSuccess": "उपचार योजना डाउनलोड झाली",
+      "shareSuccess": "उपचार योजना शेअर झाली",
+      "copiedToClipboard": "क्लिपबोर्डवर कॉपी झाले!",
+      "cleared": "विश्लेषण साफ केले"
+    },
+    "download": {
+      "title": "पिक रोग उपचार योजना",
+      "generated": "तयार केले",
+      "crop": "पिक",
+      "disease": "रोग",
+      "plan": "योजना",
+      "filename": "Treatment"
+    },
+    "share": {
+      "title": "पिक रोग योजना",
+      "crop": "पिक",
+      "disease": "रोग",
+      "shareTitle": "पिक उपचार"
+    }
+  },
+  "loadingEstates": "तुमची शेते लोड होत आहेत...",
+  "landManagement": "जमीन व्यवस्थापन",
+  "monitorPlots": "तुमच्या शेतीचे तुकडे पाहा आणि व्यवस्थापित करा",
+  "registerNewField": "नवीन शेत नोंदवा",
+  "startJourney": "तुमची डिजिटल शेती यात्रा सुरू करा",
+  "noFieldsYet": "अजून कोणतेही शेत जोडले नाही. एआय मॉनिटरिंग सुरू करण्यासाठी तुमची जमीन जोडा.",
+  "addFirstField": "पहिले शेत जोडा",
+  "regionalPlot": "प्रादेशिक तुकडा",
+  "subZones": "सब‑झोन्स",
+  "synced": "सिंक झाले",
+  "registerLand": "जमीन नोंदणी",
+  "fieldDesignation": "शेताचे नाव",
+  "fieldPlaceholder": "उदा. पश्चिम बाजूचे शेत",
+  "cropVariety": "पिकाचा प्रकार",
+  "selectType": "प्रकार निवडा",
+  "totalArea": "एकूण क्षेत्रफळ (हेक्टेअर)",
+  "analysisZones": "विश्लेषण झोन्स",
+  "village": "गाव",
+  "district": "तालुका/जिल्हा",
+  "cancel": "रद्द करा",
+  "registering": "नोंदणी सुरू आहे...",
+  "confirmEstate": "शेत पुष्टी करा",
+  "internalError": "आतील त्रुटी आली",
+  "fieldDetails": {
+    "excellent": "उत्कृष्ट",
+    "good": "चांगले",
+    "moderate": "मध्यम",
+    "poor": "खराब",
+    "aiRecGenerated": "एआय शिफारस तयार झाली!",
+    "irrigation": "सिंचन",
+    "fertilizer": "खत",
+    "healthScore": "आरोग्य गुण",
+    "aiRecFailed": "एआय शिफारस तयार करण्यात अयशस्वी. कृपया Python सर्व्हर चालू आहे याची खात्री करा.",
+    "fieldNotFound": "शेत आढळले नाही",
+    "backToFields": "शेतांच्या यादीत परत जा",
+    "backToDashboard": "डॅशबोर्डवर परत जा",
+    "status": "स्थिती",
+    "lastSync": "शेवटचे सिंक",
+    "envIntelligence": "पर्यावरणीय इंटेलिजन्स",
+    "temp": "तापमान",
+    "humidity": "आर्द्रता",
+    "rain": "पर्जन्य",
+    "stressRisk": "ताण धोका",
+    "diagnostic": "निदान",
+    "realtimeSensor": "रिअल‑टाइम सेन्सर विश्लेषण",
+    "aiAdvisor": "एआय सल्लागार",
+    "updateSensors": "सेन्सर अपडेट करा",
+    "moisture": "आर्द्रता",
+    "nutrients": "पोषक तत्वे",
+    "soilPH": "मातीचा pH",
+    "acidicEnv": "आम्लीय वातावरण",
+    "alkalineEnv": "क्षारीय वातावरण",
+    "neutralBalance": "तटस्थ संतुलन",
+    "vitality": "ताजेपणा / स्फूर्ती",
+    "aiDecisionIntel": "एआय निर्णय इंटेलिजन्स",
+    "drlEngineActive": "DRL इंजिन सक्रिय",
+    "computedHealthIndex": "गणना केलेला आरोग्य निर्देशांक",
+    "irrigationStrategy": "सिंचन धोरण",
+    "timeline": "वेळरेषा",
+    "conf": "विश्वास",
+    "statusOptimal": "स्थिती उत्तम – सध्या कोणतीही कारवाई आवश्यक नाही",
+    "nutrientStrategy": "पोषण धोरण",
+    "variant": "प्रकार",
+    "soilBalanced": "माती संतुलित – कोणतीही कारवाई आवश्यक नाही",
+    "engineRationale": "इंजिनचे कारणमीमांसा",
+    "pendingIntelSync": "इंटेलिजन्स सिंक प्रलंबित",
+    "runAiEngine": "विशिष्ट जमीन व्यवस्थापनासाठी एआय इंजिन चालवा आणि सल्ला तयार करा.",
+    "startScan": "स्कॅन सुरू करा",
+    "sensorSync": "सेन्सर सिंक",
+    "moisturePercent": "आर्द्रता (%)",
+    "acidityPH": "आम्लता (pH)",
+    "nutrientLevelsPPM": "पोषक पातळी (PPM)",
+    "nitrogen": "नायट्रोजन",
+    "phosphorus": "फॉस्फरस",
+    "potassium": "पोटॅशियम",
+    "syncing": "सिंक होत आहे...",
+    "updateLandVitals": "जमिनीचे मापदंड अपडेट करा",
+    "updateFailed": "मापदंड अपडेट करण्यात अयशस्वी."
+  },
+  "analytics": {
+    "title": "विश्लेषण डॅशबोर्ड",
+    "performanceMetrics": "कामगिरी मेट्रिक्स",
+    "trends": "कल",
+    "insights": "इनसाइट्स",
+    "exportData": "डेटा निर्यात करा"
+  }
+}

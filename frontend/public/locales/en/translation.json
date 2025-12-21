@@ -1,0 +1,383 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "myFields": "My Fields",
+    "aiAssistant": "AI Assistant",
+    "weather": "Weather",
+    "cropHealth": "Crop Health",
+    "analytics": "Analytics",
+    "notifications": "Notifications",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "header": {
+    "farmOverview": "Farm Overview",
+    "fieldManagement": "Field Management",
+    "smartAdvisory": "Smart Advisory",
+    "plantHealthCheck": "Plant Health Check",
+    "analyticsDashboard": "Analytics Dashboard",
+    "weatherStation": "Weather Station",
+    "allNotifications": "All Notifications",
+    "liveMonitoring": "Live Monitoring Active"
+  },
+  "user": {
+    "premium": "Premium",
+    "farmer": "Farmer"
+  },
+  "loading": {
+    "farmData": "Loading farm data..."
+  },
+  "placeholder": {
+    "comingSoon": "Feature coming soon"
+  },
+  "kpi": {
+    "soilMoisture": "Soil Moisture",
+    "temperature": "Temperature",
+    "cropHealth": "Crop Health",
+    "systemPressure": "System Pressure",
+    "energyUsage": "Energy Usage",
+    "yieldForecast": "Yield Forecast",
+    "vsYesterday": "vs yesterday",
+    "good": "Good"
+  },
+  "soil": {
+    "title": "Soil Health Monitor",
+    "moistureLevel": "Moisture Level",
+    "optimal": "Optimal",
+    "phLevel": "pH Level",
+    "acidic": "Acidic",
+    "neutral": "Neutral",
+    "alkaline": "Alkaline",
+    "npkNutrients": "NPK Nutrients",
+    "nitrogen": "Nitrogen",
+    "phosphorus": "Phosphorus",
+    "potassium": "Potassium"
+  },
+  "recommendations": {
+    "title": "AI Recommendations",
+    "drlOptimized": "DRL Optimized",
+    "increaseIrrigation": "Increase Irrigation",
+    "applyNitrogen": "Apply Nitrogen Boost",
+    "zoneA": "Zone A",
+    "zoneB": "Zone B",
+    "zoneC": "Zone C",
+    "zoneD": "Zone D",
+    "earlyMorning": "Early morning (5:00 AM)",
+    "afterIrrigation": "After next irrigation",
+    "scheduled": "Scheduled",
+    "lowMoisture": "Soil moisture at 32% (below optimal 40%)",
+    "noRain": "No rain forecasted for next 5 days",
+    "growthStage": "Current growth stage requires higher water intake",
+    "yieldImprovement": "+8% projected yield improvement",
+    "leafChlorosis": "Leaf chlorosis detected in drone imagery",
+    "lowNitrogen": "Soil nitrogen at 18 ppm (optimal: 25-30 ppm)",
+    "vegetativePhase": "Current vegetative growth phase",
+    "preventLoss": "Prevent 12% yield loss",
+    "amount": "Amount",
+    "schedule": "Schedule",
+    "whyThis": "Why this recommendation?",
+    "confidence": "Confidence"
+  },
+  "crops": {
+    "wheat": "Wheat",
+    "corn": "Corn",
+    "soybeans": "Soybeans",
+    "tomatoes": "Tomatoes",
+    "rice": "Rice",
+    "cotton": "Cotton"
+  },
+  "status": {
+    "excellent": "Excellent",
+    "good": "Good",
+    "moderate": "Moderate",
+    "poor": "Poor"
+  },
+  "alerts": {
+    "nitrogenDeficiency": "Nitrogen deficiency detected"
+  },
+  "weather": {
+    "title": "Weather Forecast",
+    "partlyCloudy": "Partly Cloudy With Light Breeze",
+    "heatAdvisory": "Heat Advisory: High temperatures expected Thursday. Consider early morning irrigation.",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun",
+    "loading": "Loading weather data...",
+    "navigation": {
+      "backToDashboard": "Back to Dashboard",
+      "manualSync": "Manual Sync",
+      "updating": "Updating..."
+    },
+    "noLocation": {
+      "title": "Location Missing",
+      "description": "Please add village, district, or GPS coordinates to your field to activate weather intelligence.",
+      "button": "Configure Fields"
+    },
+    "header": {
+      "title": "Weather Intelligence",
+      "subtitle": "Real-time atmospheric analysis for precision farming"
+    },
+    "current": {
+      "feelsLike": "Feels like {{temp}}°C",
+      "humidity": "Humidity",
+      "windSpeed": "Wind Speed",
+      "cloudCover": "Cloud Cover"
+    },
+    "additional": {
+      "title": "Atmos-Sensors",
+      "precipitation": "Precipitation Status",
+      "rainfall": "{{amount}} mm measured",
+      "pressure": "Pressure",
+      "visibility": "Visibility"
+    },
+    "forecast": {
+      "title": "Precision Micro-Forecast",
+      "tempRange": "Temp Range",
+      "maxRainRisk": "Max Rain Risk",
+      "totalRainfall": "Total Rainfall"
+    },
+    "aiInfluence": {
+      "title": "AI Decision Influence"
+    },
+    "stressMatrix": {
+      "title": "Crop Stress Matrix",
+      "heatStress": "Heat Stress",
+      "coldStress": "Cold Stress",
+      "diseaseRisk": "Disease Path."
+    },
+    "aiSummary": {
+      "title": "DRL Intelligence Summary"
+    },
+    "footer": {
+      "updated": "Updated {{time}} • Cycle: 10m"
+    },
+    "syncing": {
+      "title": "Syncing Data",
+      "description": "Connecting to satellite sensors for atmospheric intelligence..."
+    },
+    "notifications": {
+      "fetchFieldsError": "Failed to fetch fields data",
+      "fetchingWeather": "Fetching weather data...",
+      "weatherUpdated": "Weather data updated successfully",
+      "fetchWeatherError": "Failed to fetch weather data. Please check field location information."
+    }
+  },
+  "cropHealth": {
+    "title": "Crop Health Status",
+    "droneScan": "Drone scan: 2h ago",
+    "averageNDVI": "Average NDVI Index",
+    "bare": "0.0 Bare",
+    "sparse": "0.3 Sparse",
+    "moderate": "0.6 Moderate",
+    "dense": "1.0 Dense",
+    "goodOverall": "Good Overall Health",
+    "basedOnImagery": "Based on satellite & drone imagery"
+  },
+  "resources": {
+    "title": "Resource Usage Analytics",
+    "overview": "Overview",
+    "water": "Water",
+    "fertilizer": "Fertilizer",
+    "waterSaved": "Water Saved",
+    "fertilizerSaved": "Fertilizer Saved",
+    "energySaved": "Energy Saved",
+    "vsLastMonth": "vs last month",
+    "weeklyComparison": "Weekly Usage Comparison",
+    "waterL": "Water (L)",
+    "fertilizerKg": "Fertilizer (kg)"
+  },
+  "notifications": {
+    "title": "Alerts & Notifications",
+    "markAllRead": "Mark all read",
+    "nitrogenDeficiency": "Nitrogen deficiency detected in Zone C",
+    "irrigationComplete": "Irrigation cycle complete - Zone B",
+    "weatherAlert": "Weather alert: Rain expected tomorrow",
+    "lowMoisture": "Low soil moisture in Zone A",
+    "tenMinAgo": "10 min ago",
+    "oneHourAgo": "1 hour ago",
+    "twoHoursAgo": "2 hours ago",
+    "threeHoursAgo": "3 hours ago"
+  },
+  "aiRecommendations": {
+    "loading": "Analyzing field data...",
+    "header": {
+      "title": "RL-Powered Precision",
+      "description": "Our Deep Reinforcement Learning models simulate thousands of scenarios to provide the most resource-efficient irrigation and nutrient strategies specifically for your soil profile."
+    },
+    "noFields": {
+      "title": "No Active Fields",
+      "description": "Register your field plots to start receiving AI-driven insights.",
+      "button": "Configure Fields"
+    },
+    "zone": {
+      "health": "Health",
+      "moisture": "Moisture",
+      "ph": "pH Level",
+      "nutrients": "Nutrients"
+    },
+    "recommendation": {
+      "watering": "Watering",
+      "nutrition": "Nutrition",
+      "stableWeather": "Stable Weather",
+      "syncAI": "Sync AI",
+      "pending": "Real-time analysis pending for this zone.",
+      "generateButton": "Generate Advice"
+    },
+    "notifications": {
+      "generating": "Generating AI recommendations...",
+      "generateSuccess": "AI recommendations generated successfully!",
+      "generateError": "Failed to generate recommendations. Please ensure the Python server is running.",
+      "fetchError": "Failed to load field data. Please try again."
+    }
+  },
+  "diseaseDetection": {
+    "header": {
+      "title": "AI Crop Doctor",
+      "subtitle": "Deep learning vision for instant plant pathology"
+    },
+    "upload": {
+      "title": "Visual Input",
+      "dropzone": "Drop leaf image here",
+      "formats": "JPEG or PNG • High resolution preferred"
+    },
+    "buttons": {
+      "clearAnalysis": "Clear Analysis",
+      "runDiagnostic": "Run Diagnostic",
+      "processing": "Neural Processing...",
+      "share": "Share",
+      "download": "Download"
+    },
+    "results": {
+      "awaiting": "Awaiting Sample...",
+      "awaitingDesc": "Upload a leaf photo for instant AI pathology",
+      "scanResults": "Scan Results",
+      "crop": "Crop",
+      "confidence": "Confidence",
+      "growthStage": "Growth Stage",
+      "severity": "Severity"
+    },
+    "treatment": {
+      "title": "AI Recovery Protocol",
+      "disclaimer": "NOTE: This diagnosis is generated by deep learning models. For validation, sync with a registered agronomist before high-volume chemical application."
+    },
+    "errors": {
+      "invalidFile": "Please select a valid image file",
+      "fileTooLarge": "File size must be less than 10MB",
+      "noImage": "Please select an image first",
+      "detectionFailed": "Detection failed. Please ensure Python server is running on port 8000."
+    },
+    "notifications": {
+      "fileSelected": "Image selected: {{fileName}}",
+      "analyzing": "Analyzing plant image with AI...",
+      "analysisComplete": "Analysis completed successfully!",
+      "downloadSuccess": "Treatment plan downloaded",
+      "shareSuccess": "Treatment plan shared",
+      "copiedToClipboard": "Copied to clipboard!",
+      "cleared": "Analysis cleared"
+    },
+    "download": {
+      "title": "CROP DISEASE TREATMENT PLAN",
+      "generated": "Generated",
+      "crop": "Crop",
+      "disease": "Disease",
+      "plan": "Plan",
+      "filename": "Treatment"
+    },
+    "share": {
+      "title": "Crop Disease Plan",
+      "crop": "Crop",
+      "disease": "Disease",
+      "shareTitle": "Crop Treatment"
+    }
+  },
+  "loadingEstates": "Loading your estates...",
+  "landManagement": "Land Management",
+  "monitorPlots": "Monitor and organize your agricultural plots",
+  "registerNewField": "Register New Field",
+  "startJourney": "Start your journey",
+  "noFieldsYet": "You haven't added any fields yet. Connect your land to begin AI monitoring.",
+  "addFirstField": "Add First Field",
+  "regionalPlot": "Regional Plot",
+  "subZones": "Sub-Zones",
+  "synced": "Synced",
+  "registerLand": "Register Land",
+  "fieldDesignation": "Field Designation",
+  "fieldPlaceholder": "e.g. West Garden",
+  "cropVariety": "Crop Variety",
+  "selectType": "Select Type",
+  "totalArea": "Total Area (Ha)",
+  "analysisZones": "Analysis Zones",
+  "village": "Village",
+  "district": "District",
+  "cancel": "Cancel",
+  "registering": "Registering...",
+  "confirmEstate": "Confirm Estate",
+  "internalError": "Internal error occurred",
+  "fieldDetails": {
+    "excellent": "Excellent",
+    "good": "Good",
+    "moderate": "Moderate",
+    "poor": "Poor",
+    "aiRecGenerated": "AI Recommendation Generated!",
+    "irrigation": "Irrigation",
+    "fertilizer": "Fertilizer",
+    "healthScore": "Health Score",
+    "aiRecFailed": "Failed to generate AI recommendation. Make sure Python server is running.",
+    "fieldNotFound": "Field not found",
+    "backToFields": "Back to fields",
+    "backToDashboard": "Back to Dashboard",
+    "status": "Status",
+    "lastSync": "Last Sync",
+    "envIntelligence": "Environmental Intelligence",
+    "temp": "Temp",
+    "humidity": "Humidity",
+    "rain": "Rain",
+    "stressRisk": "Stress Risk",
+    "diagnostic": "Diagnostic",
+    "realtimeSensor": "Real-time sensor analysis",
+    "aiAdvisor": "AI Advisor",
+    "updateSensors": "Update Sensors",
+    "moisture": "Moisture",
+    "nutrients": "Nutrients",
+    "soilPH": "Soil pH",
+    "acidicEnv": "Acidic Environment",
+    "alkalineEnv": "Alkaline Environment",
+    "neutralBalance": "Neutral Balance",
+    "vitality": "Vitality",
+    "aiDecisionIntel": "AI Decision Intelligence",
+    "drlEngineActive": "DRL Engine Active",
+    "computedHealthIndex": "Computed Health Index",
+    "irrigationStrategy": "Irrigation Strategy",
+    "timeline": "Timeline",
+    "conf": "Conf.",
+    "statusOptimal": "Status Optimal - No action required",
+    "nutrientStrategy": "Nutrient Strategy",
+    "variant": "Variant",
+    "soilBalanced": "Soil Balanced - No action required",
+    "engineRationale": "Engine Rationale",
+    "pendingIntelSync": "Pending Intelligence Sync",
+    "runAiEngine": "Run the AI engine to generate specific land management advice.",
+    "startScan": "Start Scan",
+    "sensorSync": "Sensor Sync",
+    "moisturePercent": "Moisture (%)",
+    "acidityPH": "Acidity (pH)",
+    "nutrientLevelsPPM": "Nutrient Levels (PPM)",
+    "nitrogen": "nitrogen",
+    "phosphorus": "phosphorus",
+    "potassium": "potassium",
+    "syncing": "Syncing...",
+    "updateLandVitals": "Update Land Vitals",
+    "updateFailed": "Failed to update vitals."
+  },
+  "analytics": {
+    "title": "Analytics Dashboard",
+    "performanceMetrics": "Performance Metrics",
+    "trends": "Trends",
+    "insights": "Insights",
+    "exportData": "Export Data"
+  }
+}

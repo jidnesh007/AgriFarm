@@ -1,3 +1,4 @@
+// backend/routes/voiceAssistant.js
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
@@ -6,7 +7,7 @@ const auth = require("../middleware/auth");
 
 const FASTAPI_URL = process.env.FASTAPI_URL || "http://localhost:8000";
 
-// Helper function to extract zone data
+// Helper: compute average zone data
 const getAverageZoneData = (zones) => {
   if (!zones || zones.length === 0) {
     return {
@@ -57,7 +58,7 @@ const getAverageZoneData = (zones) => {
   };
 };
 
-// Helper function to get last watered date
+// Helper: get last watering timing text from zones
 const getLastWateredDate = (zones) => {
   if (!zones || zones.length === 0) return null;
 
@@ -66,15 +67,24 @@ const getLastWateredDate = (zones) => {
     .filter((timing) => timing && timing !== "Not needed");
 
   if (lastWateredDates.length === 0) return null;
-  return lastWateredDates[0]; // Return most recent
+  return lastWateredDates[0];
 };
 
-// Get field context for voice assistant
+// GET /api/voice-assistant/field-context/:fieldId
 router.get("/field-context/:fieldId", auth, async (req, res) => {
   try {
+    const userId = req.userId; // from auth middleware
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
     const field = await Field.findOne({
       _id: req.params.fieldId,
-      userId: req.user.id,
+      userId: userId,
     });
 
     if (!field) {
@@ -84,10 +94,8 @@ router.get("/field-context/:fieldId", auth, async (req, res) => {
       });
     }
 
-    // Extract average data from all zones
     const zoneData = getAverageZoneData(field.zones);
 
-    // Build context object
     const context = {
       fieldName: field.fieldName,
       cropType: field.cropType,
@@ -96,28 +104,26 @@ router.get("/field-context/:fieldId", auth, async (req, res) => {
         ? `${field.location.village || "Unknown"}, ${field.location.district}`
         : "Unknown location",
 
-      // Soil data from zones
+      // Soil / weather
       soilMoisture: zoneData.soilMoisture,
       soilPH: zoneData.soilPH,
       soilNitrogen: zoneData.soilNitrogen,
       soilPhosphorus: zoneData.soilPhosphorus,
       soilPotassium: zoneData.soilPotassium,
-
-      // Weather data
       temperature: field.weatherSummary?.temperature || null,
       humidity: field.weatherSummary?.humidity || null,
       rainfall: field.weatherSummary?.rainfall || null,
 
-      // Irrigation data
+      // Irrigation
       lastWatered: getLastWateredDate(field.zones) || "Unknown",
       wateringSchedule:
         field.zones?.[0]?.recommendations?.irrigation?.timing || "Not set",
 
-      // Health data
+      // Health
       healthScore: zoneData.healthScore,
       healthStatus: field.overallHealth?.status || "Unknown",
 
-      // AI recommendations from zones
+      // AI recommendations per zone
       aiRecommendations:
         field.zones
           ?.map((zone, index) => {
@@ -126,7 +132,6 @@ router.get("/field-context/:fieldId", auth, async (req, res) => {
 
             const recommendations = [];
 
-            // Irrigation recommendation
             if (rec.irrigation?.amount > 0) {
               recommendations.push(
                 `Zone ${index + 1}: Water ${rec.irrigation.amount}${
@@ -135,7 +140,6 @@ router.get("/field-context/:fieldId", auth, async (req, res) => {
               );
             }
 
-            // Fertilizer recommendation
             if (rec.fertilizer?.amount > 0) {
               recommendations.push(
                 `Zone ${index + 1}: Apply ${rec.fertilizer.amount}${
@@ -167,10 +171,19 @@ router.get("/field-context/:fieldId", auth, async (req, res) => {
   }
 });
 
-// Get all fields summary
+// GET /api/voice-assistant/all-fields-summary
 router.get("/all-fields-summary", auth, async (req, res) => {
   try {
-    const fields = await Field.find({ userId: req.user.id });
+    const userId = req.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
+    const fields = await Field.find({ userId: userId });
 
     const summary = {
       totalFields: fields.length,
@@ -198,7 +211,7 @@ router.get("/all-fields-summary", auth, async (req, res) => {
   }
 });
 
-// Process voice question (proxy to FastAPI)
+// POST /api/voice-assistant/ask
 router.post("/ask", auth, async (req, res) => {
   try {
     const { question, fieldContext, language } = req.body;
@@ -209,7 +222,6 @@ router.post("/ask", auth, async (req, res) => {
       hasContext: !!fieldContext,
     });
 
-    // Forward request to FastAPI
     const response = await axios.post(
       `${FASTAPI_URL}/voice-assistant/ask`,
       {
@@ -224,7 +236,6 @@ router.post("/ask", auth, async (req, res) => {
   } catch (error) {
     console.error("Error calling FastAPI:", error.message);
 
-    // If FastAPI is down, provide a fallback response
     if (error.code === "ECONNREFUSED" || error.code === "ETIMEDOUT") {
       return res.json({
         success: true,
@@ -244,7 +255,7 @@ router.post("/ask", auth, async (req, res) => {
   }
 });
 
-// Analyze field (proxy to FastAPI)
+// POST /api/voice-assistant/analyze-field
 router.post("/analyze-field", auth, async (req, res) => {
   try {
     const { fieldContext } = req.body;
