@@ -36,7 +36,7 @@ except ImportError:
     DISEASE_DETECTION_AVAILABLE = False
 
 # Initialize Groq client
-GROQ_API_KEY = "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"
+GROQ_API_KEY = ""
 if GROQ_API_KEY:
     groq_client = Groq(api_key=GROQ_API_KEY)
     VOICE_ASSISTANT_AVAILABLE = True
