@@ -28,7 +28,7 @@ class Config:
     FASTAPI_URL = "http://localhost:8000"  # Your Python FastAPI
     
     # API Keys
-    ELEVENLABS_API_KEY =" de6e4b2582fb43144eac0ae065c0f84e6eff2f92d75e11925eaac429554a209d"
+    ELEVENLABS_API_KEY =" "
     AUTH_TOKEN = None  # Will be set after login
     
     # Audio Settings
