@@ -7,7 +7,7 @@ import json
 from groq import Groq
 
 # Groq API Configuration
-GROQ_API_KEY = "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"
+GROQ_API_KEY = ""
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 
