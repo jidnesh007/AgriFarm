@@ -1,4 +1,4 @@
-<img width="1907" height="907" alt="Screenshot 2025-12-27 190144" src="https://github.com/user-attachments/assets/cc365303-b0b2-4b6b-8064-b911b9a40ea1" /># 🌾 SIGRO – AI-Powered Smart Agriculture Assistant
+# 🌾 SIGRO – AI-Powered Smart Agriculture Assistant
 
 SIGRO is an AI-driven agriculture support system built to help farmers analyze crop health, predict risks, and receive multilingual, voice-enabled recommendations.
 It blends a modern dashboard, real-time alerts, and a Jarvis-style voice assistant powered by Groq LLM and Python-based DRL models.
