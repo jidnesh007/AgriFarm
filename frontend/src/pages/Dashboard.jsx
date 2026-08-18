@@ -31,15 +31,15 @@ import axios from "axios";
 import { BACKEND_URL } from "../config/api";
 
 // Import your existing component files
-import DashboardContent from "../components/DashboardContent";
+import DashboardContent from "../Components/DashboardContent";
 import FieldsContent from "../pages/FieldList";
-import AIRecommendationsContent from "../components/AiRecommendation";
-import WeatherContent from "../components/Weather";
-import DiseaseDetectionContent from "../components/DiseaseDetection";
-import Analytics from "../components/Analytics";
-import LanguageSelector from "../components/LanguageSelector";
-import VoiceAssistant from "../components/VoiceAssistant";
-import Marketplace from "../components/Marketplace";
+import AIRecommendationsContent from "../Components/AiRecommendation";
+import WeatherContent from "../Components/Weather";
+import DiseaseDetectionContent from "../Components/DiseaseDetection";
+import Analytics from "../Components/Analytics";
+import LanguageSelector from "../Components/LanguageSelector";
+import VoiceAssistant from "../Components/VoiceAssistant";
+import Marketplace from "../Components/Marketplace";
 
 function Dashboard() {
   const { t } = useTranslation();

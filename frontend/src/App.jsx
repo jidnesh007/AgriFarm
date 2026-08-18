@@ -4,15 +4,15 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import FieldList from "./pages/FieldList";
 import FieldDetails from "./pages/FieldDetails";
-import Weather from "./components/Weather";
-import AiRecommendation from "./components/AiRecommendation";
+import Weather from "./Components/Weather";
+import AiRecommendation from "./Components/AiRecommendation";
 import HeroSection from "./pages/Hero";
-import AboutSection from "./components/About";
-import SigroLanding from "./components/SigroLanding";
-import ContactSection from "./components/Contact";
-import Footer from "./components/Footer";
-import DiseaseDetection from "./components/DiseaseDetection";
-import Analytics from "./components/Analytics";
+import AboutSection from "./Components/About";
+import SigroLanding from "./Components/SigroLanding";
+import ContactSection from "./Components/Contact";
+import Footer from "./Components/Footer";
+import DiseaseDetection from "./Components/DiseaseDetection";
+import Analytics from "./Components/Analytics";
 
 // Landing Page Component - combines all sections
 const LandingPage = () => {
