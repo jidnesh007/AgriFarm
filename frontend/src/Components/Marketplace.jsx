@@ -4,6 +4,7 @@ import { X, Upload, Plus, MapPin, Phone, Mail, Truck, Star, Filter, Search,Trend
   Send , Package as PackageIcon  } from 'lucide-react';
 
 import axios from 'axios';
+import { BACKEND_URL } from '../config/api';
 // Mock API service (replace with real axios calls to your backend)
 const api = {
   getProducts: async () => {
@@ -345,7 +346,7 @@ const ProductDetailsModal = ({ product, isOpen, onClose }) => {
 
     setSending(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/notifications/contact', {
+      const response = await axios.post(`${BACKEND_URL}/api/notifications/contact`, {
         productId: product._id,
         buyerName: buyerInfo.name,
         buyerPhone: buyerInfo.phone

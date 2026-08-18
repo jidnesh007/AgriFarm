@@ -28,6 +28,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import { BACKEND_URL } from "../config/api";
 
 // Import your existing component files
 import DashboardContent from "../components/DashboardContent";
@@ -67,7 +68,7 @@ function Dashboard() {
   // NOTIFICATION FETCHER
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/notifications');
+      const response = await axios.get(`${BACKEND_URL}/api/notifications`);
       if (response.data.success) {
         setNotifications(response.data.data || []);
         setUnreadCount(response.data.unreadCount || 0);
@@ -90,7 +91,7 @@ function Dashboard() {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5000/api/fields", {
+      const response = await axios.get(`${BACKEND_URL}/api/fields`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -168,7 +169,7 @@ function Dashboard() {
 
   const markAllRead = async () => {
     try {
-      await axios.put('http://localhost:5000/api/notifications/mark-all-read');
+      await axios.put(`${BACKEND_URL}/api/notifications/mark-all-read`);
       setUnreadCount(0);
       setNotifications(notifications.map(n => ({ ...n, read: true })));
     } catch (error) {
@@ -178,7 +179,7 @@ function Dashboard() {
 
   const markAsRead = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/notifications/${id}/read`);
+      await axios.put(`${BACKEND_URL}/api/notifications/${id}/read`);
       setNotifications(prev => prev.map(n => (n._id === id || n.id === id ? { ...n, read: true } : n)));
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import axios from "axios";
+import { BACKEND_URL } from "../config/api";
 import {
   Brain,
   Droplets,
@@ -55,7 +56,7 @@ const AiRecommendations = () => {
   const fetchFields = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5000/api/fields", {
+      const response = await axios.get(`${BACKEND_URL}/api/fields`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFields(response.data.fields || []);
@@ -74,7 +75,7 @@ const AiRecommendations = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `http://localhost:5000/api/fields/${fieldId}/zone/${zoneId}/ai-recommendation`,
+        `${BACKEND_URL}/api/fields/${fieldId}/zone/${zoneId}/ai-recommendation`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

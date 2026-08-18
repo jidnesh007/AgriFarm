@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { User, Lock, Sprout, Leaf } from "lucide-react";
 import axios from "axios";
+import { BACKEND_URL } from "../config/api";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        `${BACKEND_URL}/api/auth/login`,
         formData
       );
       localStorage.setItem("token", response.data.token);

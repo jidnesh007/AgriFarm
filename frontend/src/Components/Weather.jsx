@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import axios from "axios";
+import { BACKEND_URL } from "../config/api";
 import {
   ArrowLeft,
   Cloud,
@@ -69,7 +70,7 @@ const Weather = () => {
   const fetchFields = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5000/api/fields", {
+      const response = await axios.get(`${BACKEND_URL}/api/fields`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFields(response.data.fields || []);
@@ -92,7 +93,7 @@ const Weather = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `http://localhost:5000/api/weather/${selectedField._id}`,
+        `${BACKEND_URL}/api/weather/${selectedField._id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setWeatherData(response.data);

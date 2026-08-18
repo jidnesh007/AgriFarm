@@ -20,6 +20,7 @@ import {
   Flower2,
 } from "lucide-react";
 import axios from "axios";
+import { BACKEND_URL } from "../config/api";
 
 const VoiceAssistant = ({ selectedField, fields, onClose }) => {
   // STATE
@@ -55,7 +56,7 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        `http://localhost:5000/api/voice-assistant/field-context/${fieldId}`,
+        `${BACKEND_URL}/api/voice-assistant/field-context/${fieldId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
           timeout: 10000,
@@ -96,7 +97,7 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
         }
 
         const res = await axios.post(
-          "http://localhost:5000/api/voice-assistant/ask",
+          `${BACKEND_URL}/api/voice-assistant/ask`,
           {
             question: text,
             fieldContext: contextToSend || null,

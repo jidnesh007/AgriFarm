@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
+import { BACKEND_URL } from '../config/api';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area
@@ -49,7 +50,7 @@ const Analytics = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const response = await axios.get('http://localhost:5000/api/analytics', {
+      const response = await axios.get(`${BACKEND_URL}/api/analytics`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

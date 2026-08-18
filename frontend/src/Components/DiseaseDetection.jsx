@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import axios from "axios";
+import { PYTHON_API_URL } from "../config/api";
 import {
   Camera,
   Upload,
@@ -84,7 +85,7 @@ const DiseaseDetection = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/detect-disease",
+        `${PYTHON_API_URL}/detect-disease`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

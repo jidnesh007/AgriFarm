@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import axios from "axios";
+import { BACKEND_URL } from "../config/api";
 import {
   ArrowLeft,
   Droplets,
@@ -48,7 +49,7 @@ const FieldDetails = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `http://localhost:5000/api/fields/${id}`,
+        `${BACKEND_URL}/api/fields/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -93,7 +94,7 @@ const FieldDetails = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        `http://localhost:5000/api/fields/${id}/zone/${zoneId}/ai-recommendation`,
+        `${BACKEND_URL}/api/fields/${id}/zone/${zoneId}/ai-recommendation`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -422,7 +423,7 @@ const SoilUpdateModal = ({ fieldId, zone, onClose, onSuccess }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:5000/api/fields/${fieldId}/zone/${zone._id}/soil`, formData, {
+      await axios.put(`${BACKEND_URL}/api/fields/${fieldId}/zone/${zone._id}/soil`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       onSuccess();
