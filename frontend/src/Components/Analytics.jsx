@@ -1,4 +1,6 @@
+// src/components/Analytics.jsx - WITH MULTILANGUAGE SUPPORT
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -17,8 +19,10 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
 const Analytics = () => {
+  const { t } = useTranslation();
   const [analytics, setAnalytics] = useState(null);
   const [filteredAnalytics, setFilteredAnalytics] = useState(null);
+  const [previousAnalytics, setPreviousAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedMetric, setSelectedMetric] = useState('all');
@@ -27,13 +31,11 @@ const Analytics = () => {
 
   useEffect(() => {
     fetchAnalytics();
-    
     const interval = setInterval(() => {
       if (isMonitoring) {
         fetchAnalytics();
       }
     }, 30000);
-
     return () => clearInterval(interval);
   }, [isMonitoring]);
 
@@ -50,15 +52,29 @@ const Analytics = () => {
       const response = await axios.get('http://localhost:5000/api/analytics', {
         headers: { Authorization: `Bearer ${token}` }
       });
+
+      if (analytics) {
+        setPreviousAnalytics(analytics);
+      }
+
       setAnalytics(response.data);
       setFilteredAnalytics(response.data);
       setError(null);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to fetch analytics data');
+      setError(err.response?.data?.message || t('analytics.errors.fetchFailed'));
       console.error('Error fetching analytics:', err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculateTrend = (current, previous) => {
+    if (!previous || previous === 0) return null;
+    const change = ((current - previous) / previous * 100);
+    return {
+      value: Math.abs(change).toFixed(1),
+      isUp: change > 0
+    };
   };
 
   const applyFilters = () => {
@@ -97,41 +113,41 @@ const Analytics = () => {
 
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
-    
+
     doc.setFillColor(34, 197, 94);
     doc.rect(0, 0, pageWidth, 40, 'F');
-    
+
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
-    doc.text('Farm Analytics Report', pageWidth / 2, 20, { align: 'center' });
-    
+    doc.text(t('analytics.pdf.title'), pageWidth / 2, 20, { align: 'center' });
+
     doc.setFontSize(12);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, 30, { align: 'center' });
+    doc.text(`${t('analytics.pdf.generated')}: ${new Date().toLocaleString()}`, pageWidth / 2, 30, { align: 'center' });
 
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
-    doc.text('Executive Summary', 14, 55);
-    
+    doc.text(t('analytics.pdf.executiveSummary'), 14, 55);
+
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Total Fields: ${analytics.totalFields}`, 14, 65);
-    doc.text(`Total Zones: ${analytics.totalZones || analytics.totalFields}`, 14, 72);
-    doc.text(`Active Risk Alerts: ${analytics.risks.length}`, 14, 79);
-    
+    doc.text(`${t('analytics.pdf.totalFields')}: ${analytics.totalFields}`, 14, 65);
+    doc.text(`${t('analytics.pdf.totalZones')}: ${analytics.totalZones || analytics.totalFields}`, 14, 72);
+    doc.text(`${t('analytics.pdf.activeRiskAlerts')}: ${analytics.risks.length}`, 14, 79);
+
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('Average Metrics', 14, 95);
-    
+    doc.text(t('analytics.pdf.averageMetrics'), 14, 95);
+
     const metricsData = [
-      ['Metric', 'Value', 'Status'],
-      ['Moisture', `${analytics.averages.moisture}%`, analytics.averages.moisture >= 40 && analytics.averages.moisture <= 60 ? 'Optimal' : 'Check'],
-      ['Nitrogen (N)', analytics.averages.nitrogen, analytics.averages.nitrogen >= 60 ? 'Good' : 'Low'],
-      ['Phosphorus (P)', analytics.averages.phosphorus, analytics.averages.phosphorus >= 60 ? 'Good' : 'Low'],
-      ['Potassium (K)', analytics.averages.potassium, analytics.averages.potassium >= 60 ? 'Good' : 'Low'],
-      ['pH Level', analytics.averages.ph, analytics.averages.ph >= 6.0 && analytics.averages.ph <= 7.5 ? 'Optimal' : 'Check']
+      [t('analytics.table.metric'), t('analytics.table.value'), t('analytics.table.status')],
+      [t('analytics.metrics.moisture'), `${analytics.averages.moisture}%`, analytics.averages.moisture >= 40 && analytics.averages.moisture <= 60 ? t('analytics.status.optimal') : t('analytics.status.check')],
+      [t('analytics.metrics.nitrogen'), analytics.averages.nitrogen, analytics.averages.nitrogen >= 60 ? t('analytics.status.good') : t('analytics.status.low')],
+      [t('analytics.metrics.phosphorus'), analytics.averages.phosphorus, analytics.averages.phosphorus >= 60 ? t('analytics.status.good') : t('analytics.status.low')],
+      [t('analytics.metrics.potassium'), analytics.averages.potassium, analytics.averages.potassium >= 60 ? t('analytics.status.good') : t('analytics.status.low')],
+      [t('analytics.metrics.phLevel'), analytics.averages.ph, analytics.averages.ph >= 6.0 && analytics.averages.ph <= 7.5 ? t('analytics.status.optimal') : t('analytics.status.check')]
     ];
 
     doc.autoTable({
@@ -147,8 +163,8 @@ const Analytics = () => {
       doc.addPage();
       doc.setFontSize(16);
       doc.setFont('helvetica', 'bold');
-      doc.text('Risk Alerts', 14, 20);
-      
+      doc.text(t('analytics.pdf.riskAlerts'), 14, 20);
+
       const risksData = analytics.risks.map((risk, index) => [
         index + 1,
         risk.fieldName,
@@ -157,7 +173,7 @@ const Analytics = () => {
 
       doc.autoTable({
         startY: 30,
-        head: [['#', 'Field/Zone', 'Issue']],
+        head: [['#', t('analytics.table.fieldZone'), t('analytics.table.issue')]],
         body: risksData,
         theme: 'grid',
         headStyles: { fillColor: [239, 68, 68], textColor: 255, fontStyle: 'bold' },
@@ -168,7 +184,7 @@ const Analytics = () => {
     doc.addPage();
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
-    doc.text('Field Performance Details', 14, 20);
+    doc.text(t('analytics.pdf.fieldPerformance'), 14, 20);
 
     const fieldData = analytics.fields.map(field => [
       field.fieldName,
@@ -183,7 +199,7 @@ const Analytics = () => {
 
     doc.autoTable({
       startY: 30,
-      head: [['Field', 'Crop', 'Moisture', 'N', 'P', 'K', 'pH', 'Health']],
+      head: [[t('analytics.table.field'), t('analytics.table.crop'), t('analytics.table.moisture'), 'N', 'P', 'K', t('analytics.table.ph'), t('analytics.table.health')]],
       body: fieldData,
       theme: 'grid',
       headStyles: { fillColor: [34, 197, 94], textColor: 255, fontStyle: 'bold' },
@@ -194,8 +210,8 @@ const Analytics = () => {
     doc.addPage();
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
-    doc.text('AI Health Summary', 14, 20);
-    
+    doc.text(t('analytics.pdf.aiHealthSummary'), 14, 20);
+
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
     const splitText = doc.splitTextToSize(analytics.healthSummary, pageWidth - 28);
@@ -207,7 +223,7 @@ const Analytics = () => {
       doc.setFontSize(9);
       doc.setTextColor(150);
       doc.text(
-        `Page ${i} of ${totalPages} | Farm Analytics Dashboard`,
+        `${t('analytics.pdf.page')} ${i} ${t('analytics.pdf.of')} ${totalPages} | ${t('analytics.pdf.farmAnalyticsDashboard')}`,
         pageWidth / 2,
         doc.internal.pageSize.getHeight() - 10,
         { align: 'center' }
@@ -220,22 +236,22 @@ const Analytics = () => {
   const handleShare = () => {
     if (!analytics) return;
 
-    const message = `🌾 *Farm Analytics Report*\\n\\n` +
-      `📊 *Summary*\\n` +
-      `• Total Fields: ${analytics.totalFields}\\n` +
-      `• Risk Alerts: ${analytics.risks.length}\\n` +
-      `• Avg Moisture: ${analytics.averages.moisture}%\\n` +
-      `• Avg pH: ${analytics.averages.ph}\\n\\n` +
-      `🔬 *NPK Levels*\\n` +
-      `• Nitrogen: ${analytics.averages.nitrogen}\\n` +
-      `• Phosphorus: ${analytics.averages.phosphorus}\\n` +
-      `• Potassium: ${analytics.averages.potassium}\\n\\n` +
-      `💡 *Health Summary*\\n${analytics.healthSummary}\\n\\n` +
-      `Generated: ${new Date().toLocaleString()}`;
+    const message = `🌾 *${t('analytics.share.title')}*\n\n` +
+      `📊 *${t('analytics.share.summary')}*\n` +
+      `• ${t('analytics.share.totalFields')}: ${analytics.totalFields}\n` +
+      `• ${t('analytics.share.riskAlerts')}: ${analytics.risks.length}\n` +
+      `• ${t('analytics.share.avgMoisture')}: ${analytics.averages.moisture}%\n` +
+      `• ${t('analytics.share.avgPh')}: ${analytics.averages.ph}\n\n` +
+      `🔬 *${t('analytics.share.npkLevels')}*\n` +
+      `• ${t('analytics.share.nitrogen')}: ${analytics.averages.nitrogen}\n` +
+      `• ${t('analytics.share.phosphorus')}: ${analytics.averages.phosphorus}\n` +
+      `• ${t('analytics.share.potassium')}: ${analytics.averages.potassium}\n\n` +
+      `💡 *${t('analytics.share.healthSummary')}*\n${analytics.healthSummary}\n\n` +
+      `${t('analytics.share.generated')}: ${new Date().toLocaleString()}`;
 
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
-    
+
     window.open(whatsappUrl, '_blank');
   };
 
@@ -247,8 +263,8 @@ const Analytics = () => {
             <div className="w-24 h-24 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
             <BarChart3 className="w-10 h-10 text-emerald-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
           </div>
-          <h3 className="text-xl font-bold text-gray-700 mb-2">Loading Analytics</h3>
-          <p className="text-gray-500">Crunching your farm data...</p>
+          <h3 className="text-xl font-bold text-gray-700 mb-2">{t('analytics.loading.title')}</h3>
+          <p className="text-gray-500">{t('analytics.loading.description')}</p>
         </div>
       </div>
     );
@@ -261,14 +277,14 @@ const Analytics = () => {
           <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <AlertTriangle className="w-10 h-10 text-red-600" />
           </div>
-          <h3 className="text-2xl font-bold text-red-800 mb-3">Oops! Something went wrong</h3>
+          <h3 className="text-2xl font-bold text-red-800 mb-3">{t('analytics.error.title')}</h3>
           <p className="text-red-600 mb-6 text-lg">{error}</p>
           <button
             onClick={fetchAnalytics}
             className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-3 rounded-xl transition-all duration-200 font-semibold shadow-lg hover:shadow-xl flex items-center gap-2 mx-auto"
           >
             <RefreshCw className="w-5 h-5" />
-            Try Again
+            {t('analytics.error.tryAgain')}
           </button>
         </div>
       </div>
@@ -282,7 +298,7 @@ const Analytics = () => {
           <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <AlertCircle className="w-12 h-12 text-gray-400" />
           </div>
-          <p className="text-gray-500 text-xl">No analytics data available</p>
+          <p className="text-gray-500 text-xl">{t('analytics.noData')}</p>
         </div>
       </div>
     );
@@ -290,21 +306,28 @@ const Analytics = () => {
 
   const displayData = filteredAnalytics || analytics;
 
+  const fieldsTrend = previousAnalytics ? 
+    calculateTrend(analytics.totalFields, previousAnalytics.totalFields) : null;
+  const zonesTrend = previousAnalytics ? 
+    calculateTrend(analytics.totalZones || analytics.totalFields, previousAnalytics.totalZones || previousAnalytics.totalFields) : null;
+  const healthTrend = previousAnalytics && analytics.fields.length > 0 && previousAnalytics.fields.length > 0 ?
+    calculateTrend(
+      analytics.fields.reduce((sum, f) => sum + f.healthScore, 0) / analytics.fields.length,
+      previousAnalytics.fields.reduce((sum, f) => sum + f.healthScore, 0) / previousAnalytics.fields.length
+    ) : null;
+
   const healthDistribution = [
-    { name: 'Excellent', value: analytics.fields.filter(f => f.healthScore >= 80).length, color: '#10b981' },
-    { name: 'Good', value: analytics.fields.filter(f => f.healthScore >= 60 && f.healthScore < 80).length, color: '#fbbf24' },
-    { name: 'Fair', value: analytics.fields.filter(f => f.healthScore >= 40 && f.healthScore < 60).length, color: '#f97316' },
-    { name: 'Poor', value: analytics.fields.filter(f => f.healthScore < 40).length, color: '#ef4444' }
+    { name: t('analytics.health.excellent'), value: analytics.fields.filter(f => f.healthScore >= 80).length, color: '#10b981' },
+    { name: t('analytics.health.good'), value: analytics.fields.filter(f => f.healthScore >= 60 && f.healthScore < 80).length, color: '#fbbf24' },
+    { name: t('analytics.health.fair'), value: analytics.fields.filter(f => f.healthScore >= 40 && f.healthScore < 60).length, color: '#f97316' },
+    { name: t('analytics.health.poor'), value: analytics.fields.filter(f => f.healthScore < 40).length, color: '#ef4444' }
   ].filter(item => item.value > 0);
 
   return (
     <div className="min-h-screen relative pb-8">
-      {/* Enhanced Background Decorations - Matching Dashboard Theme */}
+      {/* Background Decorations */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        {/* Dotted Grid Pattern */}
         <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.07]"></div>
-        
-        {/* Floating Nature Elements */}
         <Sun className="absolute -top-20 -right-20 text-yellow-400 opacity-10 w-96 h-96 animate-pulse-slow" />
         <Leaf className="absolute bottom-10 -left-10 text-emerald-600 opacity-5 w-80 h-80 rotate-45" />
         <Cloud className="absolute top-20 left-1/4 text-emerald-200 opacity-15 w-32 h-32" />
@@ -313,113 +336,107 @@ const Analytics = () => {
         <Flower2 className="absolute bottom-20 right-10 w-96 h-96 text-emerald-200 opacity-10" />
       </div>
 
-      {/* Enhanced Hero Header Section */}
-      <div className="bg-gradient-to-r from-emerald-600 via-emerald-700 to-emerald-800 text-white px-8 py-10 mb-8 shadow-2xl relative overflow-hidden z-10">
-        {/* Animated Background Pattern */}
+      {/* Hero Header */}
+      <div className="bg-gradient-to-r from-emerald-600 via-emerald-700 to-emerald-800 text-white px-4 md:px-8 py-6 md:py-10 mb-8 shadow-2xl relative overflow-hidden z-10">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-10 right-20 w-40 h-40 bg-white rounded-full blur-3xl animate-pulse delay-75"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto">
-          <div className="flex justify-between items-start mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-4 sm:gap-0 mb-4 md:mb-6">
             <div>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg">
                   <BarChart3 className="w-8 h-8" />
                 </div>
                 <div>
-                  <h1 className="text-4xl font-black tracking-tight mb-2">Analytics Dashboard</h1>
+                  <h1 className="text-4xl font-black tracking-tight mb-2">{t('analytics.title')}</h1>
                   <p className="text-emerald-100 text-lg font-semibold flex items-center gap-2">
                     <div className="h-1 w-8 bg-emerald-300 rounded-full"></div>
-                    Comprehensive farm performance insights
+                    {t('analytics.subtitle')}
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Enhanced Action Buttons */}
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-2 md:gap-3">
               <button
                 onClick={fetchAnalytics}
                 className="flex items-center gap-2 bg-white/20 backdrop-blur-md hover:bg-white/30 text-white px-5 py-3 rounded-xl transition-all duration-200 border border-white/30 hover:scale-105 font-bold shadow-lg"
-                title="Refresh data"
+                title={t('analytics.buttons.refresh')}
               >
                 <RefreshCw className="w-5 h-5" />
-                Refresh
+                {t('analytics.buttons.refresh')}
               </button>
               <button 
                 onClick={handleExportPDF}
                 className="flex items-center gap-2 bg-white/20 backdrop-blur-md hover:bg-white/30 text-white px-5 py-3 rounded-xl transition-all duration-200 border border-white/30 hover:scale-105 font-bold shadow-lg"
-                title="Download PDF Report"
+                title={t('analytics.buttons.exportPDF')}
               >
                 <Download className="w-5 h-5" />
-                Export PDF
+                {t('analytics.buttons.exportPDF')}
               </button>
               <button 
                 onClick={handleShare}
                 className="flex items-center gap-2 bg-white/20 backdrop-blur-md hover:bg-white/30 text-white px-5 py-3 rounded-xl transition-all duration-200 border border-white/30 hover:scale-105 font-bold shadow-lg"
-                title="Share via WhatsApp"
+                title={t('analytics.buttons.share')}
               >
                 <Share2 className="w-5 h-5" />
-                Share
+                {t('analytics.buttons.share')}
               </button>
             </div>
           </div>
 
-          {/* Quick Stats Row */}
-          <div className="grid grid-cols-4 gap-4">
+          {/* Quick Stats with Real Trends */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             <QuickStat 
-              label="Total Fields" 
+              label={t('analytics.quickStats.totalFields')}
               value={analytics.totalFields} 
               icon={<Leaf className="w-6 h-6" />}
-              trend="+12%"
-              trendUp={true}
+              trend={fieldsTrend}
             />
             <QuickStat 
-              label="Total Zones" 
+              label={t('analytics.quickStats.totalZones')}
               value={analytics.totalZones || analytics.totalFields} 
               icon={<Target className="w-6 h-6" />}
-              trend="+8%"
-              trendUp={true}
+              trend={zonesTrend}
             />
             <QuickStat 
-              label="Risk Alerts" 
+              label={t('analytics.quickStats.riskAlerts')}
               value={analytics.risks.length} 
               icon={<AlertTriangle className="w-6 h-6" />}
-              trend={analytics.risks.length > 0 ? "Action Needed" : "All Clear"}
-              trendUp={false}
+              trend={{ value: analytics.risks.length > 0 ? t('analytics.quickStats.actionNeeded') : t('analytics.quickStats.allClear'), isUp: analytics.risks.length === 0 }}
             />
             <QuickStat 
-              label="Avg Health" 
+              label={t('analytics.quickStats.avgHealth')}
               value={`${(analytics.fields.reduce((sum, f) => sum + f.healthScore, 0) / analytics.fields.length).toFixed(0)}%`}
               icon={<Award className="w-6 h-6" />}
-              trend="+5%"
-              trendUp={true}
+              trend={healthTrend}
             />
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-8 relative z-10">
-        {/* Enhanced Filters Section */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
+        {/* Filters Section */}
         <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl p-6 mb-8 border border-emerald-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4 flex-wrap">
               <div className="flex items-center gap-2">
                 <Filter className="w-5 h-5 text-emerald-600" />
-                <span className="font-bold text-emerald-950">Filters:</span>
+                <span className="font-bold text-emerald-950">{t('analytics.filters.title')}:</span>
               </div>
-              
+
               <select 
                 value={selectedMetric}
                 onChange={(e) => setSelectedMetric(e.target.value)}
                 className="px-4 py-2 border-2 border-emerald-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white font-bold text-emerald-900 shadow-sm hover:shadow-md transition-all"
               >
-                <option value="all">🌐 All Metrics</option>
-                <option value="moisture">💧 Moisture Issues</option>
-                <option value="nutrients">🧪 Nutrient Deficiency</option>
-                <option value="ph">⚖️ pH Imbalance</option>
+                <option value="all">{t('analytics.filters.allMetrics')}</option>
+                <option value="moisture">{t('analytics.filters.moistureIssues')}</option>
+                <option value="nutrients">{t('analytics.filters.nutrientDeficiency')}</option>
+                <option value="ph">{t('analytics.filters.phImbalance')}</option>
               </select>
 
               <select 
@@ -427,10 +444,10 @@ const Analytics = () => {
                 onChange={(e) => setTimeRange(e.target.value)}
                 className="px-4 py-2 border-2 border-emerald-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white font-bold text-emerald-900 shadow-sm hover:shadow-md transition-all"
               >
-                <option value="week">📅 Last Week</option>
-                <option value="month">📆 Last Month</option>
-                <option value="quarter">📊 Last Quarter</option>
-                <option value="year">🗓️ Last Year</option>
+                <option value="week">{t('analytics.filters.lastWeek')}</option>
+                <option value="month">{t('analytics.filters.lastMonth')}</option>
+                <option value="quarter">{t('analytics.filters.lastQuarter')}</option>
+                <option value="year">{t('analytics.filters.lastYear')}</option>
               </select>
 
               {selectedMetric !== 'all' && (
@@ -438,7 +455,7 @@ const Analytics = () => {
                   onClick={() => setSelectedMetric('all')}
                   className="px-4 py-2 bg-rose-100 text-rose-700 rounded-xl hover:bg-rose-200 transition-colors font-bold text-sm shadow-sm"
                 >
-                  Clear Filter
+                  {t('analytics.filters.clearFilter')}
                 </button>
               )}
             </div>
@@ -453,12 +470,12 @@ const Analytics = () => {
                 }`}
               >
                 <Eye className="w-4 h-4" />
-                <span>{isMonitoring ? 'Monitoring Active' : 'Monitoring Paused'}</span>
+                <span>{isMonitoring ? t('analytics.monitoring.active') : t('analytics.monitoring.paused')}</span>
                 <div className={`w-2 h-2 rounded-full ${isMonitoring ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`}></div>
               </button>
               <div className="text-xs text-emerald-600 flex items-center gap-1 font-bold">
                 <Clock className="w-3 h-3" />
-                Refreshes every 30s
+                {t('analytics.monitoring.refreshInterval')}
               </div>
             </div>
           </div>
@@ -466,52 +483,64 @@ const Analytics = () => {
           {selectedMetric !== 'all' && (
             <div className="mt-4 p-3 bg-gradient-to-r from-emerald-50 to-green-50 border-l-4 border-emerald-500 rounded-r-xl shadow-sm">
               <p className="text-emerald-800 text-sm font-bold">
-                🔍 Showing {displayData.fields.length} field(s) with {
-                  selectedMetric === 'moisture' ? 'moisture issues' :
-                  selectedMetric === 'nutrients' ? 'nutrient deficiencies' :
-                  'pH imbalances'
+                🔍 {t('analytics.filters.showing')} {displayData.fields.length} {t('analytics.filters.fieldsWith')} {
+                  selectedMetric === 'moisture' ? t('analytics.filters.moistureIssues') :
+                  selectedMetric === 'nutrients' ? t('analytics.filters.nutrientDeficiency') :
+                  t('analytics.filters.phImbalance')
                 }
               </p>
             </div>
           )}
         </div>
 
-        {/* Enhanced Key Metrics Grid */}
+        {/* Key Metrics Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <MetricCard
-            title="Average Moisture"
+            title={t('analytics.metricCards.avgMoisture')}
             value={`${analytics.averages.moisture}%`}
             icon={<Droplets className="w-8 h-8" />}
             color="blue"
-            subtitle="Optimal range: 40-60%"
+            subtitle={t('analytics.metricCards.moistureOptimal')}
             status={analytics.averages.moisture >= 40 && analytics.averages.moisture <= 60 ? 'good' : 'warning'}
+            t={t}
           />
           <MetricCard
-            title="Average Nitrogen"
+            title={t('analytics.metricCards.avgNitrogen')}
             value={analytics.averages.nitrogen}
             icon={<Zap className="w-8 h-8" />}
             color="orange"
-            subtitle="Optimal range: 60-80"
+            subtitle={t('analytics.metricCards.nitrogenOptimal')}
             status={analytics.averages.nitrogen >= 60 ? 'good' : 'warning'}
+            t={t}
           />
           <MetricCard
-            title="Average pH"
+            title={t('analytics.metricCards.avgPh')}
             value={analytics.averages.ph}
             icon={<Activity className="w-8 h-8" />}
             color="cyan"
-            subtitle="Optimal range: 6.0-7.5"
+            subtitle={t('analytics.metricCards.phOptimal')}
             status={analytics.averages.ph >= 6.0 && analytics.averages.ph <= 7.5 ? 'good' : 'warning'}
+            t={t}
           />
         </div>
 
-        {/* Enhanced NPK Summary Cards */}
-        <div className="grid grid-cols-3 gap-6 mb-8">
-          <NPKCard title="Phosphorus (P)" value={analytics.averages.phosphorus} color="purple" />
-          <NPKCard title="Potassium (K)" value={analytics.averages.potassium} color="red" />
-          <NPKCard title="NPK Balance" value="Good" color="green" status="balanced" />
+        {/* NPK Summary Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+          <NPKCard title={t('analytics.npk.phosphorus')} value={analytics.averages.phosphorus} color="purple" />
+          <NPKCard title={t('analytics.npk.potassium')} value={analytics.averages.potassium} color="red" />
+          <NPKCard 
+            title={t('analytics.npk.balance')} 
+            value={
+              analytics.averages.nitrogen >= 60 && 
+              analytics.averages.phosphorus >= 60 && 
+              analytics.averages.potassium >= 60 ? t('analytics.status.good') : t('analytics.status.check')
+            } 
+            color="green" 
+            status="balanced" 
+          />
         </div>
 
-        {/* Enhanced Risk Alerts Section */}
+        {/* Risk Alerts Section */}
         <div className="bg-gradient-to-br from-white/80 to-orange-50/30 backdrop-blur-md rounded-3xl shadow-2xl p-8 mb-8 border-2 border-orange-100">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
@@ -526,26 +555,26 @@ const Analytics = () => {
                 )}
               </div>
               <div>
-                <h2 className="text-3xl font-black text-emerald-950 mb-1 tracking-tight">Risk Assessment Center</h2>
-                <p className="text-emerald-700 text-lg font-semibold">Critical issues requiring immediate attention</p>
+                <h2 className="text-3xl font-black text-emerald-950 mb-1 tracking-tight">{t('analytics.riskAssessment.title')}</h2>
+                <p className="text-emerald-700 text-lg font-semibold">{t('analytics.riskAssessment.subtitle')}</p>
               </div>
             </div>
-            
+
             <div className="flex flex-col items-end gap-2">
               <div className={`px-6 py-3 rounded-full font-bold text-lg shadow-lg ${
                 analytics.risks.length === 0 
                   ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white' 
                   : 'bg-gradient-to-r from-orange-500 to-red-500 text-white'
               }`}>
-                {analytics.risks.length} Active {analytics.risks.length === 1 ? 'Alert' : 'Alerts'}
+                {analytics.risks.length} {t('analytics.riskAssessment.activeAlerts', { count: analytics.risks.length })}
               </div>
               <div className="flex items-center gap-2 text-sm text-emerald-600 font-bold">
                 <Calendar className="w-4 h-4" />
-                Last updated: {new Date().toLocaleTimeString()}
+                {t('analytics.riskAssessment.lastUpdated')}: {new Date().toLocaleTimeString()}
               </div>
             </div>
           </div>
-          
+
           {analytics.risks.length === 0 ? (
             <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-3xl p-10 shadow-xl relative overflow-hidden">
               <Sprout className="absolute -right-10 -bottom-10 w-64 h-64 opacity-10" />
@@ -557,20 +586,20 @@ const Analytics = () => {
                   <div className="absolute -top-2 -right-2 w-8 h-8 bg-emerald-300 rounded-full animate-ping"></div>
                 </div>
                 <div className="text-white">
-                  <h3 className="text-3xl font-black mb-2 tracking-tight">All Systems Operational!</h3>
-                  <p className="text-xl text-emerald-100 font-semibold">No critical risks detected across your farm zones</p>
+                  <h3 className="text-3xl font-black mb-2 tracking-tight">{t('analytics.riskAssessment.allSystemsOperational')}</h3>
+                  <p className="text-xl text-emerald-100 font-semibold">{t('analytics.riskAssessment.noRisks')}</p>
                   <div className="flex items-center gap-4 mt-4">
                     <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-2 rounded-lg">
                       <CheckCircle2 className="w-5 h-5" />
-                      <span className="font-bold">Moisture: Optimal</span>
+                      <span className="font-bold">{t('analytics.riskAssessment.moistureOptimal')}</span>
                     </div>
                     <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-2 rounded-lg">
                       <CheckCircle2 className="w-5 h-5" />
-                      <span className="font-bold">Nutrients: Balanced</span>
+                      <span className="font-bold">{t('analytics.riskAssessment.nutrientsBalanced')}</span>
                     </div>
                     <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-2 rounded-lg">
                       <CheckCircle2 className="w-5 h-5" />
-                      <span className="font-bold">pH: Normal</span>
+                      <span className="font-bold">{t('analytics.riskAssessment.phNormal')}</span>
                     </div>
                   </div>
                 </div>
@@ -578,35 +607,37 @@ const Analytics = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {/* Risk Summary Stats */}
-              <div className="grid grid-cols-4 gap-4 mb-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
                 <RiskStat
-                  label="Moisture Issues"
-                  count={analytics.risks.filter(r => r.issue.includes('moisture')).length}
+                  label={t('analytics.riskStats.moistureIssues')}
+                  count={analytics.risks.filter(r => r.issue.toLowerCase().includes('moisture')).length}
                   icon={<Droplets className="w-5 h-5" />}
                   color="blue"
                 />
                 <RiskStat
-                  label="Nutrient Deficiency"
-                  count={analytics.risks.filter(r => r.issue.includes('nitrogen') || r.issue.includes('phosphorus') || r.issue.includes('potassium')).length}
+                  label={t('analytics.riskStats.nutrientDeficiency')}
+                  count={analytics.risks.filter(r => 
+                    r.issue.toLowerCase().includes('nitrogen') || 
+                    r.issue.toLowerCase().includes('phosphorus') || 
+                    r.issue.toLowerCase().includes('potassium')
+                  ).length}
                   icon={<Zap className="w-5 h-5" />}
                   color="orange"
                 />
                 <RiskStat
-                  label="pH Imbalance"
-                  count={analytics.risks.filter(r => r.issue.includes('pH')).length}
+                  label={t('analytics.riskStats.phImbalance')}
+                  count={analytics.risks.filter(r => r.issue.toLowerCase().includes('ph')).length}
                   icon={<Activity className="w-5 h-5" />}
                   color="purple"
                 />
                 <RiskStat
-                  label="Total Affected"
+                  label={t('analytics.riskStats.totalAffected')}
                   count={new Set(analytics.risks.map(r => r.fieldName)).size}
                   icon={<AlertTriangle className="w-5 h-5" />}
                   color="red"
                 />
               </div>
 
-              {/* Enhanced Risk Cards Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {analytics.risks.map((risk, index) => (
                   <div
@@ -614,7 +645,7 @@ const Analytics = () => {
                     className="bg-white/80 backdrop-blur-md border-2 border-orange-200 rounded-2xl p-6 hover:shadow-2xl transition-all duration-300 group relative overflow-hidden"
                   >
                     <div className="absolute top-0 right-0 w-32 h-32 bg-orange-100 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                    
+
                     <div className="relative z-10">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-start gap-4">
@@ -627,31 +658,31 @@ const Analytics = () => {
                               <h4 className="font-black text-emerald-950 text-xl">{risk.fieldName}</h4>
                             </div>
                             <p className="text-emerald-800 text-base leading-relaxed mb-3 font-medium">{risk.issue}</p>
-                            
+
                             <div className="flex items-center gap-2">
                               <span className={`px-3 py-1 rounded-full text-xs font-black shadow-sm ${
-                                risk.issue.includes('moisture') ? 'bg-blue-100 text-blue-700' :
-                                risk.issue.includes('nitrogen') || risk.issue.includes('phosphorus') || risk.issue.includes('potassium') ? 'bg-orange-100 text-orange-700' :
+                                risk.issue.toLowerCase().includes('moisture') ? 'bg-blue-100 text-blue-700' :
+                                risk.issue.toLowerCase().includes('nitrogen') || risk.issue.toLowerCase().includes('phosphorus') || risk.issue.toLowerCase().includes('potassium') ? 'bg-orange-100 text-orange-700' :
                                 'bg-purple-100 text-purple-700'
                               }`}>
-                                {risk.issue.includes('moisture') ? '💧 Moisture' :
-                                 risk.issue.includes('nitrogen') || risk.issue.includes('phosphorus') || risk.issue.includes('potassium') ? '🧪 Nutrients' :
-                                 '⚖️ pH Level'}
+                                {risk.issue.toLowerCase().includes('moisture') ? `💧 ${t('analytics.riskTypes.moisture')}` :
+                                 risk.issue.toLowerCase().includes('nitrogen') || risk.issue.toLowerCase().includes('phosphorus') || risk.issue.toLowerCase().includes('potassium') ? `🧪 ${t('analytics.riskTypes.nutrients')}` :
+                                 `⚖️ ${t('analytics.riskTypes.phLevel')}`}
                               </span>
                               <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-black shadow-sm">
-                                🔴 High Priority
+                                🔴 {t('analytics.riskTypes.highPriority')}
                               </span>
                             </div>
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center justify-between pt-4 border-t border-emerald-200">
                         <button className="text-orange-600 hover:text-orange-700 font-bold text-sm flex items-center gap-2 hover:gap-3 transition-all">
-                          View Details <ExternalLink className="w-4 h-4" />
+                          {t('analytics.buttons.viewDetails')} <ExternalLink className="w-4 h-4" />
                         </button>
                         <button className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl font-bold text-sm shadow-lg hover:shadow-xl transition-all hover:scale-105">
-                          Take Action
+                          {t('analytics.buttons.takeAction')}
                         </button>
                       </div>
                     </div>
@@ -665,7 +696,7 @@ const Analytics = () => {
         {/* Charts Section */}
         {(selectedMetric === 'all' || selectedMetric === 'moisture') && displayData.chartData.moisture.length > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <ChartCard title="Moisture Distribution" icon={<Droplets className="w-6 h-6" />}>
+            <ChartCard title={t('analytics.charts.moistureDistribution')} icon={<Droplets className="w-6 h-6" />}>
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={displayData.chartData.moisture}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -679,7 +710,7 @@ const Analytics = () => {
                       boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
                     }}
                   />
-                  <Bar dataKey="value" fill="url(#colorMoisture)" name="Moisture %" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="value" fill="url(#colorMoisture)" name={t('analytics.charts.moisturePercent')} radius={[8, 8, 0, 0]} />
                   <defs>
                     <linearGradient id="colorMoisture" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#3b82f6" stopOpacity={1}/>
@@ -690,7 +721,7 @@ const Analytics = () => {
               </ResponsiveContainer>
             </ChartCard>
 
-            <ChartCard title="Health Score Distribution" icon={<PieIcon className="w-6 h-6" />}>
+            <ChartCard title={t('analytics.charts.healthScoreDistribution')} icon={<PieIcon className="w-6 h-6" />}>
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
                   <Pie
@@ -716,7 +747,7 @@ const Analytics = () => {
         )}
 
         {(selectedMetric === 'all' || selectedMetric === 'nutrients') && displayData.chartData.npk.length > 0 && (
-          <ChartCard title="NPK Nutrient Analysis" icon={<Activity className="w-6 h-6" />} className="mb-8">
+          <ChartCard title={t('analytics.charts.npkNutrientAnalysis')} icon={<Activity className="w-6 h-6" />} className="mb-8">
             <ResponsiveContainer width="100%" height={320}>
               <BarChart data={displayData.chartData.npk}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -731,16 +762,16 @@ const Analytics = () => {
                   }}
                 />
                 <Legend />
-                <Bar dataKey="nitrogen" fill="#f97316" name="Nitrogen (N)" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="phosphorus" fill="#a855f7" name="Phosphorus (P)" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="potassium" fill="#ef4444" name="Potassium (K)" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="nitrogen" fill="#f97316" name={t('analytics.charts.nitrogenN')} radius={[8, 8, 0, 0]} />
+                <Bar dataKey="phosphorus" fill="#a855f7" name={t('analytics.charts.phosphorusP')} radius={[8, 8, 0, 0]} />
+                <Bar dataKey="potassium" fill="#ef4444" name={t('analytics.charts.potassiumK')} radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
         )}
 
         {(selectedMetric === 'all' || selectedMetric === 'ph') && displayData.chartData.ph.length > 0 && (
-          <ChartCard title="pH Level Trends" icon={<TrendingUp className="w-6 h-6" />} className="mb-8">
+          <ChartCard title={t('analytics.charts.phLevelTrends')} icon={<TrendingUp className="w-6 h-6" />} className="mb-8">
             <ResponsiveContainer width="100%" height={300}>
               <AreaChart data={displayData.chartData.ph}>
                 <defs>
@@ -760,14 +791,13 @@ const Analytics = () => {
                     boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
                   }}
                 />
-                <Area type="monotone" dataKey="value" stroke="#06b6d4" strokeWidth={3} fill="url(#colorPh)" name="pH Level" />
-                <Line type="monotone" dataKey={() => 7} stroke="#10b981" strokeWidth={2} strokeDasharray="5 5" name="Neutral pH" />
+                <Area type="monotone" dataKey="value" stroke="#06b6d4" strokeWidth={3} fill="url(#colorPh)" name={t('analytics.charts.phLevel')} />
               </AreaChart>
             </ResponsiveContainer>
           </ChartCard>
         )}
 
-        {/* Enhanced Field Performance Matrix */}
+        {/* Field Performance Table */}
         <div className="bg-gradient-to-br from-white/80 to-emerald-50/30 backdrop-blur-md rounded-3xl shadow-2xl p-8 mb-8 border-2 border-emerald-100">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
@@ -775,22 +805,22 @@ const Analytics = () => {
                 <FileText className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h2 className="text-3xl font-black text-emerald-950 mb-1 tracking-tight">Field Performance Matrix</h2>
-                <p className="text-emerald-700 text-lg font-semibold">Comprehensive metrics across all farm zones</p>
+                <h2 className="text-3xl font-black text-emerald-950 mb-1 tracking-tight">{t('analytics.performanceMatrix.title')}</h2>
+                <p className="text-emerald-700 text-lg font-semibold">{t('analytics.performanceMatrix.subtitle')}</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <div className="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-xl font-black">
-                {displayData.fields.length} {displayData.fields.length === 1 ? 'Zone' : 'Zones'}
+                {displayData.fields.length} {t('analytics.performanceMatrix.zones', { count: displayData.fields.length })}
               </div>
               <button className="px-4 py-2 bg-blue-100 text-blue-700 rounded-xl font-bold hover:bg-blue-200 transition-colors flex items-center gap-2 shadow-sm hover:shadow-md">
                 <Download className="w-4 h-4" />
-                Export Table
+                {t('analytics.buttons.exportTable')}
               </button>
             </div>
           </div>
-          
+
           <div className="overflow-x-auto rounded-2xl border-2 border-emerald-200 shadow-xl">
             <table className="w-full">
               <thead>
@@ -798,19 +828,19 @@ const Analytics = () => {
                   <th className="px-6 py-5 text-left text-sm font-black uppercase tracking-wider">
                     <div className="flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
-                      Field/Zone
+                      {t('analytics.table.fieldZone')}
                     </div>
                   </th>
                   <th className="px-6 py-5 text-left text-sm font-black uppercase tracking-wider">
                     <div className="flex items-center gap-2">
                       <Leaf className="w-4 h-4" />
-                      Crop Type
+                      {t('analytics.table.cropType')}
                     </div>
                   </th>
                   <th className="px-6 py-5 text-center text-sm font-black uppercase tracking-wider">
                     <div className="flex items-center justify-center gap-2">
                       <Droplets className="w-4 h-4" />
-                      Moisture
+                      {t('analytics.table.moisture')}
                     </div>
                   </th>
                   <th className="px-6 py-5 text-center text-sm font-black uppercase tracking-wider">N</th>
@@ -819,13 +849,13 @@ const Analytics = () => {
                   <th className="px-6 py-5 text-center text-sm font-black uppercase tracking-wider">
                     <div className="flex items-center justify-center gap-2">
                       <Activity className="w-4 h-4" />
-                      pH
+                      {t('analytics.table.ph')}
                     </div>
                   </th>
                   <th className="px-6 py-5 text-center text-sm font-black uppercase tracking-wider">
                     <div className="flex items-center justify-center gap-2">
                       <Award className="w-4 h-4" />
-                      Health
+                      {t('analytics.table.health')}
                     </div>
                   </th>
                 </tr>
@@ -838,291 +868,173 @@ const Analytics = () => {
                   >
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-lg flex items-center justify-center text-white font-bold shadow-md">
-                          {index + 1}
+                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center text-white font-bold shadow-md">
+                          {field.fieldName.charAt(0).toUpperCase()}
                         </div>
-                        <span className="text-sm text-emerald-900 font-black group-hover:text-emerald-600 transition-colors">
-                          {field.fieldName}
-                        </span>
+                        <span className="font-bold text-emerald-950">{field.fieldName}</span>
                       </div>
                     </td>
                     <td className="px-6 py-5">
-                      <span className="px-4 py-2 bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-700 rounded-full text-xs font-black shadow-sm">
-                        🌾 {field.cropType}
+                      <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold">
+                        {field.cropType}
                       </span>
                     </td>
                     <td className="px-6 py-5 text-center">
-                      <EnhancedValueBadge value={field.moisture} threshold={25} suffix="%" type="moisture" />
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="font-bold text-gray-900">{field.moisture}%</span>
+                        <div className="w-16 bg-gray-200 rounded-full h-1.5">
+                          <div 
+                            className={`h-1.5 rounded-full ${
+                              field.moisture >= 40 && field.moisture <= 60 
+                                ? 'bg-emerald-500' 
+                                : 'bg-orange-500'
+                            }`}
+                            style={{ width: `${Math.min(field.moisture, 100)}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5 text-center font-bold text-gray-900">{field.N}</td>
+                    <td className="px-6 py-5 text-center font-bold text-gray-900">{field.P}</td>
+                    <td className="px-6 py-5 text-center font-bold text-gray-900">{field.K}</td>
+                    <td className="px-6 py-5 text-center">
+                      <span className={`px-3 py-1 rounded-full text-xs font-black ${
+                        field.pH >= 6.0 && field.pH <= 7.5 
+                          ? 'bg-green-100 text-green-700' 
+                          : 'bg-amber-100 text-amber-700'
+                      }`}>
+                        {field.pH}
+                      </span>
                     </td>
                     <td className="px-6 py-5 text-center">
-                      <EnhancedValueBadge value={field.N} threshold={40} type="nutrient" />
-                    </td>
-                    <td className="px-6 py-5 text-center">
-                      <EnhancedValueBadge value={field.P} threshold={40} type="nutrient" />
-                    </td>
-                    <td className="px-6 py-5 text-center">
-                      <EnhancedValueBadge value={field.K} threshold={40} type="nutrient" />
-                    </td>
-                    <td className="px-6 py-5 text-center">
-                      <EnhancedValueBadge 
-                        value={field.pH} 
-                        threshold={5.5} 
-                        maxThreshold={8}
-                        isWarning={field.pH < 5.5 || field.pH > 8}
-                        type="ph"
-                      />
-                    </td>
-                    <td className="px-6 py-5 text-center">
-                      <EnhancedHealthScoreBadge score={field.healthScore} />
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="font-bold text-gray-900">{field.healthScore}%</span>
+                        <div className="w-16 bg-gray-200 rounded-full h-1.5">
+                          <div 
+                            className={`h-1.5 rounded-full ${
+                              field.healthScore >= 80 ? 'bg-green-500' :
+                              field.healthScore >= 60 ? 'bg-yellow-500' :
+                              field.healthScore >= 40 ? 'bg-orange-500' :
+                              'bg-red-500'
+                            }`}
+                            style={{ width: `${field.healthScore}%` }}
+                          ></div>
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-
-          {/* Table Footer Stats */}
-          <div className="mt-6 grid grid-cols-4 gap-4">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl border-2 border-blue-200 shadow-sm">
-              <p className="text-blue-600 text-sm font-bold mb-1">Avg Moisture</p>
-              <p className="text-2xl font-black text-blue-800">{analytics.averages.moisture}%</p>
-            </div>
-            <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-xl border-2 border-orange-200 shadow-sm">
-              <p className="text-orange-600 text-sm font-bold mb-1">Avg NPK</p>
-              <p className="text-2xl font-black text-orange-800">
-                {((parseFloat(analytics.averages.nitrogen) + parseFloat(analytics.averages.phosphorus) + parseFloat(analytics.averages.potassium)) / 3).toFixed(1)}
-              </p>
-            </div>
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-xl border-2 border-purple-200 shadow-sm">
-              <p className="text-purple-600 text-sm font-bold mb-1">Avg pH</p>
-              <p className="text-2xl font-black text-purple-800">{analytics.averages.ph}</p>
-            </div>
-            <div className="bg-gradient-to-br from-emerald-50 to-green-100 p-4 rounded-xl border-2 border-emerald-200 shadow-sm">
-              <p className="text-emerald-600 text-sm font-bold mb-1">Avg Health</p>
-              <p className="text-2xl font-black text-emerald-800">
-                {(analytics.fields.reduce((sum, f) => sum + f.healthScore, 0) / analytics.fields.length).toFixed(0)}%
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Enhanced Health Summary */}
-        <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 rounded-3xl shadow-2xl p-10 mb-8 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-white rounded-full blur-3xl"></div>
-          </div>
-          
-          <div className="relative z-10">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg">
-                <Activity className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h2 className="text-3xl font-black text-white mb-1 tracking-tight">AI-Powered Health Summary</h2>
-                <p className="text-emerald-100 font-semibold">Generated insights from your farm data</p>
-              </div>
-            </div>
-            
-            <div className="bg-white/95 backdrop-blur-md rounded-2xl p-8 shadow-xl">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <TrendingUp className="w-6 h-6 text-white" />
-                </div>
-                <p className="text-emerald-900 text-lg leading-relaxed flex-1 font-medium">
-                  {analytics.healthSummary}
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
-      {/* Enhanced CSS */}
       <style jsx>{`
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 0.3; transform: scale(1); }
-          50% { opacity: 0.6; transform: scale(1.1); }
-        }
-        
-        .animate-spin-slow {
-          animation: spin-slow 40s linear infinite;
-        }
-        
-        .animate-pulse-slow {
-          animation: pulse-slow 5s ease-in-out infinite;
-        }
-
-        .scrollbar-thin::-webkit-scrollbar {
-          width: 6px;
-          height: 6px;
-        }
-        
-        .scrollbar-thumb-emerald-400::-webkit-scrollbar-thumb {
-          background-color: rgb(52 211 153);
-          border-radius: 3px;
-        }
-        
-        .scrollbar-track-transparent::-webkit-scrollbar-track {
-          background: transparent;
-        }
+        @keyframes pulse-slow { 0%, 100% { opacity: 0.1; } 50% { opacity: 0.2; } }
+        @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
+        .animate-spin-slow { animation: spin-slow 20s linear infinite; }
       `}</style>
     </div>
   );
 };
 
-// Sub-components
-
-const QuickStat = ({ label, value, icon, trend, trendUp }) => (
-  <div className="bg-white/20 backdrop-blur-md rounded-xl p-4 border border-white/30 shadow-lg">
+// Component Helpers
+const QuickStat = ({ label, value, icon, trend }) => (
+  <div className="bg-white/20 backdrop-blur-md rounded-xl p-4 border border-white/30 shadow-lg hover:bg-white/30 transition-all">
     <div className="flex items-center justify-between mb-2">
       <span className="text-white/90 text-sm font-bold">{label}</span>
-      {icon}
+      <div className="text-white/90">{icon}</div>
     </div>
     <div className="text-3xl font-black text-white mb-1">{value}</div>
-    <div className="flex items-center gap-1 text-sm font-bold">
-      {trendUp ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
-      <span className="text-white/90">{trend}</span>
-    </div>
+    {trend && (
+      <div className="flex items-center gap-1 text-sm font-bold text-white/90">
+        {trend.isUp ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
+        <span>{typeof trend.value === 'string' ? trend.value : `${trend.value}%`}</span>
+      </div>
+    )}
   </div>
 );
 
-const MetricCard = ({ title, value, icon, color, subtitle, status }) => {
+const MetricCard = ({ title, value, icon, color, subtitle, status, t }) => {
   const colorClasses = {
     blue: 'from-blue-500 to-blue-600',
     orange: 'from-orange-500 to-orange-600',
     cyan: 'from-cyan-500 to-cyan-600',
+    green: 'from-green-500 to-green-600',
+    purple: 'from-purple-500 to-purple-600',
+    red: 'from-red-500 to-red-600'
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl p-6 border border-emerald-100 hover:shadow-2xl transition-all duration-300 group">
+    <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-emerald-100 hover:shadow-xl transition-all">
       <div className="flex items-start justify-between mb-4">
-        <div className={`w-14 h-14 bg-gradient-to-br ${colorClasses[color]} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg`}>
-          <div className="text-white">{icon}</div>
+        <div className={`w-14 h-14 bg-gradient-to-br ${colorClasses[color]} rounded-xl flex items-center justify-center text-white shadow-md`}>
+          {icon}
         </div>
-        <div className={`px-3 py-1 rounded-full text-xs font-black ${status === 'good' ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'}`}>
-          {status === 'good' ? 'Optimal' : 'Check'}
-        </div>
+        {status && (
+          <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+            status === 'good' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+          }`}>
+            {status === 'good' ? `✓ ${t('analytics.status.optimal')}` : `⚠ ${t('analytics.status.check')}`}
+          </span>
+        )}
       </div>
-      <h3 className="text-emerald-700 text-sm font-black mb-2 uppercase tracking-wider">{title}</h3>
-      <div className="text-4xl font-black text-emerald-950 mb-2">{value}</div>
-      <p className="text-emerald-600 text-xs font-bold">{subtitle}</p>
+      <h3 className="text-sm text-gray-600 font-semibold mb-2">{title}</h3>
+      <p className="text-3xl font-black text-gray-900 mb-1">{value}</p>
+      {subtitle && <p className="text-xs text-gray-500 font-medium">{subtitle}</p>}
     </div>
   );
 };
 
 const NPKCard = ({ title, value, color, status }) => {
   const colorClasses = {
-    purple: 'from-purple-500 to-purple-600 border-purple-200',
-    red: 'from-red-500 to-red-600 border-red-200',
-    green: 'from-emerald-500 to-emerald-600 border-emerald-200',
+    purple: 'from-purple-500 to-purple-600',
+    red: 'from-red-500 to-red-600',
+    green: 'from-green-500 to-green-600'
   };
 
   return (
-    <div className={`bg-gradient-to-br ${colorClasses[color]} rounded-3xl shadow-xl p-6 border-2 text-white hover:scale-105 transition-transform`}>
-      <h3 className="text-sm font-black mb-2 opacity-90 uppercase tracking-wider">{title}</h3>
-      <div className="text-4xl font-black mb-1">{value}</div>
-      {status && <p className="text-sm opacity-90 font-bold">System {status}</p>}
+    <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-emerald-100 hover:shadow-xl transition-all">
+      <div className={`w-12 h-12 bg-gradient-to-br ${colorClasses[color]} rounded-xl flex items-center justify-center text-white shadow-md mb-4`}>
+        <Activity className="w-6 h-6" />
+      </div>
+      <h3 className="text-sm text-gray-600 font-semibold mb-2">{title}</h3>
+      <p className="text-3xl font-black text-gray-900">{value}</p>
+    </div>
+  );
+};
+
+const RiskStat = ({ label, count, icon, color }) => {
+  const colorClasses = {
+    blue: 'bg-blue-100 text-blue-700 border-blue-200',
+    orange: 'bg-orange-100 text-orange-700 border-orange-200',
+    purple: 'bg-purple-100 text-purple-700 border-purple-200',
+    red: 'bg-red-100 text-red-700 border-red-200'
+  };
+
+  return (
+    <div className={`${colorClasses[color]} rounded-xl p-4 border-2`}>
+      <div className="flex items-center gap-3 mb-2">
+        {icon}
+        <span className="text-xs font-bold uppercase tracking-wide">{label}</span>
+      </div>
+      <p className="text-3xl font-black">{count}</p>
     </div>
   );
 };
 
 const ChartCard = ({ title, icon, children, className = '' }) => (
-  <div className={`bg-white/80 backdrop-blur-md rounded-3xl shadow-xl p-8 border border-emerald-100 ${className}`}>
+  <div className={`bg-white rounded-2xl p-6 shadow-lg border-2 border-emerald-100 ${className}`}>
     <div className="flex items-center gap-3 mb-6">
-      <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg">
-        <div className="text-white">{icon}</div>
+      <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center text-white shadow-md">
+        {icon}
       </div>
-      <h3 className="text-xl font-black text-emerald-950">{title}</h3>
+      <h3 className="text-lg font-bold text-gray-900">{title}</h3>
     </div>
     {children}
   </div>
 );
-
-const RiskStat = ({ label, count, icon, color }) => {
-  const colorClasses = {
-    blue: 'from-blue-500 to-blue-600',
-    orange: 'from-orange-500 to-orange-600',
-    purple: 'from-purple-500 to-purple-600',
-    red: 'from-red-500 to-red-600',
-  };
-
-  return (
-    <div className={`bg-gradient-to-br ${colorClasses[color]} rounded-xl p-4 text-white shadow-lg hover:scale-105 transition-transform`}>
-      <div className="flex items-center gap-2 mb-2">
-        {icon}
-        <span className="text-xs font-black opacity-90">{label}</span>
-      </div>
-      <div className="text-3xl font-black">{count}</div>
-    </div>
-  );
-};
-
-const EnhancedValueBadge = ({ value, threshold, maxThreshold, suffix = '', isWarning, type }) => {
-  const isLow = isWarning !== undefined ? isWarning : value < threshold;
-  const isHigh = maxThreshold && value > maxThreshold;
-  
-  let bgColor, textColor, icon;
-  
-  if (isLow || isHigh) {
-    bgColor = 'bg-gradient-to-r from-red-500 to-red-600';
-    textColor = 'text-white';
-    icon = <AlertTriangle className="w-3 h-3" />;
-  } else {
-    bgColor = 'bg-gradient-to-r from-emerald-500 to-emerald-600';
-    textColor = 'text-white';
-    icon = <CheckCircle2 className="w-3 h-3" />;
-  }
-  
-  return (
-    <div className="flex flex-col items-center gap-1">
-      <span className={`px-4 py-2 rounded-lg text-sm font-black shadow-lg ${bgColor} ${textColor} flex items-center gap-2`}>
-        {icon}
-        {value}{suffix}
-      </span>
-    </div>
-  );
-};
-
-const EnhancedHealthScoreBadge = ({ score }) => {
-  let bgColor, textColor, label, icon;
-  
-  if (score >= 80) {
-    bgColor = 'bg-gradient-to-r from-emerald-500 to-emerald-600';
-    textColor = 'text-white';
-    label = 'Excellent';
-    icon = '🌟';
-  } else if (score >= 60) {
-    bgColor = 'bg-gradient-to-r from-yellow-400 to-yellow-500';
-    textColor = 'text-white';
-    label = 'Good';
-    icon = '👍';
-  } else if (score >= 40) {
-    bgColor = 'bg-gradient-to-r from-orange-500 to-orange-600';
-    textColor = 'text-white';
-    label = 'Fair';
-    icon = '⚠️';
-  } else {
-    bgColor = 'bg-gradient-to-r from-red-500 to-red-600';
-    textColor = 'text-white';
-    label = 'Poor';
-    icon = '🚨';
-  }
-
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <div className={`px-5 py-2 rounded-xl text-base font-black shadow-lg ${bgColor} ${textColor} flex items-center gap-2`}>
-        <span>{icon}</span>
-        <span>{score}</span>
-      </div>
-      <span className="text-xs font-black text-emerald-700 px-3 py-1 bg-emerald-100 rounded-full">{label}</span>
-    </div>
-  );
-};
 
 export default Analytics;

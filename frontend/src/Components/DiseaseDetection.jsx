@@ -78,7 +78,7 @@ const DiseaseDetection = () => {
     setDetecting(true);
     setError("");
     showNotification('info', 'diseaseDetection.notifications.analyzing');
-    
+
     const formData = new FormData();
     formData.append("file", selectedFile);
 
@@ -120,12 +120,12 @@ const DiseaseDetection = () => {
     if (!result || !result.treatment_plan) return;
     const shareText = `🌾 ${t('diseaseDetection.share.title')}\n${t('diseaseDetection.share.crop')}: ${result.crop_type}\n${t('diseaseDetection.share.disease')}: ${result.disease_name}\n${result.treatment_plan}`;
     if (navigator.share) {
-      try { 
+      try {
         await navigator.share({ title: t('diseaseDetection.share.shareTitle'), text: shareText });
         showNotification('success', 'diseaseDetection.notifications.shareSuccess');
-      } 
-      catch (err) { 
-        console.log("Share failed", err); 
+      }
+      catch (err) {
+        console.log("Share failed", err);
       }
     } else {
       navigator.clipboard.writeText(shareText).then(() => {
@@ -153,7 +153,7 @@ const DiseaseDetection = () => {
   };
 
   const getNotificationStyles = (type) => {
-    switch(type) {
+    switch (type) {
       case 'success':
         return 'bg-emerald-50 border-emerald-500 text-emerald-900';
       case 'error':
@@ -168,7 +168,7 @@ const DiseaseDetection = () => {
   };
 
   const getNotificationIcon = (type) => {
-    switch(type) {
+    switch (type) {
       case 'success':
         return <CheckCircle className="w-5 h-5 text-emerald-600" />;
       case 'error':
@@ -186,13 +186,13 @@ const DiseaseDetection = () => {
     <div className="relative space-y-6 animate-in fade-in duration-500 pb-12">
       {/* Notification Toast */}
       {notification && (
-        <div className="fixed top-20 right-6 z-50 animate-in slide-in-from-right duration-300">
+        <div className="fixed top-20 left-4 right-4 sm:left-auto sm:right-6 sm:w-auto z-50 animate-in slide-in-from-right duration-300">
           <div className={`${getNotificationStyles(notification.type)} border-l-4 rounded-xl p-4 shadow-2xl backdrop-blur-sm max-w-md flex items-start gap-3`}>
             {getNotificationIcon(notification.type)}
             <div className="flex-1">
               <p className="text-sm font-semibold">{notification.message}</p>
             </div>
-            <button 
+            <button
               onClick={() => setNotification(null)}
               className="text-gray-400 hover:text-gray-600 transition-colors"
             >
@@ -210,7 +210,7 @@ const DiseaseDetection = () => {
 
       <div className="relative z-10 space-y-6">
         {/* Header Action Card */}
-        <div className="bg-white/60 backdrop-blur-md rounded-[32px] p-8 border border-emerald-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="bg-white/60 backdrop-blur-md rounded-[24px] md:rounded-[32px] p-5 md:p-8 border border-emerald-100 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-center gap-5">
             <div className="bg-emerald-900 p-4 rounded-2xl shadow-xl shadow-emerald-900/20">
               <Camera className="text-white w-8 h-8" />
@@ -258,7 +258,7 @@ const DiseaseDetection = () => {
                 ) : (
                   <div className="space-y-4">
                     <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm group-hover:scale-110 transition-transform">
-                       <FileImage className="w-10 h-10 text-emerald-200 group-hover:text-emerald-500" />
+                      <FileImage className="w-10 h-10 text-emerald-200 group-hover:text-emerald-500" />
                     </div>
                     <div>
                       <p className="text-lg font-bold text-emerald-900">{t('diseaseDetection.upload.dropzone')}</p>
@@ -327,8 +327,8 @@ const DiseaseDetection = () => {
                     { icon: <TrendingUp />, label: t('diseaseDetection.results.confidence'), val: `${(result.confidence * 100).toFixed(1)}%`, color: "border-emerald-500" },
                   ].map((item, i) => (
                     <div key={i} className={`bg-white rounded-3xl shadow-sm border-l-4 ${item.color} p-6`}>
-                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{item.label}</p>
-                       <p className="text-xl font-black text-emerald-950">{item.val}</p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{item.label}</p>
+                      <p className="text-xl font-black text-emerald-950">{item.val}</p>
                     </div>
                   ))}
                 </div>
@@ -351,32 +351,32 @@ const DiseaseDetection = () => {
                   <div className="bg-emerald-900 p-6 flex justify-between items-center text-white">
                     <h3 className="font-black uppercase tracking-widest text-xs">{t('diseaseDetection.treatment.title')}</h3>
                     <div className="flex gap-2">
-                       <button 
-                         onClick={handleShareTreatment} 
-                         className="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
-                         title={t('diseaseDetection.buttons.share')}
-                       >
-                         <Share2 size={16}/>
-                       </button>
-                       <button 
-                         onClick={handleDownloadTreatment} 
-                         className="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
-                         title={t('diseaseDetection.buttons.download')}
-                       >
-                         <Download size={16}/>
-                       </button>
+                      <button
+                        onClick={handleShareTreatment}
+                        className="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
+                        title={t('diseaseDetection.buttons.share')}
+                      >
+                        <Share2 size={16} />
+                      </button>
+                      <button
+                        onClick={handleDownloadTreatment}
+                        className="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
+                        title={t('diseaseDetection.buttons.download')}
+                      >
+                        <Download size={16} />
+                      </button>
                     </div>
                   </div>
                   <div className="p-8">
-                     <div className="bg-emerald-50/50 rounded-2xl p-6 text-sm text-emerald-950 font-medium leading-relaxed border border-emerald-100 whitespace-pre-wrap">
-                        {result.treatment_plan}
-                     </div>
-                     <div className="mt-6 flex items-start gap-3 p-4 bg-amber-50 rounded-2xl border border-amber-100">
-                        <AlertTriangle className="text-amber-500 w-5 h-5 flex-shrink-0" />
-                        <p className="text-[10px] font-bold text-amber-800 leading-tight">
-                           {t('diseaseDetection.treatment.disclaimer')}
-                        </p>
-                     </div>
+                    <div className="bg-emerald-50/50 rounded-2xl p-6 text-sm text-emerald-950 font-medium leading-relaxed border border-emerald-100 whitespace-pre-wrap">
+                      {result.treatment_plan}
+                    </div>
+                    <div className="mt-6 flex items-start gap-3 p-4 bg-amber-50 rounded-2xl border border-amber-100">
+                      <AlertTriangle className="text-amber-500 w-5 h-5 flex-shrink-0" />
+                      <p className="text-[10px] font-bold text-amber-800 leading-tight">
+                        {t('diseaseDetection.treatment.disclaimer')}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>

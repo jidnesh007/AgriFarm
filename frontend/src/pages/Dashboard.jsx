@@ -21,7 +21,9 @@ import {
   Brain,
   Menu,
   ChevronLeft,
-  Mic,      // Added for voice assistant
+  Mic,
+  ShoppingBag,
+  X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -35,15 +37,18 @@ import WeatherContent from "../components/Weather";
 import DiseaseDetectionContent from "../components/DiseaseDetection";
 import Analytics from "../components/Analytics";
 import LanguageSelector from "../components/LanguageSelector";
-import VoiceAssistant from "../components/VoiceAssistant"; // ✅ Added VoiceAssistant
+import VoiceAssistant from "../components/VoiceAssistant";
+import Marketplace from "../components/Marketplace";
 
 function Dashboard() {
   const { t } = useTranslation();
   const [currentView, setCurrentView] = useState("dashboard");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [selectedField, setSelectedField] = useState(null);
   const [fields, setFields] = useState([]);
   const [loading, setLoading] = useState(true);
+  
   const [statistics, setStatistics] = useState({
     totalFields: 0,
     totalArea: 0,
@@ -51,13 +56,34 @@ function Dashboard() {
     activeFields: 0,
   });
   
-  // ✅ Voice Assistant State
   const [showVoiceAssistant, setShowVoiceAssistant] = useState(false);
+  
+  // NOTIFICATION STATES
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   
   const navigate = useNavigate();
 
+  // NOTIFICATION FETCHER
+  const fetchNotifications = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/notifications');
+      if (response.data.success) {
+        setNotifications(response.data.data || []);
+        setUnreadCount(response.data.unreadCount || 0);
+      }
+    } catch (error) {
+      console.error('Notification fetch error:', error);
+    }
+  };
+
   useEffect(() => {
     fetchFields();
+    fetchNotifications();
+    
+    // Refresh notifications every 10 seconds
+    const interval = setInterval(fetchNotifications, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchFields = async () => {
@@ -133,10 +159,31 @@ function Dashboard() {
 
   const switchView = (view) => {
     setCurrentView(view);
+    setIsMobileSidebarOpen(false);
   };
 
   const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
+  };
+
+  const markAllRead = async () => {
+    try {
+      await axios.put('http://localhost:5000/api/notifications/mark-all-read');
+      setUnreadCount(0);
+      setNotifications(notifications.map(n => ({ ...n, read: true })));
+    } catch (error) {
+      console.error('Mark all read error:', error);
+    }
+  };
+
+  const markAsRead = async (id) => {
+    try {
+      await axios.put(`http://localhost:5000/api/notifications/${id}/read`);
+      setNotifications(prev => prev.map(n => (n._id === id || n.id === id ? { ...n, read: true } : n)));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (error) {
+      console.error('Mark as read error:', error);
+    }
   };
 
   const getHeaderTitle = () => {
@@ -147,6 +194,7 @@ function Dashboard() {
       "crop-health": t("header.plantHealthCheck"),
       analytics: t("header.analyticsDashboard"),
       weather: t("header.weatherStation"),
+      marketplace: "Marketplace",
       notifications: t("header.allNotifications"),
       settings: t("nav.settings"),
     };
@@ -155,7 +203,7 @@ function Dashboard() {
 
   return (
     <div className="flex h-screen bg-[#F0FDF4] relative overflow-hidden font-sans">
-      {/* --- NATURE BACKGROUND PATTERN --- */}
+      {/* NATURE BACKGROUND PATTERN */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.07]"></div>
         <Sun className="absolute -top-20 -right-20 text-yellow-400 opacity-10 w-96 h-96 animate-pulse-slow" />
@@ -165,11 +213,24 @@ function Dashboard() {
         <Cloud className="absolute top-40 right-1/4 text-emerald-200 opacity-20 w-24 h-24" />
       </div>
 
-      {/* --- SIDEBAR --- */}
+      {/* MOBILE SIDEBAR OVERLAY */}
+      {isMobileSidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/50 md:hidden"
+          onClick={() => setIsMobileSidebarOpen(false)}
+        />
+      )}
+
+      {/* SIDEBAR - Desktop: always visible, Mobile: slide-in */}
       <aside
-        className={`${
-          isSidebarCollapsed ? "w-20" : "w-72"
-        } bg-emerald-900 text-white shadow-2xl flex flex-col relative z-20 rounded-r-3xl my-4 ml-4 h-[calc(100vh-2rem)] transition-all duration-300 ease-in-out`}
+        className={`
+          bg-emerald-900 text-white shadow-2xl flex flex-col relative z-40 rounded-r-3xl
+          /* Desktop styles */
+          hidden md:flex
+          ${isSidebarCollapsed ? "md:w-20" : "md:w-72"}
+          md:my-4 md:ml-4 md:h-[calc(100vh-2rem)]
+          transition-all duration-300 ease-in-out
+        `}
       >
         {/* Decorative Circles on Sidebar */}
         {!isSidebarCollapsed && (
@@ -245,6 +306,13 @@ function Dashboard() {
             isCollapsed={isSidebarCollapsed}
           />
           <NavItem
+            icon={<ShoppingBag className="w-5 h-5" />}
+            label="Marketplace"
+            active={currentView === "marketplace"}
+            onClick={() => switchView("marketplace")}
+            isCollapsed={isSidebarCollapsed}
+          />
+          <NavItem
             icon={<Camera className="w-5 h-5" />}
             label={t("nav.cropHealth")}
             active={currentView === "crop-health"}
@@ -268,14 +336,7 @@ function Dashboard() {
             label={t("nav.notifications")}
             active={currentView === "notifications"}
             onClick={() => switchView("notifications")}
-            badge={isSidebarCollapsed ? null : 3}
-            isCollapsed={isSidebarCollapsed}
-          />
-          <NavItem
-            icon={<Settings className="w-5 h-5" />}
-            label={t("nav.settings")}
-            active={currentView === "settings"}
-            onClick={() => switchView("settings")}
+            badge={unreadCount > 0 ? unreadCount : null}
             isCollapsed={isSidebarCollapsed}
           />
         </nav>
@@ -317,51 +378,136 @@ function Dashboard() {
         </div>
       </aside>
 
-      {/* --- MAIN CONTENT AREA --- */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden relative z-10">
-        <header className="px-8 py-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-emerald-900">
+      {/* MOBILE SLIDE-IN SIDEBAR */}
+      <aside
+        className={`
+          fixed top-0 left-0 h-full z-50 w-72
+          bg-emerald-900 text-white shadow-2xl flex flex-col
+          transition-transform duration-300 ease-in-out
+          md:hidden
+          ${isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        `}
+      >
+        {/* Mobile Sidebar Header */}
+        <div className="p-5 flex items-center justify-between border-b border-emerald-800/50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg">
+              <Leaf className="w-6 h-6 text-emerald-700 fill-emerald-700" />
+            </div>
+            <div>
+              <span className="text-2xl font-bold tracking-tight block">Sigro</span>
+              <p className="text-[10px] text-emerald-300 uppercase tracking-widest">Agri AI</p>
+            </div>
+          </div>
+          <button onClick={() => setIsMobileSidebarOpen(false)} className="p-2 hover:bg-emerald-800 rounded-lg">
+            <X size={22} />
+          </button>
+        </div>
+
+        {/* Mobile Nav Items */}
+        <nav className="flex-1 px-3 space-y-2 overflow-y-auto py-4">
+          {[
+            { icon: <BarChart3 className="w-5 h-5" />, label: t("nav.dashboard"), view: "dashboard" },
+            { icon: <Map className="w-5 h-5" />, label: t("nav.myFields"), view: "field-map" },
+            { icon: <Brain className="w-5 h-5" />, label: t("nav.aiAssistant"), view: "ai-assistant" },
+            { icon: <Cloud className="w-5 h-5" />, label: t("nav.weather"), view: "weather" },
+            { icon: <ShoppingBag className="w-5 h-5" />, label: "Marketplace", view: "marketplace" },
+            { icon: <Camera className="w-5 h-5" />, label: t("nav.cropHealth"), view: "crop-health" },
+            { icon: <LineChart className="w-5 h-5" />, label: t("nav.analytics"), view: "analytics" },
+            { icon: <Bell className="w-5 h-5" />, label: t("nav.notifications"), view: "notifications", badge: unreadCount > 0 ? unreadCount : null },
+          ].map((item) => (
+            <NavItem
+              key={item.view}
+              icon={item.icon}
+              label={item.label}
+              active={currentView === item.view}
+              onClick={() => switchView(item.view)}
+              badge={item.badge}
+              isCollapsed={false}
+            />
+          ))}
+        </nav>
+
+        {/* Mobile User Profile */}
+        <div className="p-4 border-t border-emerald-800/50 bg-emerald-950/30">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-full bg-emerald-200 flex items-center justify-center border-2 border-white">
+              <User className="w-5 h-5 text-emerald-800" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-white">{localStorage.getItem("userName") || "Farmer"}</p>
+              <p className="text-xs text-emerald-300 flex items-center gap-1"><Zap className="w-3 h-3 fill-current" /> {t("user.premium")}</p>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-800 hover:bg-red-500/80 text-emerald-100 hover:text-white rounded-lg transition-all text-sm font-medium"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>{t("nav.logout")}</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* MAIN CONTENT AREA */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden relative z-10 min-w-0">
+        {/* HEADER */}
+        <header className="px-4 sm:px-6 md:px-8 py-4 md:py-6 flex items-center justify-between gap-3 flex-shrink-0">
+          {/* Mobile menu button */}
+          <button
+            className="md:hidden p-2 bg-white/60 rounded-full shadow-sm text-emerald-900"
+            onClick={() => setIsMobileSidebarOpen(true)}
+          >
+            <Menu size={20} />
+          </button>
+
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-emerald-900 truncate">
               {getHeaderTitle()}
             </h1>
             <div className="flex items-center gap-2 mt-1">
-              <div className="h-1 w-8 bg-emerald-500 rounded-full"></div>
-              <p className="text-sm text-emerald-600 font-medium tracking-wide">
+              <div className="h-1 w-6 md:w-8 bg-emerald-500 rounded-full"></div>
+              <p className="text-xs md:text-sm text-emerald-600 font-medium tracking-wide truncate">
                 {t("header.liveMonitoring")}
               </p>
             </div>
           </div>
 
-          {/* ✅ HEADER RIGHT - Language + VOICE ASSISTANT + Notifications + Settings */}
-          <div className="flex items-center gap-4">
-            <LanguageSelector />
+          {/* HEADER RIGHT */}
+          <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+            <div className="hidden sm:block">
+              <LanguageSelector />
+            </div>
             
-            {/* ✅ VOICE ASSISTANT BUTTON - Matches theme perfectly */}
             <button 
               onClick={() => setShowVoiceAssistant(true)}
-              className="p-3 bg-white/60 hover:bg-white backdrop-blur-md rounded-full shadow-sm text-emerald-900 transition-all hover:scale-105 hover:rotate-12 duration-300 group relative overflow-hidden"
+              className="p-2.5 md:p-3 bg-white/60 hover:bg-white backdrop-blur-md rounded-full shadow-sm text-emerald-900 transition-all hover:scale-105 hover:rotate-12 duration-300 group relative overflow-hidden"
               title="Voice Assistant"
             >
               <div className="relative z-10">
-                <Mic className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                <Mic className="w-4 h-4 md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
               </div>
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-500 opacity-0 group-hover:opacity-20 transition-opacity rounded-full"></div>
             </button>
 
-            <button className="p-3 bg-white/60 hover:bg-white backdrop-blur-md rounded-full shadow-sm text-emerald-900 transition-all relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+            <button className="p-2.5 md:p-3 bg-white/60 hover:bg-white backdrop-blur-md rounded-full shadow-sm text-emerald-900 transition-all relative group">
+              <Bell className="w-4 h-4 md:w-5 md:h-5" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 md:w-5 md:h-5 rounded-full flex items-center justify-center font-bold shadow-lg ring-2 ring-white text-[10px]">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
             </button>
             <button
               onClick={() => switchView("settings")}
-              className="p-3 bg-white/60 hover:bg-white backdrop-blur-md rounded-full shadow-sm text-emerald-900 transition-all hover:rotate-90 duration-500"
+              className="p-2.5 md:p-3 bg-white/60 hover:bg-white backdrop-blur-md rounded-full shadow-sm text-emerald-900 transition-all hover:rotate-90 duration-500"
             >
-              <Settings className="w-5 h-5" />
+              <Settings className="w-4 h-4 md:w-5 md:h-5" />
             </button>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-8 pb-8 scrollbar-thin scrollbar-thumb-emerald-400 scrollbar-track-transparent">
+        <main className="flex-1 overflow-y-auto px-3 sm:px-5 md:px-8 pb-20 md:pb-8 scrollbar-thin scrollbar-thumb-emerald-400 scrollbar-track-transparent">
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -386,6 +532,10 @@ function Dashboard() {
                   getHealthColor={getHealthColor}
                   getHealthBgColor={getHealthBgColor}
                   switchView={switchView}
+                  notifications={notifications}
+                  unreadCount={unreadCount}
+                  markAllRead={markAllRead}
+                  markAsRead={markAsRead}
                 />
               )}
               {currentView === "field-map" && (
@@ -407,6 +557,7 @@ function Dashboard() {
                 <WeatherContent fields={fields} selectedField={selectedField} />
               )}
               {currentView === "ai-assistant" && <AIRecommendationsContent />}
+              {currentView === "marketplace" && <Marketplace />}
               {currentView === "analytics" && <Analytics />}
               {currentView === "notifications" && (
                 <PlaceholderView title={t("header.allNotifications")} />
@@ -417,9 +568,33 @@ function Dashboard() {
             </>
           )}
         </main>
+
+        {/* MOBILE BOTTOM NAVIGATION BAR */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-emerald-900 border-t border-emerald-800/60 flex items-center justify-around px-2 py-2 safe-area-bottom">
+          {[
+            { icon: <BarChart3 size={20} />, view: "dashboard", label: "Home" },
+            { icon: <Map size={20} />, view: "field-map", label: "Fields" },
+            { icon: <ShoppingBag size={20} />, view: "marketplace", label: "Market" },
+            { icon: <Camera size={20} />, view: "crop-health", label: "Health" },
+            { icon: <Brain size={20} />, view: "ai-assistant", label: "AI" },
+          ].map((item) => (
+            <button
+              key={item.view}
+              onClick={() => switchView(item.view)}
+              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all ${
+                currentView === item.view
+                  ? "text-white bg-emerald-700"
+                  : "text-emerald-300 hover:text-white"
+              }`}
+            >
+              {item.icon}
+              <span className="text-[9px] font-bold uppercase tracking-wide">{item.label}</span>
+            </button>
+          ))}
+        </nav>
       </div>
 
-      {/* ✅ VOICE ASSISTANT MODAL */}
+      {/* VOICE ASSISTANT MODAL */}
       {showVoiceAssistant && (
         <VoiceAssistant
           selectedField={selectedField}
@@ -430,28 +605,31 @@ function Dashboard() {
 
       <style jsx>{`
         @keyframes pulse-slow {
-          0%, 100% {
-            opacity: 0.3;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 0.6;
-            transform: scale(1.1);
-          }
+         0%, 100% {
+           opacity: 0.3;
+           transform: scale(1);
+         }
+         50% {
+           opacity: 0.6;
+           transform: scale(1.1);
+         }
         }
         .animate-pulse-slow {
-          animation: pulse-slow 5s ease-in-out infinite;
+         animation: pulse-slow 5s ease-in-out infinite;
         }
         .scrollbar-thin::-webkit-scrollbar {
-          width: 6px;
-          height: 6px;
+         width: 6px;
+         height: 6px;
         }
         .scrollbar-thumb-emerald-700::-webkit-scrollbar-thumb {
-          background-color: rgb(4 120 87);
-          border-radius: 3px;
+         background-color: rgb(4 120 87);
+         border-radius: 3px;
         }
         .scrollbar-track-transparent::-webkit-scrollbar-track {
-          background: transparent;
+         background: transparent;
+        }
+        .safe-area-bottom {
+          padding-bottom: env(safe-area-inset-bottom, 8px);
         }
       `}</style>
     </div>

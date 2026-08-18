@@ -7,6 +7,8 @@ const User = require("../models/User");
 // Register Route
 router.post("/register", async (req, res) => {
   try {
+    console.log('📝 Register attempt:', req.body);
+    
     const { name, phoneNumber, password } = req.body;
 
     // Validation
@@ -15,70 +17,64 @@ router.post("/register", async (req, res) => {
     }
 
     if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ message: "Password must be at least 6 characters" });
+      return res.status(400).json({ message: "Password must be at least 6 characters" });
     }
 
-    // Validate phone number format
     if (!/^\d{10}$/.test(phoneNumber)) {
-      return res
-        .status(400)
-        .json({ message: "Phone number must be 10 digits" });
+      return res.status(400).json({ message: "Phone number must be 10 digits" });
     }
 
-    // Check if user already exists
+    // Check existing user by phoneNumber
     const existingUser = await User.findOne({ phoneNumber });
+    
     if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: "User already exists with this phone number" });
+      return res.status(400).json({ message: "Phone number already registered" });
     }
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create new user
+    // Create user using the correct model fields
     const newUser = new User({
       name,
+      email: `${phoneNumber}@agrifarm.com`,
       phoneNumber,
-      password: hashedPassword,
+      password
     });
 
-    await newUser.save();
+    const savedUser = await newUser.save();
+    console.log('✅ User registered:', savedUser._id);
 
-    // Create JWT token
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+    // Generate token
+    const token = jwt.sign({ id: savedUser._id }, process.env.JWT_SECRET || 'fallback-secret', {
       expiresIn: "7d",
     });
 
     res.status(201).json({
+      success: true,
       message: "User registered successfully",
       token,
+      userName: savedUser.name,
       user: {
-        id: newUser._id,
-        name: newUser.name,
-        phoneNumber: newUser.phoneNumber,
+        id: savedUser._id,
+        name: savedUser.name,
+        phoneNumber: savedUser.phoneNumber,
       },
     });
+
   } catch (error) {
-    console.error("Registration error:", error);
-
-    // Handle duplicate key error
+    console.error('❌ Registration FULL ERROR:', error);
+    
     if (error.code === 11000) {
-      return res
-        .status(400)
-        .json({ message: "Phone number already registered" });
+      return res.status(400).json({ message: "Phone number already registered" });
     }
 
-    // Handle validation errors
-    if (error.name === "ValidationError") {
-      const messages = Object.values(error.errors).map((err) => err.message);
-      return res.status(400).json({ message: messages.join(", ") });
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ message: messages.join(', ') });
     }
 
-    res.status(500).json({ message: "Server error during registration" });
+    res.status(500).json({ 
+      message: 'Registration failed',
+      error: error.message 
+    });
   }
 });
 
@@ -87,31 +83,34 @@ router.post("/login", async (req, res) => {
   try {
     const { phoneNumber, password } = req.body;
 
-    // Validation
     if (!phoneNumber || !password) {
       return res.status(400).json({ message: "Please provide all fields" });
     }
 
-    // Check if user exists
-    const user = await User.findOne({ phoneNumber });
+    // Query using the correct field name from the User model
+    const user = await User.findOne({ phoneNumber }).select('+password');
+    
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Compare password
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Create JWT token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    user.lastLogin = new Date();
+    await user.save({ validateBeforeSave: false });
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'fallback-secret', {
       expiresIn: "7d",
     });
 
     res.json({
+      success: true,
       message: "Login successful",
       token,
+      userName: user.name,
       user: {
         id: user._id,
         name: user.name,
@@ -119,7 +118,7 @@ router.post("/login", async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Login error:", error);
+    console.error('❌ Login error:', error);
     res.status(500).json({ message: "Server error during login" });
   }
 });

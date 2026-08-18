@@ -1,4 +1,4 @@
-// src/components/VoiceAssistant.jsx - 100% FIXED (No TDZ Error)
+// src/components/VoiceAssistant.jsx
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Mic,
@@ -16,11 +16,13 @@ import {
   Thermometer,
   Activity,
   RefreshCw,
+  CircleDashed,
+  Flower2,
 } from "lucide-react";
 import axios from "axios";
 
 const VoiceAssistant = ({ selectedField, fields, onClose }) => {
-  // 👈 ALL STATE HOOKS FIRST
+  // STATE
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -32,6 +34,7 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
   const [conversationHistory, setConversationHistory] = useState([]);
   const [fieldContext, setFieldContext] = useState(null);
   const [isLoadingContext, setIsLoadingContext] = useState(false);
+  const [textInput, setTextInput] = useState("");
   const [contextLoadError, setContextLoadError] = useState(false);
 
   const recognitionRef = useRef(null);
@@ -44,7 +47,7 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
     { code: "mr-IN", name: "Marathi", display: "🇮🇳 मराठी" },
   ];
 
-  // 👈 ALL FUNCTIONS with useCallback (BEFORE useEffect)
+  // FIELD CONTEXT
   const fetchFieldContext = useCallback(async (fieldId, retries = 2) => {
     setIsLoadingContext(true);
     setContextLoadError(false);
@@ -61,18 +64,12 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
 
       if (res.data.success) {
         setFieldContext(res.data.context);
-        console.log("✅ Field context loaded:", res.data.context);
         return res.data.context;
       } else {
         throw new Error("Invalid response from server");
       }
     } catch (error) {
-      console.error("❌ Error fetching field context:", error);
-
       if (retries > 0) {
-        console.log(
-          `🔄 Retrying field context fetch... (${retries} retries left)`
-        );
         await new Promise((resolve) => setTimeout(resolve, 1000));
         return fetchFieldContext(fieldId, retries - 1);
       } else {
@@ -84,7 +81,7 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
     }
   }, []);
 
-  // ✅ FIXED: processVoiceInput declared BEFORE useEffect
+  // PROCESS VOICE
   const processVoiceInput = useCallback(
     async (text) => {
       setIsProcessing(true);
@@ -95,17 +92,8 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
 
         let contextToSend = fieldContext;
         if (!contextToSend && selectedField?._id) {
-          console.log("🔄 Fetching field context on-demand...");
           contextToSend = await fetchFieldContext(selectedField._id, 1);
         }
-
-        console.log("🎤 VoiceAssistant sending to backend:", {
-          question: text,
-          hasContext: !!contextToSend,
-          fieldName: contextToSend?.fieldName,
-          language:
-            languages.find((l) => l.code === language)?.name || "English",
-        });
 
         const res = await axios.post(
           "http://localhost:5000/api/voice-assistant/ask",
@@ -136,7 +124,6 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
           setError("Failed to get response from AI");
         }
       } catch (error) {
-        console.error("❌ Error processing voice input:", error);
         const errorMsg =
           error.response?.data?.message ||
           error.response?.data?.error ||
@@ -150,6 +137,7 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
     [fieldContext, selectedField, language, fetchFieldContext]
   );
 
+  // SPEAK
   const speakResponse = useCallback(
     (text) => {
       if (!synthRef.current) return;
@@ -179,6 +167,7 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
     [language]
   );
 
+  // LISTEN
   const startListening = useCallback(() => {
     if (!recognitionRef.current) {
       setError("Speech recognition not available");
@@ -194,18 +183,20 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
       recognitionRef.current.lang = language;
       recognitionRef.current.start();
     } catch (error) {
-      console.error("Error starting recognition:", error);
       setError("Could not start listening");
       setIsListening(false);
     }
   }, [language]);
 
-  const stopListening = useCallback(() => {
-    if (recognitionRef.current && isListening) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-    }
-  }, [isListening]);
+  const stopListening = useCallback(
+    () => {
+      if (recognitionRef.current && isListening) {
+        recognitionRef.current.stop();
+        setIsListening(false);
+      }
+    },
+    [isListening]
+  );
 
   const stopSpeaking = useCallback(() => {
     if (synthRef.current) {
@@ -220,7 +211,7 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
     }
   }, [selectedField, fetchFieldContext]);
 
-  // 👈 useEffect AFTER all functions (NO processVoiceInput dependency)
+  // INIT SPEECH RECOGNITION
   useEffect(() => {
     if (
       !("webkitSpeechRecognition" in window) &&
@@ -241,11 +232,10 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
       const text = event.results[0][0].transcript;
       setTranscript(text);
       setIsListening(false);
-      processVoiceInput(text); // ✅ SAFE - function exists
+      processVoiceInput(text);
     };
 
     recognitionRef.current.onerror = (event) => {
-      console.error("Speech recognition error:", event.error);
       setError(`Recognition error: ${event.error}`);
       setIsListening(false);
     };
@@ -262,9 +252,9 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
         synthRef.current.cancel();
       }
     };
-  }, [language]); // ✅ ONLY language dependency
+  }, [language, processVoiceInput]);
 
-  // Auto-fetch field context
+  // AUTO FIELD CONTEXT
   useEffect(() => {
     if (selectedField?._id) {
       fetchFieldContext(selectedField._id);
@@ -274,69 +264,91 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
     }
   }, [selectedField, fetchFieldContext]);
 
-  const canListen =
-    !isProcessing &&
-    !isSpeaking &&
-    (!selectedField || fieldContext !== null || !contextLoadError);
+  const canListen = !isProcessing && !isSpeaking;
+
+  const handleTextSubmit = (e) => {
+    e?.preventDefault();
+    if (!textInput.trim() || isProcessing || isSpeaking) return;
+    const q = textInput.trim();
+    setTextInput("");
+    setTranscript(q);
+    processVoiceInput(q);
+  };
 
   return (
     <div
-      className={`fixed ${isExpanded ? "inset-4" : "bottom-4 right-4 w-96"} 
-      bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 
-      rounded-3xl shadow-2xl border-2 border-purple-200 
-      transition-all duration-300 z-50 flex flex-col max-h-[90vh]`}
+      className={`fixed ${
+        isExpanded 
+          ? "inset-2 sm:inset-6" 
+          : "bottom-4 right-2 left-2 sm:left-auto sm:right-6 sm:w-[380px]"
+      } 
+      max-h-[90vh]
+      rounded-3xl shadow-[0_24px_80px_rgba(15,23,42,0.75)]
+      border border-emerald-500/30
+      bg-emerald-900/40
+      backdrop-blur-2xl
+      overflow-hidden
+      transition-all duration-300
+      z-50 flex flex-col`}
     >
-      {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-teal-600 rounded-t-3xl p-4 flex items-center justify-between flex-shrink-0">
+      {/* EMERALD BACKGROUND DECOR (matches Dashboard) */}
+      <div className="absolute inset-0 pointer-events-none opacity-20">
+        <CircleDashed className="absolute -top-10 -left-10 w-40 h-40 text-emerald-400/40" />
+        <Flower2 className="absolute -bottom-16 -right-6 w-52 h-52 text-emerald-500/20" />
+        <div className="absolute inset-0 bg-[radial-gradient(#22c55e_1px,transparent_1px)] [background-size:28px_28px] opacity-[0.12]" />
+      </div>
+
+      {/* HEADER */}
+      <div className="relative bg-gradient-to-r from-emerald-700 via-emerald-600 to-emerald-500 rounded-t-3xl p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-xl">
-            <Brain className="w-6 h-6 text-white" />
+          <div className="w-10 h-10 bg-emerald-900/40 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-900/40">
+            <Brain className="w-6 h-6 text-emerald-50" />
           </div>
           <div>
-            <h3 className="text-white font-bold text-lg">
-              Farm Voice Assistant
+            <h3 className="text-emerald-50 font-bold text-lg tracking-tight">
+              Sigro Voice Core
             </h3>
-            <p className="text-white/80 text-xs">
+            <p className="text-emerald-100/80 text-xs">
               {selectedField
                 ? `Field: ${selectedField.fieldName}`
-                : "Ask me anything"}
+                : "Ask anything about your farm"}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-2 bg-white/20 hover:bg-white/30 rounded-xl transition-all"
+            className="p-2 bg-emerald-900/40 hover:bg-emerald-900/60 rounded-xl transition-all"
           >
             {isExpanded ? (
-              <Minimize2 className="w-5 h-5 text-white" />
+              <Minimize2 className="w-5 h-5 text-emerald-50" />
             ) : (
-              <Maximize2 className="w-5 h-5 text-white" />
+              <Maximize2 className="w-5 h-5 text-emerald-50" />
             )}
           </button>
           <button
             onClick={onClose}
-            className="p-2 bg-red-500/50 hover:bg-red-500 rounded-xl transition-all"
+            className="p-2 bg-red-500/70 hover:bg-red-500 rounded-xl transition-all"
           >
             <X className="w-5 h-5 text-white" />
           </button>
         </div>
       </div>
 
-      {/* Language Selector */}
-      <div className="p-4 border-b border-purple-200 bg-white/50 flex-shrink-0">
-        <label className="text-sm font-semibold text-gray-700 mb-2 block">
-          Select Language:
+      {/* LANGUAGE BAR */}
+      <div className="relative p-4 border-b border-emerald-500/20 bg-emerald-900/40 backdrop-blur-xl">
+        <label className="text-xs font-semibold text-emerald-100 mb-2 block tracking-wider uppercase">
+          Language
         </label>
         <div className="flex gap-2 flex-wrap">
           {languages.map((lang) => (
             <button
               key={lang.code}
               onClick={() => setLanguage(lang.code)}
-              className={`px-3 py-2 rounded-xl font-medium transition-all text-xs ${
+              className={`px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all border ${
                 language === lang.code
-                  ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg"
-                  : "bg-white text-gray-700 hover:bg-gray-100"
+                  ? "bg-emerald-500 text-emerald-950 border-emerald-300 shadow-lg shadow-emerald-500/40"
+                  : "bg-emerald-900/40 text-emerald-100/80 border-emerald-700 hover:bg-emerald-800/70"
               }`}
             >
               {lang.display}
@@ -345,72 +357,74 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
+      {/* MAIN CONTENT */}
+      <div className="relative flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
         {/* Field Info Card */}
         {selectedField && (
-          <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-4 border border-blue-200">
+          <div className="bg-emerald-900/50 backdrop-blur-xl rounded-2xl p-4 border border-emerald-500/30">
             {isLoadingContext ? (
               <div className="flex items-center justify-center gap-2 py-4">
-                <Loader className="w-5 h-5 text-blue-600 animate-spin" />
-                <span className="text-sm text-gray-600">
-                  Loading field data...
+                <Loader className="w-5 h-5 text-emerald-400 animate-spin" />
+                <span className="text-xs text-emerald-100/80">
+                  Syncing field telemetry...
                 </span>
               </div>
             ) : fieldContext ? (
               <>
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-bold text-gray-800 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-blue-600" />
-                    Field Data Ready ✅
+                  <h4 className="font-semibold text-emerald-50 flex items-center gap-2 text-sm">
+                    <Sparkles className="w-4 h-4 text-emerald-300" />
+                    Context loaded
                   </h4>
                   <button
                     onClick={retryFetchContext}
-                    className="p-1 hover:bg-blue-100 rounded-lg transition-all"
+                    className="p-1 hover:bg-emerald-800/70 rounded-lg transition-all"
                     title="Refresh data"
                   >
-                    <RefreshCw className="w-4 h-4 text-blue-600" />
+                    <RefreshCw className="w-4 h-4 text-emerald-200" />
                   </button>
                 </div>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-lg">
-                    <Activity className="w-4 h-4 text-green-600 flex-shrink-0" />
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="flex items-center gap-2 p-2 rounded-xl bg-emerald-900/70 border border-emerald-600/40">
+                    <Activity className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                     <div>
-                      <span className="text-gray-600 text-xs block">Crop</span>
-                      <p className="font-semibold text-gray-800">
+                      <span className="text-emerald-300/80 text-[10px] block">
+                        Crop
+                      </span>
+                      <p className="font-semibold text-emerald-50">
                         {fieldContext.cropType}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-lg">
-                    <Droplets className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  <div className="flex items-center gap-2 p-2 rounded-xl bg-emerald-900/70 border border-emerald-600/40">
+                    <Droplets className="w-4 h-4 text-cyan-400 flex-shrink-0" />
                     <div>
-                      <span className="text-gray-600 text-xs block">
+                      <span className="text-emerald-300/80 text-[10px] block">
                         Moisture
                       </span>
-                      <p className="font-semibold text-gray-800">
+                      <p className="font-semibold text-emerald-50">
                         {fieldContext.soilMoisture ?? "N/A"}%
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 p-2 bg-orange-50 rounded-lg">
-                    <Thermometer className="w-4 h-4 text-orange-600 flex-shrink-0" />
+                  <div className="flex items-center gap-2 p-2 rounded-xl bg-emerald-900/70 border border-emerald-600/40">
+                    <Thermometer className="w-4 h-4 text-orange-300 flex-shrink-0" />
                     <div>
-                      <span className="text-gray-600 text-xs block">
+                      <span className="text-emerald-300/80 text-[10px] block">
                         Temperature
                       </span>
-                      <p className="font-semibold text-gray-800">
+                      <p className="font-semibold text-emerald-50">
                         {fieldContext.temperature ?? "N/A"}°C
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 p-2 bg-emerald-50 rounded-lg">
-                    <Activity className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                  <div className="flex items-center gap-2 p-2 rounded-xl bg-emerald-900/70 border border-emerald-600/40">
+                    <Activity className="w-4 h-4 text-lime-300 flex-shrink-0" />
                     <div>
-                      <span className="text-gray-600 text-xs block">
+                      <span className="text-emerald-300/80 text-[10px] block">
                         Health
                       </span>
-                      <p className="font-semibold text-gray-800">
+                      <p className="font-semibold text-emerald-50">
                         {fieldContext.healthScore ?? "N/A"}%
                       </p>
                     </div>
@@ -419,13 +433,13 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
               </>
             ) : (
               <div className="text-center py-6">
-                <AlertCircle className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
-                <p className="text-sm text-gray-600 mb-3">
-                  Could not load field data
+                <AlertCircle className="w-7 h-7 text-amber-400 mx-auto mb-2" />
+                <p className="text-xs text-emerald-100/80 mb-3">
+                  Could not load field data.
                 </p>
                 <button
                   onClick={retryFetchContext}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 mx-auto"
+                  className="text-xs text-emerald-300 hover:text-emerald-200 font-medium flex items-center gap-1 mx-auto"
                 >
                   <RefreshCw className="w-4 h-4" />
                   Try again
@@ -435,78 +449,78 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
           </div>
         )}
 
-        {/* Error Display */}
+        {/* Error */}
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-xl animate-pulse">
+          <div className="bg-red-900/40 border-l-4 border-red-500 p-3 rounded-xl backdrop-blur-lg">
             <div className="flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-              <p className="text-red-700 text-sm font-medium">{error}</p>
+              <AlertCircle className="w-4 h-4 text-red-300 flex-shrink-0" />
+              <p className="text-xs text-red-100 font-medium">{error}</p>
             </div>
           </div>
         )}
 
-        {/* Conversation History */}
-        <div className="space-y-3 max-h-64 overflow-y-auto">
+        {/* Conversation */}
+        <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
           {conversationHistory.map((msg, index) => (
             <div
               key={index}
-              className={`p-4 rounded-2xl shadow-sm ${
+              className={`p-3 rounded-2xl text-xs leading-relaxed border backdrop-blur-xl ${
                 msg.type === "user"
-                  ? "bg-blue-100 border-l-4 border-blue-500 ml-4 md:ml-8"
-                  : "bg-green-100 border-l-4 border-green-500 mr-4 md:mr-8"
+                  ? "bg-emerald-900/60 border-emerald-600/60 ml-4 md:ml-10"
+                  : "bg-emerald-800/60 border-emerald-500/70 mr-4 md:mr-10"
               }`}
             >
               <div className="flex items-center gap-2 mb-1">
                 <span
-                  className={`w-2 h-2 rounded-full ${
-                    msg.type === "user" ? "bg-blue-500" : "bg-green-500"
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    msg.type === "user"
+                      ? "bg-emerald-300"
+                      : "bg-emerald-400"
                   }`}
-                ></span>
-                <p className="text-xs font-semibold text-gray-700">
-                  {msg.type === "user" ? "👨‍🌾 You" : "🤖 Assistant"}
+                />
+                <p className="text-[10px] font-semibold text-emerald-100/90">
+                  {msg.type === "user" ? "You" : "Sigro Assistant"}
                 </p>
+                <span className="text-[10px] text-emerald-300/70 ml-auto">
+                  {msg.timestamp.toLocaleTimeString()}
+                </span>
               </div>
-              <p className="text-gray-800 text-sm leading-relaxed">
-                {msg.text}
-              </p>
-              <p className="text-xs text-gray-500 mt-2">
-                {msg.timestamp.toLocaleTimeString()}
-              </p>
+              <p className="text-emerald-50">{msg.text}</p>
             </div>
           ))}
         </div>
 
-        {/* Current Transcript */}
+        {/* Transcript */}
         {transcript && !response && (
-          <div className="bg-blue-100 border-l-4 border-blue-500 p-4 rounded-2xl ml-4 md:ml-8 animate-pulse">
-            <p className="text-sm font-semibold text-blue-700 mb-1">
-              👨‍🌾 You said:
+          <div className="bg-emerald-900/60 border border-emerald-600/60 p-3 rounded-2xl ml-4 md:ml-10">
+            <p className="text-[11px] font-semibold text-emerald-300 mb-1">
+              You said
             </p>
-            <p className="text-gray-800 text-sm">{transcript}</p>
+            <p className="text-emerald-50 text-xs">{transcript}</p>
           </div>
         )}
 
-        {/* Current Response */}
+        {/* Response */}
         {response && (
-          <div className="bg-green-100 border-l-4 border-green-500 p-4 rounded-2xl mr-4 md:mr-8 animate-fade-in">
-            <p className="text-sm font-semibold text-green-700 mb-1">
-              🤖 Assistant:
+          <div className="bg-emerald-800/60 border border-emerald-500/70 p-3 rounded-2xl mr-4 md:mr-10 animate-fade-in">
+            <p className="text-[11px] font-semibold text-emerald-300 mb-1">
+              Assistant
             </p>
-            <p className="text-gray-800 text-sm leading-relaxed">{response}</p>
+            <p className="text-emerald-50 text-xs leading-relaxed">{response}</p>
           </div>
         )}
 
-        {/* Processing Indicator */}
+        {/* Processing */}
         {isProcessing && (
-          <div className="flex flex-col items-center justify-center gap-3 p-8">
-            <div className="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center">
-              <Loader className="w-6 h-6 text-purple-600 animate-spin" />
+          <div className="flex flex-col items-center justify-center gap-2 p-6">
+            <div className="w-11 h-11 bg-emerald-900/60 rounded-2xl flex items-center justify-center border border-emerald-500/60">
+              <Loader className="w-5 h-5 text-emerald-300 animate-spin" />
             </div>
-            <span className="text-purple-600 font-medium text-sm">
-              Processing your question...
+            <span className="text-xs text-emerald-100 font-medium">
+              Thinking with your field data...
             </span>
-            <p className="text-xs text-gray-500">
-              {fieldContext ? "Using field data..." : "General advice..."}
+            <p className="text-[10px] text-emerald-300/70">
+              {fieldContext ? "Context-aware agronomy insights." : "General guidance mode."}
             </p>
           </div>
         )}
@@ -516,81 +530,122 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
           !isProcessing &&
           conversationHistory.length === 0 &&
           !error && (
-            <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
-              <p className="text-sm font-semibold text-purple-700 mb-3 flex items-center gap-2">
-                <Sparkles className="w-4 h-4" />
-                Try asking:
+            <div className="bg-emerald-900/50 rounded-2xl p-4 border border-emerald-600/50">
+              <p className="text-xs font-semibold text-emerald-200 mb-2 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-emerald-300" />
+                Try asking
               </p>
-              <div className="grid grid-cols-1 gap-2 text-sm text-purple-600">
-                <div>• "Should I water my field today?"</div>
-                <div>• "What's the soil moisture level?"</div>
-                <div>• "Is my crop healthy?"</div>
-                <div>• "When should I fertilize?"</div>
-                <div>• "What's the weather like?"</div>
+              <div className="grid grid-cols-1 gap-1.5 text-[11px] text-emerald-100/80">
+                {[
+                  "Should I irrigate this field today?",
+                  "What is my current soil moisture?",
+                  "How healthy is my crop?",
+                  "When should I apply fertilizer?",
+                  "Any risk of disease this week?",
+                ].map((q, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setTranscript(q);
+                      processVoiceInput(q);
+                    }}
+                    className="text-left hover:text-emerald-300 transition-colors cursor-pointer py-0.5 flex items-center gap-1 group"
+                  >
+                    <span className="text-emerald-400 group-hover:translate-x-0.5 transition-transform">•</span>
+                    <span>{q}</span>
+                  </button>
+                ))}
               </div>
             </div>
           )}
       </div>
 
-      {/* Control Panel */}
-      <div className="p-4 bg-white/70 backdrop-blur-xl rounded-b-3xl border-t border-purple-200 flex-shrink-0">
+      {/* CONTROL PANEL */}
+      <div className="relative p-4 bg-emerald-950/70 backdrop-blur-2xl border-t border-emerald-700/60 rounded-b-3xl">
+        {/* TEXT INPUT FORM */}
+        <form onSubmit={handleTextSubmit} className="flex items-center gap-2 mb-3">
+          <input
+            type="text"
+            value={textInput}
+            onChange={(e) => setTextInput(e.target.value)}
+            placeholder="Type your question or click mic..."
+            disabled={isProcessing || isSpeaking}
+            className="flex-1 bg-emerald-900/60 border border-emerald-600/60 rounded-xl px-3 py-2 text-xs text-white placeholder-emerald-300/50 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          />
+          <button
+            type="submit"
+            disabled={!textInput.trim() || isProcessing || isSpeaking}
+            className="px-3 py-2 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 text-emerald-950 font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-1"
+          >
+            Ask
+          </button>
+        </form>
+
         <div className="flex items-center justify-center gap-4 mb-3">
           <button
             onClick={isListening ? stopListening : startListening}
             disabled={!canListen}
-            className={`w-16 h-16 rounded-full flex items-center justify-center transition-all transform hover:scale-110 shadow-xl group ${
+            className={`w-16 h-16 rounded-full flex items-center justify-center transition-all transform hover:scale-110 shadow-xl ${
               isListening
-                ? "bg-red-500 hover:bg-red-600 animate-pulse shadow-red-500/50"
+                ? "bg-red-500 shadow-red-500/60 animate-pulse"
                 : isProcessing || isSpeaking
-                ? "bg-gray-400 cursor-not-allowed shadow-gray-300"
-                : !selectedField || !fieldContext
-                ? "bg-orange-400 hover:bg-orange-500 cursor-wait shadow-orange-300"
-                : "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-purple-500/50"
+                ? "bg-slate-500/60 cursor-not-allowed shadow-slate-600/40"
+                : "bg-gradient-to-br from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 shadow-emerald-500/70"
             }`}
-            title={!canListen ? "Loading field data..." : "Click to speak"}
+            title={
+              !canListen
+                ? "Please wait, processing..."
+                : "Tap to talk with Sigro"
+            }
           >
             {isListening ? (
-              <MicOff className="w-8 h-8 text-white" />
+              <MicOff className="w-7 h-7 text-white" />
             ) : (
-              <Mic className="w-8 h-8 text-white" />
+              <Mic className="w-7 h-7 text-emerald-950" />
             )}
           </button>
 
           <button
             onClick={isSpeaking ? stopSpeaking : null}
             disabled={!isSpeaking}
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+            className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${
               isSpeaking
-                ? "bg-green-500 hover:bg-green-600 animate-pulse shadow-green-500/50"
-                : "bg-gray-300 cursor-not-allowed"
+                ? "bg-emerald-500 hover:bg-emerald-400 shadow-lg shadow-emerald-500/60"
+                : "bg-slate-700/60 cursor-not-allowed"
             }`}
           >
             {isSpeaking ? (
-              <VolumeX className="w-6 h-6 text-white" />
+              <VolumeX className="w-6 h-6 text-emerald-950" />
             ) : (
-              <Volume2 className="w-6 h-6 text-gray-500" />
+              <Volume2 className="w-6 h-6 text-slate-400" />
             )}
           </button>
         </div>
 
         <div className="text-center space-y-1">
-          <p className="text-sm text-gray-700 font-medium">
+          <p className="text-xs text-emerald-100 font-medium">
             {isListening
-              ? "🎤 Listening... Speak now!"
+              ? "🎤 Listening... speak clearly near the mic."
               : isProcessing
-              ? "🧠 Thinking..."
+              ? "🧠 Generating agronomy advice..."
               : isSpeaking
-              ? "🔊 Speaking..."
+              ? "🔊 Playing response..."
               : selectedField && !fieldContext && !isLoadingContext
-              ? "⏳ Loading field data..."
-              : "🎤 Ready to answer field questions"}
+              ? "⏳ Preparing field intelligence..."
+              : "🎤 Ready for your next field question."}
           </p>
           <p
-            className={`text-xs ${
-              fieldContext ? "text-emerald-600 font-medium" : "text-gray-500"
+            className={`text-[11px] ${
+              fieldContext
+                ? "text-emerald-400 font-medium"
+                : "text-emerald-300/70"
             }`}
           >
-            {fieldContext ? "✅ Field data loaded" : "No field selected"}
+            {fieldContext
+              ? "✅ Context-aware: using live field data"
+              : selectedField
+              ? "Context loading for selected field..."
+              : "No field selected – answering in general mode"}
           </p>
         </div>
       </div>
@@ -607,7 +662,7 @@ const VoiceAssistant = ({ selectedField, fields, onClose }) => {
           }
         }
         .animate-fade-in {
-          animation: fade-in 0.3s ease-out;
+          animation: fade-in 0.25s ease-out;
         }
       `}</style>
     </div>

@@ -79,29 +79,29 @@ const ContactSection = () => {
   const current = contentData[activeTab];
 
   return (
-    <div id="contact-carousel" className="relative min-h-screen py-28 px-10 overflow-hidden font-sans bg-[#064e3b]">
+    <div id="contact-carousel" className="relative min-h-screen py-16 md:py-28 px-4 sm:px-6 md:px-10 overflow-hidden font-sans bg-[#064e3b]">
       
       {/* Background Decorations */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-10">
         <motion.div animate={{ rotate: 360 }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }} className="absolute -top-24 -left-24">
-          <CircleDashed className="w-[500px] h-[500px] text-white" />
+          <CircleDashed className="w-[300px] md:w-[500px] h-[300px] md:h-[500px] text-white" />
         </motion.div>
         <motion.div animate={{ scale: [1, 1.1, 1], rotate: [0, 5, 0] }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }} className="absolute bottom-10 right-0 translate-x-1/4">
-          <Flower2 className="w-[600px] h-[600px] text-white" />
+          <Flower2 className="w-[300px] md:w-[600px] h-[300px] md:h-[600px] text-white" />
         </motion.div>
       </div>
 
       <div className="relative z-10 max-w-[1400px] mx-auto">
-        {/* Carousel Navigation */}
-        <div className="flex justify-center mb-24">
-          <div className="inline-flex p-2 bg-emerald-900/40 backdrop-blur-3xl rounded-[2.5rem] border border-emerald-800/50 shadow-2xl">
+        {/* Carousel Navigation - Scrollable on mobile */}
+        <div className="flex justify-center mb-12 md:mb-24">
+          <div className="inline-flex p-1.5 md:p-2 bg-emerald-900/40 backdrop-blur-3xl rounded-[2rem] md:rounded-[2.5rem] border border-emerald-800/50 shadow-2xl overflow-x-auto max-w-full no-scrollbar">
             {Object.keys(contentData).map((tab) => (
               <motion.button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className={`px-10 py-4 text-[10px] font-black uppercase tracking-[0.3em] rounded-full transition-all duration-500 ${
+                className={`px-4 sm:px-6 md:px-10 py-3 md:py-4 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] rounded-full transition-all duration-500 whitespace-nowrap flex-shrink-0 ${
                   activeTab === tab
                     ? 'bg-emerald-50 text-emerald-900 shadow-xl'
                     : 'text-emerald-100 hover:text-white hover:bg-emerald-800/50'
@@ -122,14 +122,14 @@ const ContactSection = () => {
             transition={{ duration: 0.5 }}
           >
             {/* Top Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-32 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10 mb-16 md:mb-32 items-center">
               <div className="lg:col-span-5">
-                <div className="inline-flex items-center gap-3 px-6 py-2.5 bg-emerald-900/50 backdrop-blur-md rounded-2xl border border-emerald-800/50 mb-10">
+                <div className="inline-flex items-center gap-3 px-5 md:px-6 py-2 md:py-2.5 bg-emerald-900/50 backdrop-blur-md rounded-2xl border border-emerald-800/50 mb-6 md:mb-10">
                   <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_rgba(16,185,129,1)]"></div>
                   <span className="text-[10px] font-black text-emerald-100 uppercase tracking-widest">{activeTab} Syncing</span>
                 </div>
                 
-                <h1 className="text-8xl lg:text-9xl font-black text-white mb-10 leading-[0.8] tracking-tighter uppercase">
+                <h1 className="text-6xl sm:text-7xl lg:text-9xl font-black text-white mb-6 md:mb-10 leading-[0.8] tracking-tighter uppercase">
                   {current.title} <br />
                   <span className="text-emerald-400 relative italic">
                     {current.subtitle}
@@ -137,74 +137,83 @@ const ContactSection = () => {
                   </span>
                 </h1>
                 
-                <div className="flex items-start gap-6 border-l-4 border-emerald-400 pl-8 py-4">
-                  <p className="text-lg text-emerald-100/70 font-semibold leading-relaxed max-w-sm">
+                <div className="flex items-start gap-6 border-l-4 border-emerald-400 pl-6 md:pl-8 py-4">
+                  <p className="text-base md:text-lg text-emerald-100/70 font-semibold leading-relaxed max-w-sm">
                     {current.description}
                   </p>
                 </div>
               </div>
 
-              <div className="lg:col-span-7 grid grid-cols-12 gap-6 relative">
+              <div className="lg:col-span-7 grid grid-cols-12 gap-4 md:gap-6 relative">
                 <motion.div className="col-span-8 relative perspective-1000">
-                  <div className="h-[450px] rounded-[4rem] bg-cover bg-center border-[12px] border-emerald-900 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.6)] overflow-hidden relative group"
+                  <div className="h-[250px] sm:h-[350px] md:h-[450px] rounded-[2.5rem] md:rounded-[4rem] bg-cover bg-center border-[8px] md:border-[12px] border-emerald-900 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.6)] overflow-hidden relative group"
                     style={{ backgroundImage: `url(${current.mainImage})` }}>
                     <div className="absolute inset-0 bg-emerald-950/20"></div>
-                    <div className="absolute top-10 left-10 p-6 bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 shadow-2xl">
-                        <Globe size={24} className="text-emerald-400 mb-2" />
+                    <div className="absolute top-6 left-6 md:top-10 md:left-10 p-4 md:p-6 bg-white/5 backdrop-blur-xl rounded-[2rem] md:rounded-[2.5rem] border border-white/10 shadow-2xl">
+                        <Globe size={20} className="text-emerald-400 mb-2" />
                         <p className="text-white font-black text-xs uppercase tracking-widest">Global Link</p>
                     </div>
                   </div>
                 </motion.div>
 
                 <div className="col-span-4 self-end">
-                  <div className="h-64 rounded-[3rem] bg-white/5 backdrop-blur-xl border-[4px] border-emerald-400/20 shadow-2xl flex flex-col items-center justify-center p-8 text-center text-white">
-                    <ShieldCheck size={48} className="text-emerald-400 mb-4" />
-                    <p className="font-black uppercase tracking-widest text-[10px]">Vault Secured</p>
-                    <p className="text-xs text-emerald-200/60 mt-2 font-bold italic tracking-wider">Protocol Locked</p>
+                  <div className="h-40 sm:h-52 md:h-64 rounded-[2rem] md:rounded-[3rem] bg-white/5 backdrop-blur-xl border-[4px] border-emerald-400/20 shadow-2xl flex flex-col items-center justify-center p-5 md:p-8 text-center text-white">
+                    <ShieldCheck size={36} className="text-emerald-400 mb-3 md:mb-4" />
+                    <p className="font-black uppercase tracking-widest text-[9px] md:text-[10px]">Vault Secured</p>
+                    <p className="text-xs text-emerald-200/60 mt-2 font-bold italic tracking-wider hidden sm:block">Protocol Locked</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Bottom Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
               <div className="relative group">
-                <div className="h-[600px] rounded-[5rem] bg-cover bg-center border-[15px] border-emerald-900 shadow-2xl relative z-0 overflow-hidden"
+                <div className="h-[350px] sm:h-[450px] md:h-[600px] rounded-[3rem] md:rounded-[5rem] bg-cover bg-center border-[8px] md:border-[15px] border-emerald-900 shadow-2xl relative z-0 overflow-hidden"
                   style={{ backgroundImage: `url(${current.floatingImage})` }}>
                    <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 to-transparent"></div>
                 </div>
 
-                <motion.div className="absolute -right-10 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-2xl p-12 rounded-[4rem] border border-white/20 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.7)] max-w-md z-10">
-                  <h3 className="text-4xl font-black text-white mb-6 tracking-tighter leading-none uppercase">
+                {/* AI Core Card - Repositioned on mobile */}
+                <motion.div className="
+                  mx-4 mt-4 md:mt-0
+                  relative md:absolute md:-right-10 md:top-1/2 md:-translate-y-1/2
+                  bg-white/10 backdrop-blur-2xl p-6 md:p-12
+                  rounded-[2rem] md:rounded-[4rem]
+                  border border-white/20
+                  shadow-[0_50px_100px_-20px_rgba(0,0,0,0.7)]
+                  md:max-w-md z-10
+                ">
+                  <h3 className="text-2xl md:text-4xl font-black text-white mb-4 md:mb-6 tracking-tighter leading-none uppercase">
                     AI <span className="text-emerald-400 italic">Core</span>
                   </h3>
                   
-                  <div className="space-y-6 mb-10">
+                  <div className="space-y-4 md:space-y-6 mb-6 md:mb-10">
                     {current.features.map((item, i) => (
-                      <div key={i} className="flex items-center gap-4 group cursor-pointer">
-                        <div className="p-3 bg-emerald-400/10 rounded-2xl group-hover:bg-emerald-400 group-hover:text-emerald-950 transition-all duration-300 border border-emerald-400/20">
-                           <item.icon size={20} className="text-emerald-400 group-hover:text-emerald-950" />
+                      <div key={i} className="flex items-center gap-3 md:gap-4 group cursor-pointer">
+                        <div className="p-2 md:p-3 bg-emerald-400/10 rounded-xl md:rounded-2xl group-hover:bg-emerald-400 group-hover:text-emerald-950 transition-all duration-300 border border-emerald-400/20">
+                           <item.icon size={18} className="text-emerald-400 group-hover:text-emerald-950" />
                         </div>
-                        <p className="font-bold text-white/80 text-sm tracking-tight uppercase tracking-wider">{item.text}</p>
+                        <p className="font-bold text-white/80 text-xs md:text-sm tracking-tight uppercase tracking-wider">{item.text}</p>
                       </div>
                     ))}
                   </div>
                   
-                  <motion.button whileHover={{ scale: 1.05, letterSpacing: '0.4em' }} className="w-full py-5 bg-emerald-50 text-emerald-900 font-black rounded-3xl transition-all uppercase tracking-[0.2em] text-[10px] shadow-2xl">
+                  <motion.button whileHover={{ scale: 1.05, letterSpacing: '0.4em' }} className="w-full py-4 md:py-5 bg-emerald-50 text-emerald-900 font-black rounded-2xl md:rounded-3xl transition-all uppercase tracking-[0.2em] text-[10px] shadow-2xl">
                     Access System
                   </motion.button>
                 </motion.div>
               </div>
 
-              <div className="lg:pl-20">
-                <motion.p className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-400 mb-6">Market Statistics</motion.p>
-                <h2 className="text-7xl font-black text-white mb-12 tracking-tighter leading-none uppercase italic">Global <br /> Precision.</h2>
+              <div className="md:pl-10 lg:pl-20">
+                <motion.p className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-400 mb-4 md:mb-6">Market Statistics</motion.p>
+                <h2 className="text-5xl sm:text-6xl md:text-7xl font-black text-white mb-8 md:mb-12 tracking-tighter leading-none uppercase italic">Global <br /> Precision.</h2>
                 
-                <div className="space-y-8">
+                <div className="space-y-5 md:space-y-8">
                   {current.stats.map((card, i) => (
-                    <motion.div key={i} whileHover={{ x: 20 }} className="p-10 bg-white/5 backdrop-blur-md rounded-[3.5rem] border border-white/10 shadow-2xl relative overflow-hidden group">
+                    <motion.div key={i} whileHover={{ x: 10 }} className="p-6 md:p-10 bg-white/5 backdrop-blur-md rounded-[2rem] md:rounded-[3.5rem] border border-white/10 shadow-2xl relative overflow-hidden group">
                       <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-400 rounded-full -mr-20 -mt-20 opacity-5"></div>
-                      <p className="text-7xl font-black text-emerald-400 mb-4 tracking-tighter">{card.val}</p>
+                      <p className="text-4xl md:text-7xl font-black text-emerald-400 mb-3 md:mb-4 tracking-tighter">{card.val}</p>
                       <div className="relative z-10">
                         <p className="text-xs font-black uppercase tracking-widest text-white mb-2">{card.label}</p>
                         <p className="text-sm font-medium text-emerald-100/60 leading-relaxed font-bold tracking-wide">{card.desc}</p>

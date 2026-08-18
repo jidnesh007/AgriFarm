@@ -185,7 +185,7 @@ const Weather = () => {
             </div>
             {t('weather.navigation.backToDashboard')}
           </button>
-          <div className="bg-white/40 backdrop-blur-md rounded-[40px] p-20 text-center border-2 border-dashed border-emerald-200">
+          <div className="bg-white/40 backdrop-blur-md rounded-[2.5rem] p-8 md:p-20 text-center border-2 border-dashed border-emerald-200">
             <MapPin size={64} className="mx-auto text-emerald-200 mb-4" />
             <h3 className="text-2xl font-bold text-emerald-900 mb-2">{t('weather.noLocation.title')}</h3>
             <p className="text-emerald-600 mb-8 max-w-sm mx-auto">{t('weather.noLocation.description')}</p>
@@ -199,7 +199,7 @@ const Weather = () => {
     <div className="relative space-y-6 animate-in fade-in duration-500">
       {/* Notification Toast */}
       {notification && (
-        <div className="fixed top-20 right-6 z-50 animate-in slide-in-from-right duration-300">
+        <div className="fixed top-20 left-4 right-4 sm:left-auto sm:right-6 sm:w-auto z-50 animate-in slide-in-from-right duration-300">
           <div className={`${getNotificationStyles(notification.type)} border-l-4 rounded-xl p-4 shadow-2xl backdrop-blur-sm max-w-md flex items-start gap-3`}>
             {getNotificationIcon(notification.type)}
             <div className="flex-1">
@@ -279,31 +279,31 @@ const Weather = () => {
             {/* Main Weather Row */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Main Weather Card (Hero) */}
-              <div className="lg:col-span-2 bg-emerald-900 rounded-[32px] p-8 text-white shadow-2xl relative overflow-hidden group">
+              <div className="lg:col-span-2 bg-emerald-900 rounded-[24px] md:rounded-[32px] p-5 md:p-8 text-white shadow-2xl relative overflow-hidden group">
                 <Flower2 className="absolute -right-10 -bottom-10 w-64 h-64 opacity-10 group-hover:rotate-12 transition-transform duration-1000" />
                 <div className="relative z-10">
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-4">
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="space-y-3 md:space-y-4 min-w-0">
                       <div className="flex items-center gap-2 text-emerald-300 font-bold uppercase tracking-widest text-xs">
                         <MapPin size={14} />
-                        {weatherData.current.location.name}
+                        <span className="truncate">{weatherData.current.location.name}</span>
                       </div>
-                      <div className="flex items-baseline gap-4">
-                        <h2 className="text-8xl font-black tracking-tighter">
+                      <div className="flex items-baseline gap-3 md:gap-4 flex-wrap">
+                        <h2 className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tighter">
                           {Math.round(weatherData.current.weather.temperature)}°
                         </h2>
                         <div className="space-y-1">
-                          <p className="text-2xl font-bold text-emerald-200 capitalize leading-none">{weatherData.current.weather.description}</p>
+                          <p className="text-lg md:text-2xl font-bold text-emerald-200 capitalize leading-none">{weatherData.current.weather.description}</p>
                           <p className="text-sm font-medium text-emerald-400 opacity-80">{t('weather.current.feelsLike', { temp: Math.round(weatherData.current.weather.feelsLike) })}</p>
                         </div>
                       </div>
                     </div>
-                    <div className="p-8 bg-white/10 backdrop-blur-xl rounded-[40px] border border-white/20 shadow-inner group-hover:scale-105 transition-transform">
+                    <div className="p-4 md:p-8 bg-white/10 backdrop-blur-xl rounded-[2rem] md:rounded-[40px] border border-white/20 shadow-inner group-hover:scale-105 transition-transform flex-shrink-0">
                       {getWeatherIcon(weatherData.current.weather.main)}
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4 mt-12 pt-6 border-t border-white/10">
+                  <div className="grid grid-cols-3 gap-2 md:gap-4 mt-6 md:mt-12 pt-4 md:pt-6 border-t border-white/10">
                     {[
                       { icon: <Droplets size={18}/>, label: t('weather.current.humidity'), val: `${weatherData.current.weather.humidity}%` },
                       { icon: <Wind size={18}/>, label: t('weather.current.windSpeed'), val: `${weatherData.current.weather.windSpeed.toFixed(1)} m/s` },

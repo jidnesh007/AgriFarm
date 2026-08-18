@@ -35,9 +35,9 @@ const SigroLanding = () => {
         <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:32px_32px]"></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-8 py-20">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-14 md:py-20">
         {/* Header Section */}
-        <header className="flex flex-col lg:flex-row justify-between items-start gap-10 mb-16">
+        <header className="flex flex-col lg:flex-row justify-between items-start gap-8 md:gap-10 mb-12 md:mb-16">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -45,7 +45,7 @@ const SigroLanding = () => {
             className="flex-[2]"
           >
             <motion.p
-              className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full border border-emerald-200 mb-6"
+              className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full border border-emerald-200 mb-5 md:mb-6"
             >
               <motion.span
                 animate={{ scale: [1, 1.4, 1] }}
@@ -56,7 +56,7 @@ const SigroLanding = () => {
             </motion.p>
             
             <motion.h1
-              className="text-6xl font-black leading-none text-emerald-900 tracking-tighter"
+              className="text-4xl sm:text-5xl md:text-6xl font-black leading-none text-emerald-900 tracking-tighter"
             >
               Explore Sigro Tech <br />
               <span className="text-emerald-400">Revolutionizing</span> <br />
@@ -67,9 +67,9 @@ const SigroLanding = () => {
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
-            className="flex-1 max-w-sm mt-8 lg:mt-16"
+            className="flex-1 max-w-sm lg:mt-16"
           >
-            <p className="text-lg text-emerald-700/80 font-medium leading-relaxed">
+            <p className="text-base md:text-lg text-emerald-700/80 font-medium leading-relaxed">
               Become part of a supportive community dedicated to fostering
               innovation in agriculture. Engage in precision farming tools and data-driven growth.
             </p>
@@ -77,7 +77,7 @@ const SigroLanding = () => {
         </header>
 
         {/* Product Cards - Transparent Glass Style */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 mb-16 md:mb-24">
           {products.map((product, i) => (
             <motion.div
               key={product.label}
@@ -89,7 +89,7 @@ const SigroLanding = () => {
             >
               <motion.div
                 whileHover={{ y: -12 }}
-                className="h-64 rounded-[2.5rem] bg-cover bg-center overflow-hidden border-4 border-white shadow-2xl relative shadow-emerald-900/10"
+                className="h-52 sm:h-60 md:h-64 rounded-[2rem] md:rounded-[2.5rem] bg-cover bg-center overflow-hidden border-4 border-white shadow-2xl relative shadow-emerald-900/10"
                 style={{ backgroundImage: `url('${product.image}')` }}
               >
                 <motion.div
@@ -104,33 +104,33 @@ const SigroLanding = () => {
               </motion.div>
               <div className="flex items-center gap-3 px-2">
                 <div className="p-2 bg-emerald-100 rounded-lg">{product.icon}</div>
-                <p className="text-lg font-black text-emerald-900 uppercase tracking-widest text-sm">{product.label}</p>
+                <p className="text-sm md:text-base font-black text-emerald-900 uppercase tracking-widest">{product.label}</p>
               </div>
             </motion.div>
           ))}
         </section>
 
         {/* Discover Solutions Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
           <motion.section
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             className="max-w-2xl"
           >
-            <h2 className="text-5xl font-black text-emerald-900 tracking-tighter mb-6 leading-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-emerald-900 tracking-tighter mb-5 md:mb-6 leading-tight">
               Discover Sigro Modern <br />
               <span className="text-emerald-400">Farming Solutions.</span>
             </h2>
             
-            <p className="text-lg text-emerald-700/80 leading-relaxed font-medium mb-10">
+            <p className="text-base md:text-lg text-emerald-700/80 leading-relaxed font-medium mb-8 md:mb-10">
               At Sigro, we offer innovative services to revolutionize modern
               agriculture, helping you maximize productivity, minimize environmental
               impact, and achieve sustainable growth using AI insights.
             </p>
             
-            <div className="flex gap-4">
-              <motion.div whileHover={{ scale: 1.1 }} className="p-4 bg-emerald-900 rounded-3xl text-white">
-                <Zap size={24} />
+            <div className="flex gap-4 items-center">
+              <motion.div whileHover={{ scale: 1.1 }} className="p-3 md:p-4 bg-emerald-900 rounded-2xl md:rounded-3xl text-white">
+                <Zap size={22} />
               </motion.div>
               <p className="text-sm font-bold text-emerald-900 max-w-[200px]">AI-Powered efficiency for every field.</p>
             </div>
@@ -138,7 +138,7 @@ const SigroLanding = () => {
 
           {/* Benefits List - Matches Sidebar Nav Style */}
           <section className="w-full">
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               {benefits.map((benefit, i) => (
                 <motion.div
                   key={benefit.num}
@@ -146,17 +146,17 @@ const SigroLanding = () => {
                   whileInView={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.1 }}
                   whileHover={{ x: 10 }}
-                  className={`flex items-center justify-between px-8 py-6 rounded-[2rem] cursor-pointer border-2 transition-all duration-300 ${
+                  className={`flex items-center justify-between px-5 md:px-8 py-5 md:py-6 rounded-[1.5rem] md:rounded-[2rem] cursor-pointer border-2 transition-all duration-300 ${
                     benefit.active
                       ? 'bg-emerald-500 text-white border-emerald-400 shadow-xl shadow-emerald-900/20'
                       : 'bg-white/60 backdrop-blur-md border-emerald-100 text-emerald-900 hover:bg-white hover:border-emerald-300'
                   }`}
                 >
-                  <div className="flex items-center gap-8">
-                    <span className={`text-sm font-black ${benefit.active ? 'text-emerald-100' : 'text-emerald-400'}`}>
+                  <div className="flex items-center gap-4 md:gap-8">
+                    <span className={`text-xs md:text-sm font-black ${benefit.active ? 'text-emerald-100' : 'text-emerald-400'}`}>
                       {benefit.num}
                     </span>
-                    <span className="font-black text-2xl tracking-tighter italic uppercase">
+                    <span className="font-black text-lg sm:text-xl md:text-2xl tracking-tighter italic uppercase">
                       {benefit.title}
                     </span>
                   </div>
@@ -164,7 +164,7 @@ const SigroLanding = () => {
                     animate={{ x: [0, 5, 0] }}
                     transition={{ repeat: Infinity, duration: 1.5 }}
                   >
-                    <ArrowRight size={28} className={benefit.active ? "text-white" : "text-emerald-400"} />
+                    <ArrowRight size={24} className={benefit.active ? "text-white" : "text-emerald-400"} />
                   </motion.div>
                 </motion.div>
               ))}

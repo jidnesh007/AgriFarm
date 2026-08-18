@@ -378,6 +378,269 @@
     "performanceMetrics": "कामगिरी मेट्रिक्स",
     "trends": "कल",
     "insights": "इनसाइट्स",
-    "exportData": "डेटा निर्यात करा"
+    "exportData": "डेटा निर्यात करा",
+    "subtitle": "रीयल-टाइम शेत कामगिरी अंतर्दृष्टी",
+    "loading": {
+      "title": "विश्लेषण लोड होत आहे",
+      "description": "तुमचा शेत डेटा प्रक्रिया करीत आहे..."
+  },
+  
+ 
+    "error": {
+      "title": "अरे! काहीतरी चूक झाली",
+      "tryAgain": "पुन्हा प्रयत्न करा"
+    },
+    "errors": {
+      "fetchFailed": "विश्लेषण डेटा आणण्यात अयशस्वी"
+    },
+    "noData": "कोणताही विश्लेषण डेटा उपलब्ध नाही",
+    "buttons": {
+      "refresh": "रिफ्रेश करा",
+      "exportPDF": "PDF निर्यात करा",
+      "share": "सामायिक करा",
+      "viewDetails": "तपशील पहा",
+      "takeAction": "कारवाई करा",
+      "exportTable": "टेबल निर्यात करा"
+    },
+    "quickStats": {
+      "totalFields": "एकूण शेत",
+      "totalZones": "एकूण क्षेत्रे",
+      "riskAlerts": "जोखीम सूचना",
+      "avgHealth": "सरासरी आरोग्य",
+      "actionNeeded": "कारवाई आवश्यक",
+      "allClear": "सर्व ठीक आहे"
+    },
+    "filters": {
+      "title": "फिल्टर",
+      "allMetrics": "🌐 सर्व मापदंड",
+      "moistureIssues": "💧 ओलावा समस्या",
+      "nutrientDeficiency": "🧪 पोषक तत्वांची कमतरता",
+      "phImbalance": "⚖️ pH असंतुलन",
+      "lastWeek": "📅 मागील आठवडा",
+      "lastMonth": "📆 मागील महिना",
+      "lastQuarter": "📊 मागील तिमाही",
+      "lastYear": "🗓️ मागील वर्ष",
+      "clearFilter": "फिल्टर साफ करा",
+      "showing": "दाखवत आहे",
+      "fieldsWith": "शेत ज्यात"
+    },
+    "monitoring": {
+      "active": "निरीक्षण सक्रिय",
+      "paused": "निरीक्षण थांबवले",
+      "refreshInterval": "प्रत्येक 30 सेकंदांनी रिफ्रेश होते"
+    },
+    "metricCards": {
+      "avgMoisture": "सरासरी ओलावा",
+      "avgNitrogen": "सरासरी नायट्रोजन",
+      "avgPh": "सरासरी pH",
+      "moistureOptimal": "इष्टतम श्रेणी: 40-60%",
+      "nitrogenOptimal": "इष्टतम श्रेणी: 60-80",
+      "phOptimal": "इष्टतम श्रेणी: 6.0-7.5"
+    },
+    "npk": {
+      "phosphorus": "फॉस्फरस (P)",
+      "potassium": "पोटॅशियम (K)",
+      "balance": "NPK संतुलन"
+    },
+    "metrics": {
+      "moisture": "ओलावा",
+      "nitrogen": "नायट्रोजन (N)",
+      "phosphorus": "फॉस्फरस (P)",
+      "potassium": "पोटॅशियम (K)",
+      "phLevel": "pH पातळी"
+    },
+    "status": {
+      "optimal": "इष्टतम",
+      "good": "चांगले",
+      "low": "कमी",
+      "check": "तपासा"
+    },
+    "health": {
+      "excellent": "उत्कृष्ट",
+      "good": "चांगले",
+      "fair": "सामान्य",
+      "poor": "खराब"
+    },
+    "riskAssessment": {
+      "title": "जोखीम मूल्यांकन केंद्र",
+      "subtitle": "तातडीने लक्ष देण्याजोगे गंभीर मुद्दे",
+      "activeAlerts": "सक्रिय सूचना",
+      "activeAlerts_plural": "सक्रिय सूचना",
+      "lastUpdated": "शेवटचे अपडेट",
+      "allSystemsOperational": "सर्व सिस्टम कार्यरत आहेत!",
+      "noRisks": "तुमच्या शेत क्षेत्रांमध्ये कोणतीही गंभीर जोखीम आढळली नाही",
+      "moistureOptimal": "ओलावा: इष्टतम",
+      "nutrientsBalanced": "पोषक तत्वे: संतुलित",
+      "phNormal": "pH: सामान्य"
+    },
+    "riskStats": {
+      "moistureIssues": "ओलावा समस्या",
+      "nutrientDeficiency": "पोषक तत्वांची कमतरता",
+      "phImbalance": "pH असंतुलन",
+      "totalAffected": "एकूण प्रभावित"
+    },
+    "riskTypes": {
+      "moisture": "ओलावा",
+      "nutrients": "पोषक तत्वे",
+      "phLevel": "pH पातळी",
+      "highPriority": "उच्च प्राधान्य"
+    },
+    "charts": {
+      "moistureDistribution": "ओलावा वितरण",
+      "healthScoreDistribution": "आरोग्य स्कोअर वितरण",
+      "npkNutrientAnalysis": "NPK पोषक तत्व विश्लेषण",
+      "phLevelTrends": "pH पातळी ट्रेंड",
+      "moisturePercent": "ओलावा %",
+      "nitrogenN": "नायट्रोजन (N)",
+      "phosphorusP": "फॉस्फरस (P)",
+      "potassiumK": "पोटॅशियम (K)",
+      "phLevel": "pH पातळी"
+    },
+    "performanceMatrix": {
+      "title": "शेत कामगिरी मॅट्रिक्स",
+      "subtitle": "सर्व शेत क्षेत्रांमधील सर्वसमावेशक मापदंड",
+      "zones": "क्षेत्र",
+      "zones_plural": "क्षेत्रे"
+    },
+    "table": {
+      "fieldZone": "शेत/क्षेत्र",
+      "cropType": "पीक प्रकार",
+      "moisture": "ओलावा",
+      "ph": "pH",
+      "health": "आरोग्य",
+      "field": "शेत",
+      "crop": "पीक",
+      "metric": "मापदंड",
+      "value": "मूल्य",
+      "status": "स्थिती",
+      "issue": "समस्या"
+    },
+    "pdf": {
+      "title": "शेत विश्लेषण अहवाल",
+      "generated": "निर्मित",
+      "executiveSummary": "कार्यकारी सारांश",
+      "totalFields": "एकूण शेत",
+      "totalZones": "एकूण क्षेत्रे",
+      "activeRiskAlerts": "सक्रिय जोखीम सूचना",
+      "averageMetrics": "सरासरी मापदंड",
+      "riskAlerts": "जोखीम सूचना",
+      "fieldPerformance": "शेत कामगिरी तपशील",
+      "aiHealthSummary": "AI आरोग्य सारांश",
+      "page": "पृष्ठ",
+      "of": "चे",
+      "farmAnalyticsDashboard": "शेत विश्लेषण डॅशबोर्ड"
+    },
+    "share": {
+      "title": "शेत विश्लेषण अहवाल",
+      "summary": "सारांश",
+      "totalFields": "एकूण शेत",
+      "riskAlerts": "जोखीम सूचना",
+      "avgMoisture": "सरासरी ओलावा",
+      "avgPh": "सरासरी pH",
+      "npkLevels": "NPK पातळी",
+      "nitrogen": "नायट्रोजन",
+      "phosphorus": "फॉस्फरस",
+      "potassium": "पोटॅशियम",
+      "healthSummary": "आरोग्य सारांश",
+      "generated": "निर्मित"
+    }
+  },
+  
+  "marketplace": {
+    "title": "शेतकरी बाजारपेठ",
+    "subtitle": "ताज्या उत्पादनांसाठी थेट शेतकऱ्यांशी संपर्क साधा",
+    "addListing": "लिस्टिंग जोडा",
+    "addNewListing": "नवीन लिस्टिंग जोडा",
+    "searchPlaceholder": "पिकांचा शोध घ्या...",
+    "showFilters": "फिल्टर दाखवा",
+    "hideFilters": "फिल्टर लपवा",
+    "clearFilters": "फिल्टर साफ करा",
+    "showingResults": "{{total}} पैकी {{count}} लिस्टिंग दाखवत आहे",
+    
+    "filters": {
+      "location": "स्थान",
+      "locationPlaceholder": "जिल्हा किंवा राज्य",
+      "qualityGrade": "गुणवत्ता श्रेणी",
+      "allGrades": "सर्व श्रेणी",
+      "priceRange": "किंमत श्रेणी (₹)",
+      "allPrices": "सर्व किंमती"
+    },
+    
+    "priceRanges": {
+      "range1": "₹0 - ₹1,000",
+      "range2": "₹1,000 - ₹2,500",
+      "range3": "₹2,500 - ₹5,000",
+      "range4": "₹5,000 - ₹10,000",
+      "range5": "₹10,000+"
+    },
+    
+    "form": {
+      "cropName": "पिकाचे नाव",
+      "cropNamePlaceholder": "उदा., गहू, तांदूळ, टोमॅटो",
+      "quantity": "प्रमाण",
+      "unit": "एकक",
+      "expectedPrice": "अपेक्षित किंमत (₹)",
+      "pricePerUnit": "प्रति एकक किंमत",
+      "qualityGrade": "गुणवत्ता श्रेणी",
+      "village": "गाव",
+      "district": "जिल्हा",
+      "state": "राज्य",
+      "deliveryOption": "डिलिव्हरी पर्याय",
+      "farmerDetails": "शेतकरी तपशील",
+      "yourName": "तुमचे नाव",
+      "phoneNumber": "फोन नंबर",
+      "emailOptional": "ईमेल (पर्यायी)",
+      "uploadImages": "प्रतिमा अपलोड करा (जास्तीत जास्त 5)",
+      "clickToUpload": "प्रतिमा अपलोड करण्यासाठी क्लिक करा"
+    },
+    
+    "units": {
+      "kilograms": "किलोग्राम",
+      "quintals": "क्विंटल",
+      "tons": "टन"
+    },
+    
+    "grades": {
+      "gradeA": "ग्रेड A (प्रीमियम)",
+      "gradeB": "ग्रेड B (मानक)",
+      "gradeC": "ग्रेड C (सामान्य)"
+    },
+    
+    "delivery": {
+      "pickupOnly": "फक्त पिकअप",
+      "deliveryAvailable": "डिलिव्हरी उपलब्ध",
+      "both": "दोन्ही पर्याय"
+    },
+    
+    "buttons": {
+      "cancel": "रद्द करा",
+      "addListing": "लिस्टिंग जोडा",
+      "adding": "जोडत आहे...",
+      "contactFarmer": "शेतकऱ्याशी संपर्क साधा",
+      "close": "बंद करा"
+    },
+    
+    "productDetails": {
+      "price": "किंमत",
+      "quantityAvailable": "उपलब्ध प्रमाण",
+      "qualityGrade": "गुणवत्ता श्रेणी",
+      "location": "स्थान",
+      "delivery": "डिलिव्हरी",
+      "farmerDetails": "शेतकरी तपशील",
+      "name": "नाव",
+      "grade": "श्रेणी"
+    },
+    
+    "messages": {
+      "loading": "लिस्टिंग लोड होत आहेत...",
+      "noListings": "अद्याप कोणतीही लिस्टिंग उपलब्ध नाही",
+      "noMatches": "तुमच्या फिल्टरशी कोणतेही उत्पादन जुळत नाही",
+      "addFirstListing": "पहिली लिस्टिंग जोडा",
+      "fillAllFields": "कृपया सर्व आवश्यक फील्ड भरा",
+      "addListingFailed": "लिस्टिंग जोडण्यात अयशस्वी",
+      "available": "उपलब्ध"
+    }
   }
+
+
 }

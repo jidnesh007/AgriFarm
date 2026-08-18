@@ -40,7 +40,14 @@ const Login = () => {
         formData
       );
       localStorage.setItem("token", response.data.token);
-      localStorage.setItem("userName", response.data.userName || "Farmer");
+      // response.data.userName is set by backend, fallback to user.name
+      localStorage.setItem(
+        "userName",
+        response.data.userName || response.data.user?.name || "Farmer"
+      );
+      if (response.data.user?.id) {
+        localStorage.setItem("userId", response.data.user.id);
+      }
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
@@ -50,7 +57,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden font-sans">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden font-sans">
       {/* Background Video */}
       <video
         autoPlay
@@ -156,7 +163,7 @@ const Login = () => {
       {/* Main Login Card Container */}
       <div className="relative z-10 w-full max-w-2xl login-card-enter" style={{ perspective: '1500px' }}>
         <div 
-          className="relative overflow-visible"
+          className="relative overflow-hidden"
           style={{
             background: 'rgba(255, 255, 255, 0.03)',
             backdropFilter: 'blur(25px) saturate(150%)',
@@ -184,10 +191,10 @@ const Login = () => {
             e.currentTarget.style.transform = 'perspective(1500px) rotateX(0deg) rotateY(0deg)';
           }}
         >
-          <div className="relative p-12">
-            {/* Welcome Back Panel - Dashboard Emerald Theme */}
+          <div className="relative p-6 sm:p-10 md:p-12">
+            {/* Welcome Back Panel - Hidden on mobile, visible on sm+ */}
             <div 
-              className="absolute top-0 right-0 px-12 py-16 welcome-panel-enter"
+              className="hidden sm:block absolute top-0 right-0 px-8 md:px-12 py-12 md:py-16 welcome-panel-enter"
               style={{
                 clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 70% 100%)',
                 width: '50%',
@@ -202,12 +209,12 @@ const Login = () => {
                 borderBottomRightRadius: '24px',
               }}
             >
-              <div className="absolute top-12 right-12 text-right">
+              <div className="absolute top-8 md:top-12 right-8 md:right-12 text-right">
                 <div className="flex justify-end mb-4">
-                  <Leaf className="w-10 h-10 text-emerald-400 opacity-80" />
+                  <Leaf className="w-8 h-8 md:w-10 md:h-10 text-emerald-400 opacity-80" />
                 </div>
                 <h3 
-                  className="text-3xl font-bold text-white leading-tight"
+                  className="text-2xl md:text-3xl font-bold text-white leading-tight"
                   style={{
                     textShadow: '0 0 20px rgba(16, 185, 129, 0.8), 0 2px 10px rgba(0, 0, 0, 0.5)',
                     animation: 'pulse 3s ease-in-out infinite'
@@ -219,16 +226,24 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Login Content */}
-            <div className="relative z-10 login-content-enter" style={{ maxWidth: '55%' }}>
+            {/* Mobile Top Banner - Only shows on mobile */}
+            <div className="sm:hidden flex items-center justify-center gap-3 mb-6 pb-4 border-b border-emerald-500/20">
+              <Leaf className="w-7 h-7 text-emerald-400" />
+              <div className="text-center">
+                <p className="text-xl font-bold text-white">SIGRO <span className="text-emerald-300">FARMING</span></p>
+              </div>
+            </div>
+
+            {/* Login Content - Full width on mobile, 55% on sm+ */}
+            <div className="relative z-10 login-content-enter sm:max-w-[55%]">
               <div className="flex items-center gap-2 mb-4">
-                <Sprout className="w-6 h-6 text-emerald-400" />
+                <Sprout className="w-5 h-5 md:w-6 md:h-6 text-emerald-400" />
                 <span className="text-emerald-400 uppercase tracking-widest text-[10px] font-bold">Agriculture AI</span>
               </div>
               
-              {/* Heading: Changed to solid White */}
+              {/* Heading */}
               <h2 
-                className="text-5xl font-bold text-white mb-16"
+                className="text-4xl sm:text-5xl font-bold text-white mb-10 md:mb-16"
                 style={{
                   textShadow: '0 4px 15px rgba(0, 0, 0, 0.4)',
                   animation: 'fadeInUp 0.8s ease-out'
@@ -267,7 +282,7 @@ const Login = () => {
               )}
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-8">
+              <form onSubmit={handleSubmit} className="space-y-7 md:space-y-8">
                 <div className="relative group form-field">
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 text-emerald-400 transition-all duration-300 group-focus-within:text-emerald-300 group-focus-within:scale-110">
                     <User size={18} />
@@ -327,7 +342,7 @@ const Login = () => {
                 </div>
               </form>
 
-              <div className="text-center mt-8" style={{ animation: 'fadeInUp 0.5s ease-out 0.8s forwards', opacity: 0 }}>
+              <div className="text-center mt-6 md:mt-8" style={{ animation: 'fadeInUp 0.5s ease-out 0.8s forwards', opacity: 0 }}>
                 <p className="text-white/50 text-sm">
                   New to Sigro?{" "}
                   <Link

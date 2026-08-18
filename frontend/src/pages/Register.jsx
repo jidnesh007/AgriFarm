@@ -32,10 +32,16 @@ const Register = () => {
       return;
     }
 
+    // Validation: ensure phoneNumber is not empty
+    if (!formData.phoneNumber || formData.phoneNumber.trim() === "") {
+      setError("Phone number is required");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await axios.post(
+      const response = await axios.post(
         "http://localhost:5000/api/auth/register",
         {
           name: formData.name,
@@ -51,6 +57,7 @@ const Register = () => {
         });
       }, 1500);
     } catch (err) {
+      console.error("Registration error:", err);
       setError(err.response?.data?.message || "Registration failed");
     } finally {
       setLoading(false);
@@ -58,7 +65,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden font-sans">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden font-sans">
       {/* Background Video */}
       <video
         autoPlay
@@ -140,7 +147,7 @@ const Register = () => {
       {/* Main Register Card Container */}
       <div className="relative z-10 w-full max-w-2xl register-card-enter" style={{ perspective: '1500px' }}>
         <div 
-          className="relative overflow-visible"
+          className="relative overflow-hidden"
           style={{
             background: 'rgba(255, 255, 255, 0.05)',
             backdropFilter: 'blur(12px) saturate(160%)',
@@ -162,11 +169,11 @@ const Register = () => {
           }}
           onMouseLeave={(e) => { e.currentTarget.style.transform = 'perspective(1500px) rotateX(0deg) rotateY(0deg)'; }}
         >
-          <div className="relative p-12 flex">
+          <div className="relative p-6 sm:p-10 md:p-12 flex">
             
-            {/* Left Panel: Matches Login Style */}
+            {/* Left Panel: Hidden on mobile, visible on sm+ */}
             <div 
-              className="absolute top-0 left-0 flex items-start justify-center welcome-panel-enter"
+              className="hidden sm:flex absolute top-0 left-0 items-start justify-center welcome-panel-enter"
               style={{
                 clipPath: 'polygon(0% 0%, 100% 0%, 30% 100%, 0% 100%)',
                 width: '50%',
@@ -179,10 +186,10 @@ const Register = () => {
                 borderBottomLeftRadius: '24px',
               }}
             >
-              <div className="w-full pt-20 text-center">
-                <Leaf className="w-10 h-10 text-emerald-400 opacity-80 mx-auto mb-4" />
+              <div className="w-full pt-16 md:pt-20 text-center">
+                <Leaf className="w-8 h-8 md:w-10 md:h-10 text-emerald-400 opacity-80 mx-auto mb-4" />
                 <h3 
-                  className="text-3xl font-bold text-white leading-tight"
+                  className="text-2xl md:text-3xl font-bold text-white leading-tight"
                   style={{ 
                     textShadow: '0 0 15px rgba(16, 185, 129, 0.6), 0 2px 5px rgba(0, 0, 0, 0.5)',
                     animation: 'pulse 3s ease-in-out infinite'
@@ -193,15 +200,23 @@ const Register = () => {
               </div>
             </div>
 
-            {/* Right Side: Register Content */}
-            <div className="relative z-10 ml-auto register-content-enter" style={{ width: '50%', paddingLeft: '2rem' }}>
+            {/* Mobile Top Banner - Only shows on mobile */}
+            <div className="sm:hidden flex items-center justify-center gap-3 mb-6 pb-4 border-b border-emerald-500/20 w-full">
+              <Leaf className="w-7 h-7 text-emerald-400" />
+              <div className="text-center">
+                <p className="text-xl font-bold text-white">JOIN <span className="text-emerald-300">SIGRO</span></p>
+              </div>
+            </div>
+
+            {/* Right Side: Register Content - Full width on mobile, 50% on sm+ */}
+            <div className="relative z-10 w-full sm:ml-auto sm:w-[50%] sm:pl-8 register-content-enter">
               <div className="flex items-center gap-2 mb-4">
-                <Sprout className="w-6 h-6 text-emerald-400" />
+                <Sprout className="w-5 h-5 md:w-6 md:h-6 text-emerald-400" />
                 <span className="text-emerald-400 uppercase tracking-widest text-[10px] font-bold">Agriculture AI</span>
               </div>
 
               {/* Heading: Solid White Exact Match */}
-              <h2 className="text-5xl font-bold text-white mb-12" style={{ textShadow: '0 4px 15px rgba(0, 0, 0, 0.4)' }}>
+              <h2 className="text-4xl sm:text-5xl font-bold text-white mb-8 md:mb-12" style={{ textShadow: '0 4px 15px rgba(0, 0, 0, 0.4)' }}>
                 Register
               </h2>
 
@@ -220,7 +235,7 @@ const Register = () => {
               )}
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-8">
+              <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
                 <div className="relative group form-field">
                   <User className="absolute left-0 bottom-3 text-emerald-400" size={18} />
                   <input
@@ -243,6 +258,7 @@ const Register = () => {
                     onChange={handleChange}
                     required
                     maxLength="10"
+                    pattern="\d{10}"
                     className="w-full bg-transparent border-b border-white/30 focus:border-emerald-400 text-white text-sm pl-7 pb-3 outline-none transition-all placeholder-white"
                     placeholder="Phone Number"
                   />
@@ -262,20 +278,24 @@ const Register = () => {
                   />
                 </div>
 
-                {/* Confirm Password (logic matches your original) */}
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="hidden"
-                />
+                <div className="relative group form-field">
+                  <Lock className="absolute left-0 bottom-3 text-emerald-400" size={18} />
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    required
+                    minLength="6"
+                    className="w-full bg-transparent border-b border-white/30 focus:border-emerald-400 text-white text-sm pl-7 pb-3 outline-none transition-all placeholder-white"
+                    placeholder="Confirm Password"
+                  />
+                </div>
 
                 <div className="pt-4 form-field">
                   <button
                     type="submit"
                     disabled={loading || success}
-                    onClick={() => setFormData(p => ({ ...p, confirmPassword: p.password }))}
                     className="w-full text-white font-bold text-sm py-4 rounded-full transition-all duration-300 disabled:opacity-50 uppercase tracking-widest relative overflow-hidden group shadow-lg"
                     style={{
                       background: 'rgba(16, 185, 129, 0.25)',
@@ -290,7 +310,7 @@ const Register = () => {
                 </div>
               </form>
 
-              <div className="text-center mt-8" style={{ animation: 'fadeInUp 0.5s ease-out 0.9s forwards', opacity: 0 }}>
+              <div className="text-center mt-6 md:mt-8" style={{ animation: 'fadeInUp 0.5s ease-out 0.9s forwards', opacity: 0 }}>
                 <p className="text-white/60 text-sm">
                   Already a member?{" "}
                   <Link to="/login" className="text-emerald-400 hover:text-emerald-300 font-bold hover:underline">

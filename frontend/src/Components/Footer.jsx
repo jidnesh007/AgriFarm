@@ -23,29 +23,29 @@ const Footer = () => {
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
           className="absolute -top-20 -right-20"
         >
-          <CircleDashed className="w-96 h-96 text-emerald-400" />
+          <CircleDashed className="w-48 md:w-96 h-48 md:h-96 text-emerald-400" />
         </motion.div>
         <motion.div 
           animate={{ scale: [1, 1.1, 1] }}
           transition={{ duration: 10, repeat: Infinity }}
           className="absolute -bottom-10 -left-10"
         >
-          <Flower2 className="w-80 h-80 text-emerald-500" />
+          <Flower2 className="w-40 md:w-80 h-40 md:h-80 text-emerald-500" />
         </motion.div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-8 pt-20 pb-10">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 pt-14 md:pt-20 pb-8 md:pb-10">
         
         {/* TOP SECTION: BRANDING & LINKS */}
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-12 pb-16 border-b border-emerald-900/50">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 md:gap-12 pb-12 md:pb-16 border-b border-emerald-900/50">
           
-          {/* Brand Info */}
+          {/* Brand Info - Full width on mobile */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            className="md:col-span-2"
+            className="col-span-2 sm:col-span-3 md:col-span-2"
           >
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-3 mb-5 md:mb-6">
               <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg">
                 <Leaf className="w-6 h-6 text-emerald-700 fill-emerald-700" />
               </div>
@@ -55,7 +55,7 @@ const Footer = () => {
               </div>
             </div>
             
-            <p className="text-sm text-emerald-100/60 mb-8 leading-relaxed max-w-xs">
+            <p className="text-sm text-emerald-100/60 mb-6 md:mb-8 leading-relaxed max-w-xs">
               Empowering the next generation of farmers with real-time neural insights and precision agricultural monitoring.
             </p>
             
@@ -65,15 +65,15 @@ const Footer = () => {
                 <motion.div
                   key={i}
                   whileHover={{ scale: 1.1, backgroundColor: '#10b981', color: '#fff' }}
-                  className="w-10 h-10 rounded-xl bg-emerald-900/50 border border-emerald-800 flex items-center justify-center cursor-pointer transition-all text-emerald-400"
+                  className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-emerald-900/50 border border-emerald-800 flex items-center justify-center cursor-pointer transition-all text-emerald-400"
                 >
-                  <Icon size={18} />
+                  <Icon size={16} />
                 </motion.div>
               ))}
             </div>
           </motion.div>
 
-          {/* Link Columns */}
+          {/* Link Columns - 2 cols on mobile, 1 each on md+ */}
           {[
             { title: 'System', links: companyLinks },
             { title: 'Resources', links: resourceLinks },
@@ -85,12 +85,12 @@ const Footer = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
-              className="md:col-span-1"
+              className="col-span-1"
             >
-              <h3 className="text-[11px] font-black uppercase tracking-[0.2em] mb-6 text-emerald-400">
+              <h3 className="text-[11px] font-black uppercase tracking-[0.2em] mb-4 md:mb-6 text-emerald-400">
                 {section.title}
               </h3>
-              <ul className="space-y-4">
+              <ul className="space-y-3 md:space-y-4">
                 {section.links.map((link, i) => (
                   <li key={i}>
                     <motion.a
@@ -108,15 +108,15 @@ const Footer = () => {
         </div>
 
         {/* MIDDLE SECTION: NEWSLETTER & CONTACT */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 py-16 border-b border-emerald-900/50">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 py-10 md:py-16 border-b border-emerald-900/50">
           
           {/* Premium Newsletter */}
           <motion.div 
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
           >
-            <h2 className="text-4xl font-black mb-4 tracking-tighter">Stay Synchronized.</h2>
-            <p className="text-emerald-100/60 mb-8 text-sm max-w-sm font-medium">
+            <h2 className="text-3xl md:text-4xl font-black mb-3 md:mb-4 tracking-tighter">Stay Synchronized.</h2>
+            <p className="text-emerald-100/60 mb-6 md:mb-8 text-sm max-w-sm font-medium">
               Receive weekly AI harvest reports and exclusive agricultural technology updates.
             </p>
             
@@ -124,12 +124,12 @@ const Footer = () => {
               <input
                 type="email"
                 placeholder="Enter field operator email"
-                className="w-full px-6 py-4 rounded-2xl bg-emerald-900/50 border border-emerald-800 text-white text-sm placeholder-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-emerald-900 transition-all"
+                className="w-full px-5 md:px-6 py-3 md:py-4 rounded-2xl bg-emerald-900/50 border border-emerald-800 text-white text-sm placeholder-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-emerald-900 transition-all"
               />
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="absolute right-2 top-2 bottom-2 px-6 bg-emerald-500 hover:bg-emerald-400 text-emerald-950 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg"
+                className="absolute right-2 top-2 bottom-2 px-4 md:px-6 bg-emerald-500 hover:bg-emerald-400 text-emerald-950 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg"
               >
                 Sync Now
               </motion.button>
@@ -137,7 +137,7 @@ const Footer = () => {
           </motion.div>
 
           {/* Contact Details Grid */}
-          <div className="grid grid-cols-2 gap-8">
+          <div className="grid grid-cols-2 gap-6 md:gap-8">
             {[
               { icon: MapPin, title: 'Global HQ', content: '1901 Sigro Valley.\nJakarta, Indonesia' },
               { icon: Phone, title: 'Operations', content: '+62 875 2983 00' },
@@ -145,7 +145,7 @@ const Footer = () => {
               { icon: Zap, title: 'Membership', content: 'Premium Active' }
             ].map((info, i) => (
               <motion.div key={i} whileHover={{ y: -5 }}>
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 mb-2 md:mb-3">
                   <info.icon size={14} className="text-emerald-500" />
                   <h4 className="text-[10px] font-black text-emerald-400 tracking-[0.2em] uppercase">
                     {info.title}
@@ -160,11 +160,11 @@ const Footer = () => {
         </div>
 
         {/* BOTTOM SECTION: COPYRIGHT */}
-        <div className="flex flex-col md:flex-row justify-between items-center pt-10 text-emerald-100/40">
-          <p className="text-[10px] font-black uppercase tracking-widest">
+        <div className="flex flex-col sm:flex-row justify-between items-center pt-8 md:pt-10 text-emerald-100/40 gap-4">
+          <p className="text-[10px] font-black uppercase tracking-widest text-center sm:text-left">
             © 2025 Sigro Agriculture AI. All Protocols Reserved.
           </p>
-          <div className="flex gap-8 mt-6 md:mt-0">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-8">
             {['Privacy Policy', 'Data Terms', 'Security'].map((link, i) => (
               <a key={i} href="#" className="text-[10px] font-bold uppercase tracking-widest hover:text-emerald-400 transition-colors">
                 {link}

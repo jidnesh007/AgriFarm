@@ -157,26 +157,25 @@ const FieldDetails = () => {
           {t('fieldDetails.backToDashboard')}
         </button>
 
-        <div className="bg-emerald-900 rounded-[32px] p-8 text-white shadow-2xl relative overflow-hidden">
+        <div className="bg-emerald-900 rounded-[24px] md:rounded-[32px] p-5 md:p-8 text-white shadow-2xl relative overflow-hidden">
           <Flower2 className="absolute -right-10 -bottom-10 w-64 h-64 opacity-10 rotate-12" />
-          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div>
-              <h1 className="text-4xl font-black tracking-tight mb-2">
+          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start gap-4 md:gap-6">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight mb-2 truncate">
                 {field.fieldName}
               </h1>
-              <div className="flex items-center gap-4 text-emerald-200 font-medium">
-                <span className="bg-white/10 px-3 py-1 rounded-lg backdrop-blur-md border border-white/10">
+              <div className="flex flex-wrap items-center gap-2 md:gap-4 text-emerald-200 font-medium">
+                <span className="bg-white/10 px-3 py-1 rounded-lg backdrop-blur-md border border-white/10 text-sm">
                   {field.cropType}
                 </span>
-                <span>•</span>
-                <span>{field.fieldArea.value} {field.fieldArea.unit}</span>
+                <span className="text-sm">{field.fieldArea.value} {field.fieldArea.unit}</span>
               </div>
-              <p className="text-sm text-emerald-300/80 mt-4 flex items-center gap-2">
+              <p className="text-sm text-emerald-300/80 mt-3 flex items-center gap-2">
                 <MapPin size={14} />
                 {field.location.village && `${field.location.village}, `}{field.location.district}
               </p>
             </div>
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-3xl text-right min-w-[200px]">
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 p-3 md:p-4 rounded-2xl md:rounded-3xl text-right w-full md:w-auto md:min-w-[200px]">
               <div className={`inline-block px-4 py-2 rounded-2xl text-xs font-black uppercase tracking-widest ${getStatusColor(field.overallHealth.status)}`}>
                 {field.overallHealth.status} {t('fieldDetails.status')}
               </div>
@@ -236,20 +235,20 @@ const FieldDetails = () => {
                   </h2>
                   <p className="text-sm text-slate-500 font-medium">{t('fieldDetails.realtimeSensor')}</p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-2 md:gap-3">
                   <button
                     onClick={() => generateAIRecommendation(selectedZone._id)}
                     disabled={generatingRecs}
-                    className="bg-emerald-900 text-white px-5 py-3 rounded-2xl flex items-center gap-2 font-bold shadow-xl hover:bg-emerald-800 transition-all disabled:opacity-50"
+                    className="bg-emerald-900 text-white px-4 md:px-5 py-2.5 md:py-3 rounded-2xl flex items-center gap-2 font-bold shadow-xl hover:bg-emerald-800 transition-all disabled:opacity-50 text-sm"
                   >
-                    {generatingRecs ? <Loader size={18} className="animate-spin" /> : <Brain size={18} />}
+                    {generatingRecs ? <Loader size={16} className="animate-spin" /> : <Brain size={16} />}
                     {t('fieldDetails.aiAdvisor')}
                   </button>
                   <button
                     onClick={() => setShowSoilModal(true)}
-                    className="bg-emerald-50 text-emerald-700 px-5 py-3 rounded-2xl flex items-center gap-2 font-bold border border-emerald-100 hover:bg-emerald-100 transition-all"
+                    className="bg-emerald-50 text-emerald-700 px-4 md:px-5 py-2.5 md:py-3 rounded-2xl flex items-center gap-2 font-bold border border-emerald-100 hover:bg-emerald-100 transition-all text-sm"
                   >
-                    <Edit2 size={18} />
+                    <Edit2 size={16} />
                     {t('fieldDetails.updateSensors')}
                   </button>
                 </div>

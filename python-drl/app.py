@@ -1,9 +1,15 @@
+# -*- coding: utf-8 -*-
 """
 app.py - Complete FastAPI Server for Agriculture AI Services
 - DRL Recommendations
 - Disease Detection  
 - Voice Assistant with Groq LLM
 """
+
+import sys
+import io
+# Force UTF-8 stdout so emoji print statements work on Windows (cp1252 terminals)
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
@@ -36,7 +42,9 @@ except ImportError:
     DISEASE_DETECTION_AVAILABLE = False
 
 # Initialize Groq client
-GROQ_API_KEY = ""
+
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
 if GROQ_API_KEY:
     groq_client = Groq(api_key=GROQ_API_KEY)
     VOICE_ASSISTANT_AVAILABLE = True
@@ -76,15 +84,107 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 
 class SoilDataInput(BaseModel):
     """DRL Model Input"""
-    moisture: float = Field(..., ge=0, le=100, description="Soil moisture percentage")
-    nitrogen: float = Field(..., ge=0, le=200, description="Nitrogen level (kg/ha)")
-    phosphorus: float = Field(..., ge=0, le=200, description="Phosphorus level (kg/ha)")
-    potassium: float = Field(..., ge=0, le=200, description="Potassium level (kg/ha)")
-    ph: float = Field(..., ge=4.0, le=9.0, description="Soil pH level")
-    growth: float = Field(..., ge=0.0, le=1.0, description="Crop growth stage (0-1)")
-    temp: float = Field(..., ge=-10, le=50, description="Temperature (°C)")
-    humidity: float = Field(..., ge=0, le=100, description="Humidity percentage")
-    rain_prob: float = Field(..., ge=0.0, le=1.0, description="Rain probability (0-1)")
+    moisture:   float = Field(default=50.0, description="Soil moisture percentage")
+    nitrogen:   float = Field(default=80.0, description="Nitrogen level (kg/ha)")
+    phosphorus: float = Field(default=50.0, description="Phosphorus level (kg/ha)")
+    potassium:  float = Field(default=60.0, description="Potassium level (kg/ha)")
+    ph:         float = Field(default=6.8,  description="Soil pH level")
+    growth:     float = Field(default=0.5,  description="Crop growth stage (0-1)")
+    temp:       float = Field(default=25.0, description="Temperature (°C)")
+    humidity:   float = Field(default=60.0, description="Humidity percentage")
+    rain_prob:  float = Field(default=0.3,  description="Rain probability (0-1)")
+
+
+# ============================================================
+# HEALTH CHECK & ROOT
+# ============================================================
+
+@app.get("/")
+async def root():
+    """API root endpoint"""
+    return {
+        "status": "online",
+        "service": "Agriculture AI API",
+        "version": "3.0.0",
+        "endpoints": {
+            "health": "/health",
+            "docs": "/docs",
+            "drl_recommendation": "/recommend" if DRL_AVAILABLE else "disabled",
+            "disease_detection": "/detect-disease" if DISEASE_DETECTION_AVAILABLE else "disabled",
+            "voice_assistant": "/voice-assistant/ask" if VOICE_ASSISTANT_AVAILABLE else "disabled",
+            "field_analysis": "/voice-assistant/analyze-field" if VOICE_ASSISTANT_AVAILABLE else "disabled"
+        },
+        "powered_by": "FastAPI + Groq + ONNX"
+    }
+
+
+@app.get("/health")
+async def health_check():
+    """Check health of all services"""
+    return {
+        "status": "healthy",
+        "timestamp": time.time(),
+        "services": {
+            "drl_model": DRL_AVAILABLE,
+            "disease_detector": DISEASE_DETECTION_AVAILABLE,
+            "voice_assistant": VOICE_ASSISTANT_AVAILABLE,
+            "groq_llm": VOICE_ASSISTANT_AVAILABLE
+        },
+        "configuration": {
+            "groq_api_configured": bool(GROQ_API_KEY),
+            "upload_dir": str(UPLOAD_DIR),
+            "cors_enabled": True
+        }
+    }
+
+
+# ============================================================
+# DRL RECOMMENDATION ENDPOINT
+# ============================================================
+
+@app.post("/recommend", tags=["DRL Recommendations"])
+async def get_irrigation_recommendation(data: SoilDataInput) -> Dict:
+    """
+    Get irrigation and fertilizer recommendations using DRL model
+    
+    Returns:
+    - Water amount recommendation
+    - Nitrogen fertilizer amount
+    - Phosphorus fertilizer amount  
+    - Potassium fertilizer amount
+    """
+    if not DRL_AVAILABLE:
+        raise HTTPException(
+            status_code=503,
+            detail="DRL recommendation service not available. load_model.py not found."
+        )
+    
+    try:
+        # Clamp all values to safe ranges before passing to the model
+        def clamp(val, lo, hi):
+            return max(lo, min(hi, val))
+
+        recommendation = get_recommendation(
+            moisture=clamp(data.moisture,   0.0,  100.0),
+            nitrogen=clamp(data.nitrogen,   0.0,  200.0),
+            phosphorus=clamp(data.phosphorus, 0.0, 200.0),
+            potassium=clamp(data.potassium, 0.0,  200.0),
+            ph=clamp(data.ph,               4.0,    9.0),
+            growth=clamp(data.growth,       0.0,    1.0),
+            temp=clamp(data.temp,          -10.0,  50.0),
+            humidity=clamp(data.humidity,   0.0,  100.0),
+            rain_prob=clamp(data.rain_prob, 0.0,    1.0),
+        )
+        return {
+            "success": True,
+            "timestamp": time.time(),
+            **recommendation
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"DRL model error: {str(e)}"
+        )
 
 
 class FieldContext(BaseModel):
@@ -408,7 +508,7 @@ Mention actual numbers when answering (e.g., "Your soil moisture is 35%...").
 
         # Call Groq API
         response = groq_client.chat.completions.create(
-            model="meta-llama/llama-4-scout-17b-16e-instruct",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {
                     "role": "system",

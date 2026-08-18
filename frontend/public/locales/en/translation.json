@@ -378,6 +378,270 @@
     "performanceMetrics": "Performance Metrics",
     "trends": "Trends",
     "insights": "Insights",
-    "exportData": "Export Data"
+    "exportData": "Export Data",
+     "subtitle": "Real-time farm performance insights",
+    "loading": {
+      "title": "Loading Analytics",
+      "description": "Crunching your farm data..."
+  },
+  
+    "error": {
+      "title": "Oops! Something went wrong",
+      "tryAgain": "Try Again"
+    },
+    "errors": {
+      "fetchFailed": "Failed to fetch analytics data"
+    },
+    "noData": "No analytics data available",
+    "buttons": {
+      "refresh": "Refresh",
+      "exportPDF": "Export PDF",
+      "share": "Share",
+      "viewDetails": "View Details",
+      "takeAction": "Take Action",
+      "exportTable": "Export Table"
+    },
+    "quickStats": {
+      "totalFields": "Total Fields",
+      "totalZones": "Total Zones",
+      "riskAlerts": "Risk Alerts",
+      "avgHealth": "Avg Health",
+      "actionNeeded": "Action Needed",
+      "allClear": "All Clear"
+    },
+    "filters": {
+      "title": "Filters",
+      "allMetrics": "🌐 All Metrics",
+      "moistureIssues": "💧 Moisture Issues",
+      "nutrientDeficiency": "🧪 Nutrient Deficiency",
+      "phImbalance": "⚖️ pH Imbalance",
+      "lastWeek": "📅 Last Week",
+      "lastMonth": "📆 Last Month",
+      "lastQuarter": "📊 Last Quarter",
+      "lastYear": "🗓️ Last Year",
+      "clearFilter": "Clear Filter",
+      "showing": "Showing",
+      "fieldsWith": "field(s) with"
+    },
+    "monitoring": {
+      "active": "Monitoring Active",
+      "paused": "Monitoring Paused",
+      "refreshInterval": "Refreshes every 30s"
+    },
+    "metricCards": {
+      "avgMoisture": "Average Moisture",
+      "avgNitrogen": "Average Nitrogen",
+      "avgPh": "Average pH",
+      "moistureOptimal": "Optimal range: 40-60%",
+      "nitrogenOptimal": "Optimal range: 60-80",
+      "phOptimal": "Optimal range: 6.0-7.5"
+    },
+    "npk": {
+      "phosphorus": "Phosphorus (P)",
+      "potassium": "Potassium (K)",
+      "balance": "NPK Balance"
+    },
+    "metrics": {
+      "moisture": "Moisture",
+      "nitrogen": "Nitrogen (N)",
+      "phosphorus": "Phosphorus (P)",
+      "potassium": "Potassium (K)",
+      "phLevel": "pH Level"
+    },
+    "status": {
+      "optimal": "Optimal",
+      "good": "Good",
+      "low": "Low",
+      "check": "Check"
+    },
+    "health": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "fair": "Fair",
+      "poor": "Poor"
+    },
+    "riskAssessment": {
+      "title": "Risk Assessment Center",
+      "subtitle": "Critical issues requiring immediate attention",
+      "activeAlerts": "Active Alert",
+      "activeAlerts_plural": "Active Alerts",
+      "lastUpdated": "Last updated",
+      "allSystemsOperational": "All Systems Operational!",
+      "noRisks": "No critical risks detected across your farm zones",
+      "moistureOptimal": "Moisture: Optimal",
+      "nutrientsBalanced": "Nutrients: Balanced",
+      "phNormal": "pH: Normal"
+    },
+    "riskStats": {
+      "moistureIssues": "Moisture Issues",
+      "nutrientDeficiency": "Nutrient Deficiency",
+      "phImbalance": "pH Imbalance",
+      "totalAffected": "Total Affected"
+    },
+    "riskTypes": {
+      "moisture": "Moisture",
+      "nutrients": "Nutrients",
+      "phLevel": "pH Level",
+      "highPriority": "High Priority"
+    },
+    "charts": {
+      "moistureDistribution": "Moisture Distribution",
+      "healthScoreDistribution": "Health Score Distribution",
+      "npkNutrientAnalysis": "NPK Nutrient Analysis",
+      "phLevelTrends": "pH Level Trends",
+      "moisturePercent": "Moisture %",
+      "nitrogenN": "Nitrogen (N)",
+      "phosphorusP": "Phosphorus (P)",
+      "potassiumK": "Potassium (K)",
+      "phLevel": "pH Level"
+    },
+    "performanceMatrix": {
+      "title": "Field Performance Matrix",
+      "subtitle": "Comprehensive metrics across all farm zones",
+      "zones": "Zone",
+      "zones_plural": "Zones"
+    },
+    "table": {
+      "fieldZone": "Field/Zone",
+      "cropType": "Crop Type",
+      "moisture": "Moisture",
+      "ph": "pH",
+      "health": "Health",
+      "field": "Field",
+      "crop": "Crop",
+      "metric": "Metric",
+      "value": "Value",
+      "status": "Status",
+      "issue": "Issue"
+    },
+    "pdf": {
+      "title": "Farm Analytics Report",
+      "generated": "Generated",
+      "executiveSummary": "Executive Summary",
+      "totalFields": "Total Fields",
+      "totalZones": "Total Zones",
+      "activeRiskAlerts": "Active Risk Alerts",
+      "averageMetrics": "Average Metrics",
+      "riskAlerts": "Risk Alerts",
+      "fieldPerformance": "Field Performance Details",
+      "aiHealthSummary": "AI Health Summary",
+      "page": "Page",
+      "of": "of",
+      "farmAnalyticsDashboard": "Farm Analytics Dashboard"
+    },
+    "share": {
+      "title": "Farm Analytics Report",
+      "summary": "Summary",
+      "totalFields": "Total Fields",
+      "riskAlerts": "Risk Alerts",
+      "avgMoisture": "Avg Moisture",
+      "avgPh": "Avg pH",
+      "npkLevels": "NPK Levels",
+      "nitrogen": "Nitrogen",
+      "phosphorus": "Phosphorus",
+      "potassium": "Potassium",
+      "healthSummary": "Health Summary",
+      "generated": "Generated"
+    }
+  },
+ 
+
+  "marketplace": {
+    "title": "Farmer Marketplace",
+    "subtitle": "Connect directly with farmers for fresh produce",
+    "addListing": "Add Listing",
+    "addNewListing": "Add New Listing",
+    "searchPlaceholder": "Search for crops...",
+    "showFilters": "Show Filters",
+    "hideFilters": "Hide Filters",
+    "clearFilters": "Clear Filters",
+    "showingResults": "Showing {{count}} of {{total}} listings",
+    
+    "filters": {
+      "location": "Location",
+      "locationPlaceholder": "District or State",
+      "qualityGrade": "Quality Grade",
+      "allGrades": "All Grades",
+      "priceRange": "Price Range (₹)",
+      "allPrices": "All Prices"
+    },
+    
+    "priceRanges": {
+      "range1": "₹0 - ₹1,000",
+      "range2": "₹1,000 - ₹2,500",
+      "range3": "₹2,500 - ₹5,000",
+      "range4": "₹5,000 - ₹10,000",
+      "range5": "₹10,000+"
+    },
+    
+    "form": {
+      "cropName": "Crop Name",
+      "cropNamePlaceholder": "e.g., Wheat, Rice, Tomatoes",
+      "quantity": "Quantity",
+      "unit": "Unit",
+      "expectedPrice": "Expected Price (₹)",
+      "pricePerUnit": "Price per unit",
+      "qualityGrade": "Quality Grade",
+      "village": "Village",
+      "district": "District",
+      "state": "State",
+      "deliveryOption": "Delivery Option",
+      "farmerDetails": "Farmer Details",
+      "yourName": "Your Name",
+      "phoneNumber": "Phone Number",
+      "emailOptional": "Email (optional)",
+      "uploadImages": "Upload Images (up to 5)",
+      "clickToUpload": "Click to upload images"
+    },
+    
+    "units": {
+      "kilograms": "Kilograms",
+      "quintals": "Quintals",
+      "tons": "Tons"
+    },
+    
+    "grades": {
+      "gradeA": "Grade A (Premium)",
+      "gradeB": "Grade B (Standard)",
+      "gradeC": "Grade C (Economy)"
+    },
+    
+    "delivery": {
+      "pickupOnly": "Pickup Only",
+      "deliveryAvailable": "Delivery Available",
+      "both": "Both Options"
+    },
+    
+    "buttons": {
+      "cancel": "Cancel",
+      "addListing": "Add Listing",
+      "adding": "Adding...",
+      "contactFarmer": "Contact Farmer",
+      "close": "Close"
+    },
+    
+    "productDetails": {
+      "price": "Price",
+      "quantityAvailable": "Quantity Available",
+      "qualityGrade": "Quality Grade",
+      "location": "Location",
+      "delivery": "Delivery",
+      "farmerDetails": "Farmer Details",
+      "name": "Name",
+      "grade": "Grade"
+    },
+    
+    "messages": {
+      "loading": "Loading listings...",
+      "noListings": "No listings available yet",
+      "noMatches": "No products match your filters",
+      "addFirstListing": "Add First Listing",
+      "fillAllFields": "Please fill in all required fields",
+      "addListingFailed": "Failed to add listing",
+      "available": "Available"
+    }
   }
+
+
+
 }

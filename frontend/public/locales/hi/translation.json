@@ -378,6 +378,265 @@
     "performanceMetrics": "प्रदर्शन मैट्रिक्स",
     "trends": "रुझान",
     "insights": "अंतर्दृष्टि",
-    "exportData": "डेटा निर्यात करें"
+    "exportData": "डेटा निर्यात करें",
+    "subtitle": "रीयल-टाइम फार्म प्रदर्शन अंतर्दृष्टि",
+    "loading": {
+      "title": "विश्लेषण लोड हो रहा है",
+      "description": "आपका फार्म डेटा संसाधित किया जा रहा है..."
+  },
+   "error": {
+      "title": "ओह! कुछ गड़बड़ हो गई",
+      "tryAgain": "पुनः प्रयास करें"
+    },
+    "errors": {
+      "fetchFailed": "विश्लेषण डेटा प्राप्त करने में विफल"
+    },
+    "noData": "कोई विश्लेषण डेटा उपलब्ध नहीं है",
+    "buttons": {
+      "refresh": "रिफ्रेश करें",
+      "exportPDF": "PDF निर्यात करें",
+      "share": "साझा करें",
+      "viewDetails": "विवरण देखें",
+      "takeAction": "कार्रवाई करें",
+      "exportTable": "टेबल निर्यात करें"
+    },
+    "quickStats": {
+      "totalFields": "कुल खेत",
+      "totalZones": "कुल क्षेत्र",
+      "riskAlerts": "जोखिम चेतावनी",
+      "avgHealth": "औसत स्वास्थ्य",
+      "actionNeeded": "कार्रवाई आवश्यक",
+      "allClear": "सब ठीक है"
+    },
+    "filters": {
+      "title": "फ़िल्टर",
+      "allMetrics": "🌐 सभी मापदंड",
+      "moistureIssues": "💧 नमी की समस्याएं",
+      "nutrientDeficiency": "🧪 पोषक तत्व की कमी",
+      "phImbalance": "⚖️ pH असंतुलन",
+      "lastWeek": "📅 पिछला सप्ताह",
+      "lastMonth": "📆 पिछला महीना",
+      "lastQuarter": "📊 पिछली तिमाही",
+      "lastYear": "🗓️ पिछला वर्ष",
+      "clearFilter": "फ़िल्टर साफ़ करें",
+      "showing": "दिखा रहे हैं",
+      "fieldsWith": "खेत जिनमें"
+    },
+    "monitoring": {
+      "active": "निगरानी सक्रिय",
+      "paused": "निगरानी रोकी गई",
+      "refreshInterval": "हर 30 सेकंड में रिफ्रेश होता है"
+    },
+    "metricCards": {
+      "avgMoisture": "औसत नमी",
+      "avgNitrogen": "औसत नाइट्रोजन",
+      "avgPh": "औसत pH",
+      "moistureOptimal": "इष्टतम सीमा: 40-60%",
+      "nitrogenOptimal": "इष्टतम सीमा: 60-80",
+      "phOptimal": "इष्टतम सीमा: 6.0-7.5"
+    },
+    "npk": {
+      "phosphorus": "फास्फोरस (P)",
+      "potassium": "पोटेशियम (K)",
+      "balance": "NPK संतुलन"
+    },
+    "metrics": {
+      "moisture": "नमी",
+      "nitrogen": "नाइट्रोजन (N)",
+      "phosphorus": "फास्फोरस (P)",
+      "potassium": "पोटेशियम (K)",
+      "phLevel": "pH स्तर"
+    },
+    "status": {
+      "optimal": "इष्टतम",
+      "good": "अच्छा",
+      "low": "कम",
+      "check": "जांचें"
+    },
+    "health": {
+      "excellent": "उत्कृष्ट",
+      "good": "अच्छा",
+      "fair": "सामान्य",
+      "poor": "खराब"
+    },
+    "riskAssessment": {
+      "title": "जोखिम मूल्यांकन केंद्र",
+      "subtitle": "तत्काल ध्यान देने योग्य गंभीर मुद्दे",
+      "activeAlerts": "सक्रिय चेतावनी",
+      "activeAlerts_plural": "सक्रिय चेतावनियां",
+      "lastUpdated": "अंतिम अपडेट",
+      "allSystemsOperational": "सभी सिस्टम चालू हैं!",
+      "noRisks": "आपके फार्म क्षेत्रों में कोई गंभीर जोखिम नहीं पाया गया",
+      "moistureOptimal": "नमी: इष्टतम",
+      "nutrientsBalanced": "पोषक तत्व: संतुलित",
+      "phNormal": "pH: सामान्य"
+    },
+    "riskStats": {
+      "moistureIssues": "नमी की समस्याएं",
+      "nutrientDeficiency": "पोषक तत्व की कमी",
+      "phImbalance": "pH असंतुलन",
+      "totalAffected": "कुल प्रभावित"
+    },
+    "riskTypes": {
+      "moisture": "नमी",
+      "nutrients": "पोषक तत्व",
+      "phLevel": "pH स्तर",
+      "highPriority": "उच्च प्राथमिकता"
+    },
+    "charts": {
+      "moistureDistribution": "नमी वितरण",
+      "healthScoreDistribution": "स्वास्थ्य स्कोर वितरण",
+      "npkNutrientAnalysis": "NPK पोषक तत्व विश्लेषण",
+      "phLevelTrends": "pH स्तर रुझान",
+      "moisturePercent": "नमी %",
+      "nitrogenN": "नाइट्रोजन (N)",
+      "phosphorusP": "फास्फोरस (P)",
+      "potassiumK": "पोटेशियम (K)",
+      "phLevel": "pH स्तर"
+    },
+    "performanceMatrix": {
+      "title": "खेत प्रदर्शन मैट्रिक्स",
+      "subtitle": "सभी फार्म क्षेत्रों में व्यापक मापदंड",
+      "zones": "क्षेत्र",
+      "zones_plural": "क्षेत्र"
+    },
+    "table": {
+      "fieldZone": "खेत/क्षेत्र",
+      "cropType": "फसल प्रकार",
+      "moisture": "नमी",
+      "ph": "pH",
+      "health": "स्वास्थ्य",
+      "field": "खेत",
+      "crop": "फसल",
+      "metric": "मापदंड",
+      "value": "मान",
+      "status": "स्थिति",
+      "issue": "समस्या"
+    },
+    "pdf": {
+      "title": "फार्म विश्लेषण रिपोर्ट",
+      "generated": "उत्पन्न",
+      "executiveSummary": "कार्यकारी सारांश",
+      "totalFields": "कुल खेत",
+      "totalZones": "कुल क्षेत्र",
+      "activeRiskAlerts": "सक्रिय जोखिम चेतावनी",
+      "averageMetrics": "औसत मापदंड",
+      "riskAlerts": "जोखिम चेतावनियां",
+      "fieldPerformance": "खेत प्रदर्शन विवरण",
+      "aiHealthSummary": "AI स्वास्थ्य सारांश",
+      "page": "पेज",
+      "of": "का",
+      "farmAnalyticsDashboard": "फार्म विश्लेषण डैशबोर्ड"
+    },
+    "share": {
+      "title": "फार्म विश्लेषण रिपोर्ट",
+      "summary": "सारांश",
+      "totalFields": "कुल खेत",
+      "riskAlerts": "जोखिम चेतावनियां",
+      "avgMoisture": "औसत नमी",
+      "avgPh": "औसत pH",
+      "npkLevels": "NPK स्तर",
+      "nitrogen": "नाइट्रोजन",
+      "phosphorus": "फास्फोरस",
+      "potassium": "पोटेशियम",
+      "healthSummary": "स्वास्थ्य सारांश",
+      "generated": "उत्पन्न"
+    }
+  },
+ "marketplace": {
+    "title": "किसान बाज़ार",
+    "subtitle": "ताज़ी उपज के लिए सीधे किसानों से जुड़ें",
+    "addListing": "लिस्टिंग जोड़ें",
+    "addNewListing": "नई लिस्टिंग जोड़ें",
+    "searchPlaceholder": "फसलों की खोज करें...",
+    "showFilters": "फ़िल्टर दिखाएं",
+    "hideFilters": "फ़िल्टर छुपाएं",
+    "clearFilters": "फ़िल्टर साफ़ करें",
+    "showingResults": "{{total}} में से {{count}} लिस्टिंग दिखा रहे हैं",
+    
+    "filters": {
+      "location": "स्थान",
+      "locationPlaceholder": "जिला या राज्य",
+      "qualityGrade": "गुणवत्ता श्रेणी",
+      "allGrades": "सभी श्रेणियां",
+      "priceRange": "मूल्य सीमा (₹)",
+      "allPrices": "सभी मूल्य"
+    },
+    
+    "priceRanges": {
+      "range1": "₹0 - ₹1,000",
+      "range2": "₹1,000 - ₹2,500",
+      "range3": "₹2,500 - ₹5,000",
+      "range4": "₹5,000 - ₹10,000",
+      "range5": "₹10,000+"
+    },
+    
+    "form": {
+      "cropName": "फसल का नाम",
+      "cropNamePlaceholder": "जैसे, गेहूं, चावल, टमाटर",
+      "quantity": "मात्रा",
+      "unit": "इकाई",
+      "expectedPrice": "अपेक्षित मूल्य (₹)",
+      "pricePerUnit": "प्रति इकाई मूल्य",
+      "qualityGrade": "गुणवत्ता श्रेणी",
+      "village": "गाँव",
+      "district": "जिला",
+      "state": "राज्य",
+      "deliveryOption": "डिलीवरी विकल्प",
+      "farmerDetails": "किसान विवरण",
+      "yourName": "आपका नाम",
+      "phoneNumber": "फ़ोन नंबर",
+      "emailOptional": "ईमेल (वैकल्पिक)",
+      "uploadImages": "तस्वीरें अपलोड करें (अधिकतम 5)",
+      "clickToUpload": "तस्वीरें अपलोड करने के लिए क्लिक करें"
+    },
+    
+    "units": {
+      "kilograms": "किलोग्राम",
+      "quintals": "क्विंटल",
+      "tons": "टन"
+    },
+    
+    "grades": {
+      "gradeA": "ग्रेड A (प्रीमियम)",
+      "gradeB": "ग्रेड B (मानक)",
+      "gradeC": "ग्रेड C (सामान्य)"
+    },
+    
+    "delivery": {
+      "pickupOnly": "केवल पिकअप",
+      "deliveryAvailable": "डिलीवरी उपलब्ध",
+      "both": "दोनों विकल्प"
+    },
+    
+    "buttons": {
+      "cancel": "रद्द करें",
+      "addListing": "लिस्टिंग जोड़ें",
+      "adding": "जोड़ा जा रहा है...",
+      "contactFarmer": "किसान से संपर्क करें",
+      "close": "बंद करें"
+    },
+    
+    "productDetails": {
+      "price": "मूल्य",
+      "quantityAvailable": "उपलब्ध मात्रा",
+      "qualityGrade": "गुणवत्ता श्रेणी",
+      "location": "स्थान",
+      "delivery": "डिलीवरी",
+      "farmerDetails": "किसान विवरण",
+      "name": "नाम",
+      "grade": "श्रेणी"
+    },
+    
+    "messages": {
+      "loading": "लिस्टिंग लोड हो रही हैं...",
+      "noListings": "अभी तक कोई लिस्टिंग उपलब्ध नहीं है",
+      "noMatches": "आपके फ़िल्टर से कोई उत्पाद मेल नहीं खाता",
+      "addFirstListing": "पहली लिस्टिंग जोड़ें",
+      "fillAllFields": "कृपया सभी आवश्यक फ़ील्ड भरें",
+      "addListingFailed": "लिस्टिंग जोड़ने में विफल",
+      "available": "उपलब्ध"
+    }
   }
+
 }

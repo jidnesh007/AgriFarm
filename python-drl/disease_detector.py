@@ -4,10 +4,13 @@ import numpy as np
 import onnxruntime as ort
 from pathlib import Path
 import json
+import os
 from groq import Groq
 
 # Groq API Configuration
-GROQ_API_KEY = ""
+# ✅ Safe environment variable
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 
@@ -179,7 +182,7 @@ Temperature: [Ideal temperature range]
 
 Use simple Hinglish words. Be specific with product names and quantities. Max 350 words."""
 
-        # Call Groq API with Llama 3.1 70B for detailed treatment
+        # Call Groq API with Llama 3.3 70B for detailed treatment
         chat_completion = groq_client.chat.completions.create(
             messages=[
                 {
@@ -191,7 +194,7 @@ Use simple Hinglish words. Be specific with product names and quantities. Max 35
                     "content": prompt
                 }
             ],
-            model="meta-llama/llama-4-scout-17b-16e-instruct",
+            model="llama-3.3-70b-versatile",
             temperature=0.6,  # Lower for more consistent treatment plans
             max_tokens=800,
             top_p=0.9

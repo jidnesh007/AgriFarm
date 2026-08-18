@@ -12,11 +12,11 @@ const AboutSection = () => {
   ];
 
   return (
-    <section id="about" className="relative bg-[#F0FDF4] py-24 px-6 overflow-hidden">
+    <section id="about" className="relative bg-[#F0FDF4] py-16 md:py-24 px-4 sm:px-6 overflow-hidden">
       {/* --- Dashboard Style Nature Background Pattern --- */}
       <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
         <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:32px_32px]"></div>
-        <Leaf className="absolute top-20 right-10 text-emerald-200 w-64 h-64 rotate-12 opacity-20" />
+        <Leaf className="absolute top-20 right-10 text-emerald-200 w-40 md:w-64 h-40 md:h-64 rotate-12 opacity-20" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
@@ -26,7 +26,7 @@ const AboutSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.5 }}
-          className="mb-10"
+          className="mb-8 md:mb-10"
         >
           <p className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full border border-emerald-200">
             <motion.span
@@ -38,22 +38,22 @@ const AboutSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
           {/* Left Side - Image Composition with Dashboard-style Shadows */}
-          <div className="relative flex gap-6">
+          <div className="relative flex gap-4 md:gap-6 justify-center lg:justify-start">
             <motion.div
               initial={{ opacity: 0, x: -50, rotate: -5 }}
               whileInView={{ opacity: 1, x: 0, rotate: -3 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.6 }}
               whileHover={{ scale: 1.05, rotate: 0, zIndex: 10 }}
-              className="w-64 h-80 rounded-[2.5rem] bg-cover bg-center shadow-2xl border-4 border-white relative z-10"
+              className="w-40 h-56 sm:w-52 sm:h-72 md:w-64 md:h-80 rounded-[2rem] md:rounded-[2.5rem] bg-cover bg-center shadow-2xl border-4 border-white relative z-10 flex-shrink-0"
               style={{
                 backgroundImage:
                   "url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80')",
               }}
             >
-                <div className="absolute inset-0 bg-emerald-900/10 rounded-[2.5rem]"></div>
+                <div className="absolute inset-0 bg-emerald-900/10 rounded-[2rem] md:rounded-[2.5rem]"></div>
             </motion.div>
             
             <motion.div
@@ -62,13 +62,13 @@ const AboutSection = () => {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               whileHover={{ scale: 1.05, rotate: 0, zIndex: 10 }}
-              className="w-64 h-80 rounded-[2.5rem] bg-cover bg-center shadow-2xl border-4 border-white mt-12"
+              className="w-40 h-56 sm:w-52 sm:h-72 md:w-64 md:h-80 rounded-[2rem] md:rounded-[2.5rem] bg-cover bg-center shadow-2xl border-4 border-white mt-8 md:mt-12 flex-shrink-0"
               style={{
                 backgroundImage:
                   "url('https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&q=80')",
               }}
             >
-                <div className="absolute inset-0 bg-emerald-900/10 rounded-[2.5rem]"></div>
+                <div className="absolute inset-0 bg-emerald-900/10 rounded-[2rem] md:rounded-[2.5rem]"></div>
             </motion.div>
           </div>
 
@@ -79,7 +79,7 @@ const AboutSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.6 }}
-              className="text-6xl font-black leading-[1.1] mb-8 tracking-tighter"
+              className="text-4xl sm:text-5xl md:text-6xl font-black leading-[1.1] mb-6 md:mb-8 tracking-tighter"
             >
               <span className="text-emerald-900">Amidst the </span>
               <motion.span
@@ -107,13 +107,13 @@ const AboutSection = () => {
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
-                className="text-emerald-700/80 text-lg mb-12 max-w-xl leading-relaxed font-medium"
+                className="text-emerald-700/80 text-base md:text-lg mb-8 md:mb-12 max-w-xl leading-relaxed font-medium"
             >
                 We empower farmers with AI-driven insights, moving beyond labor-intensive traditions to precision growth and sustainable harvesting.
             </motion.p>
 
             {/* Feature Icons Grid - Transparent Dashboard Style */}
-            <div className="grid grid-cols-4 gap-6 mt-12">
+            <div className="grid grid-cols-4 gap-3 md:gap-6 mt-8 md:mt-12">
               {features.map((feature, i) => (
                 <motion.div
                   key={feature.label}
@@ -130,11 +130,11 @@ const AboutSection = () => {
                         boxShadow: "0 20px 25px -5px rgba(16, 185, 129, 0.2)" 
                     }}
                     transition={{ duration: 0.6 }}
-                    className={`w-20 h-20 rounded-3xl ${feature.color} backdrop-blur-md flex items-center justify-center mb-4 shadow-sm border border-white/50 transition-all`}
+                    className={`w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-2xl md:rounded-3xl ${feature.color} backdrop-blur-md flex items-center justify-center mb-2 md:mb-4 shadow-sm border border-white/50 transition-all`}
                   >
-                    <feature.icon size={28} />
+                    <feature.icon size={22} className="md:w-7 md:h-7" />
                   </motion.div>
-                  <p className="text-xs font-black text-emerald-900 uppercase tracking-widest">
+                  <p className="text-[9px] md:text-xs font-black text-emerald-900 uppercase tracking-wider text-center">
                     {feature.label}
                   </p>
                 </motion.div>

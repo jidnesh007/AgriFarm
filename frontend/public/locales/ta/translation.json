@@ -379,5 +379,101 @@
     "trends": "போக்குகள்",
     "insights": "நுண்ணறிவுகள்",
     "exportData": "தரவை ஏற்றுமதி செய்யவும்"
+  },
+"marketplace": {
+    "title": "விவசாயி சந்தை",
+    "subtitle": "புதிய விளைபொருட்களுக்கு விவசாயிகளுடன் நேரடியாக இணைக்கவும்",
+    "addListing": "பட்டியல் சேர்க்கவும்",
+    "addNewListing": "புதிய பட்டியல் சேர்க்கவும்",
+    "searchPlaceholder": "பயிர்களைத் தேடுங்கள்...",
+    "showFilters": "வடிகட்டிகளைக் காட்டு",
+    "hideFilters": "வடிகட்டிகளை மறைக்கவும்",
+    "clearFilters": "வடிகட்டிகளை அழிக்கவும்",
+    "showingResults": "{{total}} இல் {{count}} பட்டியல்களைக் காட்டுகிறது",
+    
+    "filters": {
+      "location": "இடம்",
+      "locationPlaceholder": "மாவட்டம் அல்லது மாநிலம்",
+      "qualityGrade": "தரம்",
+      "allGrades": "அனைத்து தரங்களும்",
+      "priceRange": "விலை வரம்பு (₹)",
+      "allPrices": "அனைத்து விலைகளும்"
+    },
+    
+    "priceRanges": {
+      "range1": "₹0 - ₹1,000",
+      "range2": "₹1,000 - ₹2,500",
+      "range3": "₹2,500 - ₹5,000",
+      "range4": "₹5,000 - ₹10,000",
+      "range5": "₹10,000+"
+    },
+    
+    "form": {
+      "cropName": "பயிர் பெயர்",
+      "cropNamePlaceholder": "எ.கா., கோதுமை, அரிசி, தக்காளி",
+      "quantity": "அளவு",
+      "unit": "அலகு",
+      "expectedPrice": "எதிர்பார்க்கும் விலை (₹)",
+      "pricePerUnit": "ஒரு அலகுக்கான விலை",
+      "qualityGrade": "தரம்",
+      "village": "கிராமம்",
+      "district": "மாவட்டம்",
+      "state": "மாநிலம்",
+      "deliveryOption": "டெலிவரி விருப்பம்",
+      "farmerDetails": "விவசாயி விவரங்கள்",
+      "yourName": "உங்கள் பெயர்",
+      "phoneNumber": "தொலைபேசி எண்",
+      "emailOptional": "மின்னஞ்சல் (விருப்பமானது)",
+      "uploadImages": "படங்களை பதிவேற்றவும் (அதிகபட்சம் 5)",
+      "clickToUpload": "படங்களை பதிவேற்ற கிளிக் செய்யவும்"
+    },
+    
+    "units": {
+      "kilograms": "கிலோகிராம்",
+      "quintals": "குவிண்டால்கள்",
+      "tons": "டன்கள்"
+    },
+    
+    "grades": {
+      "gradeA": "தரம் A (பிரீமியம்)",
+      "gradeB": "தரம் B (நிலையான)",
+      "gradeC": "தரம் C (பொருளாதாரம்)"
+    },
+    
+    "delivery": {
+      "pickupOnly": "பிக்அப் மட்டும்",
+      "deliveryAvailable": "டெலிவரி கிடைக்கும்",
+      "both": "இரண்டு விருப்பங்களும்"
+    },
+    
+    "buttons": {
+      "cancel": "ரத்து செய்",
+      "addListing": "பட்டியல் சேர்க்கவும்",
+      "adding": "சேர்க்கப்படுகிறது...",
+      "contactFarmer": "விவசாயியை தொடர்பு கொள்ளவும்",
+      "close": "மூடு"
+    },
+    
+    "productDetails": {
+      "price": "விலை",
+      "quantityAvailable": "கிடைக்கும் அளவு",
+      "qualityGrade": "தரம்",
+      "location": "இடம்",
+      "delivery": "டெலிவரி",
+      "farmerDetails": "விவசாயி விவரங்கள்",
+      "name": "பெயர்",
+      "grade": "தரம்"
+    },
+    
+    "messages": {
+      "loading": "பட்டியல்கள் ஏற்றப்படுகின்றன...",
+      "noListings": "இன்னும் பட்டியல்கள் கிடைக்கவில்லை",
+      "noMatches": "உங்கள் வடிகட்டிகளுடன் பொருந்தும் தயாரிப்புகள் இல்லை",
+      "addFirstListing": "முதல் பட்டியலைச் சேர்க்கவும்",
+      "fillAllFields": "அனைத்து தேவையான புலங்களையும் நிரப்பவும்",
+      "addListingFailed": "பட்டியலைச் சேர்ப்பது தோல்வியடைந்தது",
+      "available": "கிடைக்கும்"
+    }
   }
+
 }

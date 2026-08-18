@@ -174,18 +174,23 @@ router.post(
         }
       }
 
-      // Prepare data for DRL model
+      // Helper to clamp a value within [min, max]
+      const clamp = (val, min, max) => Math.min(Math.max(Number(val) || 0, min), max);
+
+      // Prepare data for DRL model — values are clamped to match Pydantic constraints
       const drlInput = {
-        moisture: zone.soilMoisture.value,
-        nitrogen: zone.soilNutrients.nitrogen,
-        phosphorus: zone.soilNutrients.phosphorus,
-        potassium: zone.soilNutrients.potassium,
-        ph: zone.soilPH.value,
-        growth: 0.5, // Default growth stage
-        temp: temperature,
-        humidity: humidity,
-        rain_prob: rain_prob,
+        moisture: clamp(zone.soilMoisture.value, 0, 100),
+        nitrogen: clamp(zone.soilNutrients.nitrogen, 0, 200),
+        phosphorus: clamp(zone.soilNutrients.phosphorus, 0, 200),
+        potassium: clamp(zone.soilNutrients.potassium, 0, 200),
+        ph: clamp(zone.soilPH.value || 6.8, 4.0, 9.0),
+        growth: 0.5, // Default growth stage (0.0-1.0)
+        temp: clamp(temperature, -10, 50),
+        humidity: clamp(humidity, 0, 100),
+        rain_prob: clamp(rain_prob, 0, 1),
       };
+
+      console.log("📤 Sending to DRL:", JSON.stringify(drlInput));
 
       // Call Python DRL API
       let aiRecommendation;
@@ -195,11 +200,14 @@ router.post(
         });
         aiRecommendation = drlResponse.data;
       } catch (error) {
-        console.error("DRL API error:", error.message);
+        // Log the full Pydantic validation detail if available
+        const detail = error.response?.data?.detail;
+        console.error("DRL API error:", error.message, detail ? JSON.stringify(detail) : "");
         return res.status(503).json({
           message:
             "AI service unavailable. Please make sure the Python server is running on port 8000.",
           error: error.message,
+          detail: detail || null,
         });
       }
 
